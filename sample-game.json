@@ -1,0 +1,47 @@
+{
+  "version": "1.0",
+  "meta": {
+    "title": "Sample Adventure",
+    "author": "",
+    "createdAt": "2025-09-28T00:00:00.000Z",
+    "updatedAt": "2025-09-28T00:00:00.000Z",
+    "start": "start"
+  },
+  "nodes": [
+    {
+      "id": "start",
+      "title": "はじまり",
+      "text": "あなたは分かれ道に立っている。どちらへ進む？",
+      "choices": [
+        { "id": "", "label": "森へ進む", "target": "forest" },
+        { "id": "", "label": "見知らぬ道へ…", "target": "missing-node" }
+      ]
+    },
+    {
+      "id": "forest",
+      "title": "深い森",
+      "text": "鳥のさえずりが聞こえる。薄暗い小道が続いている。",
+      "choices": [
+        { "id": "", "label": "洞窟へ", "target": "cave" },
+        { "id": "", "label": "戻る", "target": "start" }
+      ]
+    },
+    {
+      "id": "cave",
+      "title": "洞窟の入口",
+      "text": "冷たい風が吹き出している。奥から水音が聞こえる。",
+      "choices": [
+        { "id": "", "label": "湖へ向かう", "target": "lake" },
+        { "id": "", "label": "スタートへ戻る", "target": "start" }
+      ]
+    },
+    {
+      "id": "lake",
+      "title": "静かな湖畔",
+      "text": "湖面は鏡のように静かだ。遠くでカモが鳴く。",
+      "choices": [
+        { "id": "", "label": "スタートへ戻る", "target": "start" }
+      ]
+    }
+  ]
+}

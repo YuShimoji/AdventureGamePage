@@ -1,0 +1,41 @@
+(function () {
+  document.addEventListener('DOMContentLoaded', () => {
+    const titleEl = document.getElementById('game-title');
+    const textEl = document.getElementById('scene');
+    const choicesEl = document.getElementById('choices');
+    const btnRestart = document.getElementById('btn-restart');
+
+    function normalizeSpecToEngine(data){
+      if(!data) return null;
+      if(Array.isArray(data.nodes)){
+        const nodes = {};
+        data.nodes.forEach(n => {
+          if(!n || !n.id) return;
+          nodes[n.id] = {
+            title: n.title || '',
+            text: n.text || '',
+            choices: Array.isArray(n.choices) ? n.choices.map(c => ({ text: c.label ?? c.text ?? '', to: c.target ?? c.to ?? '' })) : []
+          };
+        });
+        return {
+          title: data?.meta?.title || data.title || 'Adventure',
+          start: data?.meta?.start || data.start || 'start',
+          nodes
+        };
+      }
+      return data;
+    }
+
+    const loaded = StorageUtil.loadJSON('agp_game_data');
+    const normalize = (window.Converters?.normalizeSpecToEngine) || normalizeSpecToEngine;
+    const game = normalize(loaded) || window.SAMPLE_GAME;
+
+    const engine = GameEngine.createEngine(game, { titleEl, textEl, choicesEl });
+    engine.loadProgress();
+    // 進行が保存されていればそれを復元、なければ初期ノードが使用される
+    // engine.reset() は初期化（リスタート）専用
+    engine.render();
+
+    btnRestart.addEventListener('click', () => engine.reset());
+  });
+})();

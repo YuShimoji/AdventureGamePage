@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Adventure Game Page</title>
+    <link rel="stylesheet" href="styles/common.css" />
+  </head>
+  <body>
+    <header class="app-header">
+      <h1>Adventure Game Page</h1>
+      <nav class="nav">
+        <a class="btn" href="admin.html">管理（執筆エディタ）</a>
+        <a class="btn btn-accent" href="play.html">プレイ</a>
+      </nav>
+      <button id="btn-theme" class="icon-btn" title="テーマ設定">🎨</button>
+    </header>
+
+    <main class="container narrow">
+      <section class="card">
+        <h2>概要</h2>
+        <p>
+          管理画面でアドベンチャーゲームの原稿をZenライクに執筆・保存できます。プレイ画面では、サンプルゲームまたは保存済みのゲームデータでプレイできます。
+        </p>
+      </section>
+
+      <section class="card">
+        <h3>使い方</h3>
+        <ol>
+          <li>「管理（執筆エディタ）」で原稿を執筆・保存</li>
+          <li>「プレイ」でサンプルまたは保存データを使ってプレイ</li>
+        </ol>
+      </section>
+    </main>
+
+    <div id="theme-panel" class="theme-panel" hidden></div>
+
+    <script src="scripts/storage.js"></script>
+    <script src="scripts/theme.js"></script>
+  </body>
+</html>

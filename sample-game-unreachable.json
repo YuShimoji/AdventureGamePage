@@ -1,0 +1,15 @@
+{
+  "version": "1.0",
+  "meta": { "title": "Sample Adventure (Unreachable)", "start": "start" },
+  "nodes": [
+    { "id": "start", "title": "スタート", "text": "二手に分かれる", "choices": [
+      { "id": "", "label": "森へ", "target": "forest" }
+    ]},
+    { "id": "forest", "title": "森", "text": "木漏れ日", "choices": [
+      { "id": "", "label": "戻る", "target": "start" }
+    ]},
+    { "id": "secret", "title": "秘密の部屋", "text": "ここには来られない", "choices": [
+      { "id": "", "label": "エコー", "target": "secret" }
+    ]}
+  ]
+}

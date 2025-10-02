@@ -1,0 +1,82 @@
+---
+Title: Storage Architecture for AdventureGamePage
+---
+
+%% Class Diagram
+```mermaid
+classDiagram
+  class StorageProvider {
+    <<interface>>
+    +list() Array<Entry>
+    +get(id) Any
+    +set(id, data) void
+    +remove(id) void
+  }
+  class LocalStorageProvider {
+    +keys() Array<string>
+    +list() Array<Entry>
+    +get(id) Any
+    +set(id, data) void
+    +remove(id) void
+  }
+  class IndexedDBProvider {
+  }
+  class FileSystemAccessProvider {
+  }
+  class StorageHub {
+    -_provider: StorageProvider
+    +setProvider(p: StorageProvider)
+    +getProvider(): StorageProvider
+  }
+  class Entry {
+    +id: string
+    +title: string
+    +savedAt: string
+    +size: number
+    +excerpt: string
+    +type: string
+  }
+  class SavePreview {
+    +refresh() void
+  }
+
+  StorageProvider <|.. LocalStorageProvider
+  StorageProvider <|.. IndexedDBProvider
+  StorageProvider <|.. FileSystemAccessProvider
+  StorageHub o--> StorageProvider
+  SavePreview --> StorageHub
+  LocalStorageProvider --> Entry
+```
+
+%% Flow
+```mermaid
+flowchart LR
+  subgraph Admin[admin.html]
+    A1[editor contenteditable]
+    A2[保存ボタン (simple/full)]
+    A3[プレビューボタン 🗂]
+  end
+
+  subgraph Config[config.js]
+    C1[APP_CONFIG.ui.showSavePreview]
+  end
+
+  subgraph Storage
+    SH[StorageHub]
+    LSP[LocalStorageProvider]
+  end
+
+  subgraph UI[savePreview.js]
+    P1[preview-panel]
+    P2[preview-list]
+  end
+
+  A2 -->|saveText/saveJSON| LS[(localStorage)]
+  LS -.->|read| LSP
+  LSP --> SH
+  A3 -->|toggle & refresh()| P1
+  P1 --> P2
+  P2 -->|list()| SH
+  SH --> LSP
+  C1 --> A3
+```

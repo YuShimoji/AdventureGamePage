@@ -1,0 +1,5 @@
+/* Play screen */
+.play-container { width: min(820px, 100% - 32px); }
+.scene { white-space: pre-wrap; font-size: 18px; margin-bottom: 16px; }
+.choices { display: grid; gap: 8px; grid-template-columns: 1fr; }
+.choices .btn { justify-content: center; }

@@ -1,0 +1,19 @@
+# OS/Editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Cache/Artifacts
+*.log
+*.tmp
+*.cache
+
+# Build (not used currently, reserved)
+dist/
+build/

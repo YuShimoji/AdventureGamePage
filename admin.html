@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>管理（Zenライク執筆エディタ）</title>
+    <link rel="stylesheet" href="styles/common.css" />
+    <link rel="stylesheet" href="styles/admin.css" />
+  </head>
+  <body>
+    <header class="app-header">
+      <a class="btn" href="index.html">← トップ</a>
+      <h1>Zenライクエディタ</h1>
+      <div class="header-actions">
+        <span id="char-count" class="muted">0 文字</span>
+        <button id="btn-theme" class="icon-btn" title="テーマ設定">🎨</button>
+        <button id="btn-toggle-sidebar" class="icon-btn" title="ツール">☰</button>
+      </div>
+    </header>
+
+    <aside id="sidebar" class="sidebar" hidden>
+      <div class="sidebar-inner">
+        <h2>ツール / 保存</h2>
+        <label class="field">
+          <span>タイトル</span>
+          <input id="title-input" type="text" placeholder="無題" />
+        </label>
+
+        <label class="field">
+          <span>保存先（ストレージ）</span>
+          <select id="storage-provider-select">
+            <option value="idb">IndexedDB（推奨）</option>
+            <option value="local">LocalStorage</option>
+          </select>
+        </label>
+
+        <!-- 書式ツールはフローティングバーに分離 -->
+
+        <div class="actions">
+          <button id="btn-save-simple" class="btn">シンプル保存</button>
+          <button id="btn-load-simple" class="btn">シンプル読込</button>
+          <button id="btn-save-full" class="btn btn-accent">完全保存</button>
+          <button id="btn-load-full" class="btn">完全読込</button>
+          <button id="btn-export" class="btn">エクスポート(JSON)</button>
+          <label class="btn file-label">
+            インポート(JSON)
+            <input id="file-import" type="file" accept="application/json" hidden />
+          </label>
+          <button id="btn-saves-list" class="btn">保存一覧</button>
+        </div>
+
+        <section id="validation-panel" class="card" hidden>
+          <h3>検証メッセージ</h3>
+          <ul id="validation-list"></ul>
+        </section>
+
+    <!-- 保存一覧パネル -->
+    <section id="saves-panel" class="saves-panel" hidden>
+      <header class="memos-header">
+        <h3>保存一覧</h3>
+        <button id="saves-refresh" class="btn">更新</button>
+        <button id="saves-close" class="icon-btn" title="閉じる">✕</button>
+      </header>
+      <div id="saves-list" class="memos-list"></div>
+    </section>
+
+        <section id="editor-settings" class="card">
+          <h3>エディタ設定</h3>
+          <div class="field">
+            <label class="muted"><input id="cfg-autoscroll-enabled" type="checkbox" /> 自動スクロールを有効にする</label>
+          </div>
+          <div class="field">
+            <span>安全領域（上） <small id="cfg-safe-top-label">20%</small></span>
+            <input id="cfg-safe-top" type="range" min="5" max="40" step="1" value="20" />
+          </div>
+          <div class="field">
+            <span>安全領域（下） <small id="cfg-safe-bottom-label">60%</small></span>
+            <input id="cfg-safe-bottom" type="range" min="55" max="90" step="1" value="60" />
+          </div>
+          <div class="field">
+            <label class="muted"><input id="cfg-ink-enabled" type="checkbox" /> 入力アニメーションを有効にする</label>
+          </div>
+          <div class="field">
+            <span>アニメーション時間 <small id="cfg-ink-duration-label">160ms</small></span>
+            <input id="cfg-ink-duration" type="range" min="0" max="400" step="10" value="160" />
+          </div>
+          <div class="ne-row">
+            <button id="cfg-save" class="btn btn-accent">設定を保存</button>
+            <button id="cfg-reset" class="btn">既定に戻す</button>
+          </div>
+        </section>
+
+        <section id="node-editor" class="card">
+          <h3>ノード編集（MVP）</h3>
+          <div class="ne-actions">
+            <button id="ne-load" class="btn">取込（agp_game_data）</button>
+            <button id="ne-validate" class="btn">検証</button>
+            <button id="ne-save" class="btn btn-accent">適用保存</button>
+            <button id="ne-export" class="btn">JSON出力</button>
+          </div>
+          <div class="ne-banner" id="ne-dirty-banner" hidden>未保存の変更があります（Ctrl+S で保存）</div>
+          <div class="field">
+            <span>開始ノード</span>
+            <select id="ne-start-select"></select>
+          </div>
+          <div class="field ne-unresolved" id="ne-unresolved-panel" hidden>
+            <span>未解決 target 一覧</span>
+            <ul id="ne-unresolved-list"></ul>
+          </div>
+          <div class="field">
+            <span>ノード選択</span>
+            <div class="ne-row">
+              <select id="ne-node-select"></select>
+              <button id="ne-add-node" class="btn">ノード追加</button>
+              <button id="ne-remove-node" class="btn">ノード削除</button>
+            </div>
+          </div>
+          <div class="field">
+            <span>ノードID</span>
+            <input id="ne-node-id" type="text" placeholder="node:id" />
+          </div>
+          <div class="field">
+            <span>タイトル</span>
+            <input id="ne-node-title" type="text" placeholder="タイトル" />
+          </div>
+          <div class="field">
+            <span>本文</span>
+            <textarea id="ne-node-text" rows="4" placeholder="テキスト"></textarea>
+          </div>
+          <div class="field">
+            <span>選択肢</span>
+            <div id="ne-choices" class="ne-choices"></div>
+            <button id="ne-add-choice" class="btn">選択肢を追加</button>
+          </div>
+          <datalist id="ne-node-id-list"></datalist>
+          <div class="field">
+            <span>部分エクスポート（到達可能サブグラフ）</span>
+            <div class="ne-row">
+              <select id="ne-export-multiselect" multiple size="6" style="flex:1"></select>
+              <div class="ne-subactions" style="display:grid; gap:6px;">
+                <button id="ne-export-select-all" class="btn">全選択</button>
+                <button id="ne-export-select-none" class="btn">全解除</button>
+                <button id="ne-export-partial" class="btn">選択からエクスポート</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="mermaid-panel" class="card">
+          <h3>分岐プレビュー（Mermaid）</h3>
+          <div class="actions" style="grid-template-columns: 1fr 1fr;">
+            <button id="ne-mermaid-gen" class="btn">生成</button>
+            <button id="ne-mermaid-render" class="btn">描画</button>
+          </div>
+          <div class="ne-row" style="margin:6px 0 0;">
+            <button id="ne-mermaid-open" class="btn">別ウィンドウで開く</button>
+            <div class="spacer"></div>
+          </div>
+          <div class="field">
+            <span>対象</span>
+            <div class="ne-row">
+              <select id="ne-mermaid-scope">
+                <option value="all">全体</option>
+                <option value="from_start">開始から到達</option>
+                <option value="from_selected">選択ノードをseed</option>
+              </select>
+              <select id="ne-mermaid-seed" multiple size="5" style="flex:1" disabled></select>
+            </div>
+            <label class="muted"><input id="ne-mermaid-show-labels" type="checkbox" checked /> エッジに選択肢ラベルを表示</label>
+          </div>
+          <label class="field">
+            <span>Mermaid ソース</span>
+            <textarea id="ne-mermaid-src" rows="6" placeholder="flowchart TD..." style="width:100%;"></textarea>
+          </label>
+          <div class="mermaid-view" id="ne-mermaid-view"></div>
+          <p class="muted" style="margin-top:6px;">
+            注: オフライン環境では描画が行われない場合があります。その場合でもソースはコピー可能です。
+          </p>
+        </section>
+
+        <details>
+          <summary>ヘルプ</summary>
+          <ul>
+            <li>エディタは Zen ライクで、本文に集中できます。</li>
+            <li>文字数カウントは自動更新されます。</li>
+            <li>保存はブラウザの localStorage を使用します。</li>
+          </ul>
+        </details>
+      </div>
+    </aside>
+
+    <main class="editor-container">
+      <div id="editor" class="editor" contenteditable spellcheck="false"></div>
+    </main>
+
+    <div id="theme-panel" class="theme-panel" hidden></div>
+
+    <!-- フローティング：書式ツールバー -->
+    <div id="formatbar" class="formatbar-floating">
+      <button data-cmd="bold" title="太字"><b>B</b></button>
+      <button data-cmd="italic" title="斜体"><i>I</i></button>
+      <button data-cmd="underline" title="下線"><u>U</u></button>
+      <span class="spacer"></span>
+      <button data-cmd="justifyLeft" title="左揃え">⟸</button>
+      <button data-cmd="justifyCenter" title="中央">⇔</button>
+      <button data-cmd="justifyRight" title="右揃え">⟹</button>
+    </div>
+
+    <!-- フローティング：操作（Zen/サイドバー/テーマ） -->
+    <div class="floating-controls">
+      <button id="btn-quick-zen" class="icon-btn" title="Zen切替">🧘</button>
+      <button id="btn-quick-sidebar" class="icon-btn" title="ツール切替">☰</button>
+      <button id="btn-quick-theme" class="icon-btn" title="テーマ設定">🎨</button>
+      <button id="btn-quick-preview" class="icon-btn" title="保存プレビュー">🗂</button>
+      <button id="btn-quick-memos" class="icon-btn" title="メモ">📝</button>
+    </div>
+
+    <!-- メモパネル -->
+    <section id="memos-panel" class="memos-panel" hidden>
+      <header class="memos-header">
+        <h3>メモ</h3>
+        <select id="memos-sort">
+          <option value="createdAt_desc">作成日時(新→旧)</option>
+          <option value="createdAt_asc">作成日時(旧→新)</option>
+          <option value="rank_desc">順位(高→低)</option>
+          <option value="rank_asc">順位(低→高)</option>
+        </select>
+        <button id="memos-close" class="icon-btn" title="閉じる">✕</button>
+      </header>
+      <div class="memos-new">
+        <input id="memo-label" type="text" placeholder="ラベル" />
+        <textarea id="memo-text" rows="3" placeholder="メモ本文"></textarea>
+        <button id="memo-quote" class="btn" title="エディタの選択範囲を引用">選択を引用</button>
+        <button id="memo-add" class="btn btn-accent">追加</button>
+      </div>
+      <div id="memos-list" class="memos-list"></div>
+    </section>
+
+    <!-- 保存プレビューパネル（モック） -->
+    <section id="preview-panel" class="preview-panel" hidden>
+      <header class="preview-header">
+        <h3>保存プレビュー</h3>
+        <label class="muted">種類
+          <select id="preview-filter-type">
+            <option value="all">すべて</option>
+            <option value="simple">シンプル</option>
+            <option value="full">完全</option>
+            <option value="snapshot">スナップショット</option>
+          </select>
+        </label>
+        <label class="muted">並び
+          <select id="preview-sort">
+            <option value="date_desc">保存日時(新→旧)</option>
+            <option value="date_asc">保存日時(旧→新)</option>
+            <option value="size_desc">サイズ(大→小)</option>
+            <option value="size_asc">サイズ(小→大)</option>
+          </select>
+        </label>
+        <div class="spacer"></div>
+        <button id="preview-delete-selected" class="btn" disabled>選択削除</button>
+        <button id="preview-refresh" class="btn">更新</button>
+        <button id="preview-close" class="icon-btn" title="閉じる">✕</button>
+      </header>
+      <div class="snapshot-bar">
+        <input id="snapshot-label" type="text" placeholder="スナップショットのラベル (任意)" />
+        <button id="snapshot-create" class="btn btn-accent">スナップショット作成</button>
+      </div>
+      <div id="preview-list" class="preview-list"></div>
+    </section>
+
+    <script src="scripts/storage.js"></script>
+    <script src="scripts/theme.js"></script>
+    <script src="scripts/config.js"></script>
+    <script src="scripts/memos.js"></script>
+    <script src="scripts/storageProviders.js"></script>
+    <script src="scripts/storageBridge.js"></script>
+    <script src="scripts/admin.js"></script>

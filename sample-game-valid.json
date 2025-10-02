@@ -1,0 +1,39 @@
+{
+  "version": "1.0",
+  "meta": {
+    "title": "Sample Adventure (Valid)",
+    "author": "",
+    "createdAt": "2025-09-28T00:00:00.000Z",
+    "updatedAt": "2025-09-28T00:00:00.000Z",
+    "start": "start"
+  },
+  "nodes": [
+    {
+      "id": "start",
+      "title": "スタート",
+      "text": "ここから冒険が始まる。どちらへ？",
+      "choices": [
+        { "id": "", "label": "森へ", "target": "forest" },
+        { "id": "", "label": "湖へ", "target": "lake" }
+      ]
+    },
+    {
+      "id": "forest",
+      "title": "森",
+      "text": "鳥のさえずり。",
+      "choices": [
+        { "id": "", "label": "湖へ", "target": "lake" },
+        { "id": "", "label": "スタートへ戻る", "target": "start" }
+      ]
+    },
+    {
+      "id": "lake",
+      "title": "湖",
+      "text": "水面が揺れている。",
+      "choices": [
+        { "id": "", "label": "スタートへ戻る", "target": "start" },
+        { "id": "", "label": "森へ", "target": "forest" }
+      ]
+    }
+  ]
+}
