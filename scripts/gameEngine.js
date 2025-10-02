@@ -1,11 +1,15 @@
 (function () {
   function createEngine(gameData, elements) {
-    const state = { nodeId: gameData.start || 'start' };
+    const state = { nodeId: gameData.start || 'start', history: [] };
 
     function setNode(id) {
       if (!gameData.nodes[id]) {
         console.warn('Unknown node:', id);
         return;
+      }
+      // push current to history when moving to a different node
+      if (state.nodeId && state.nodeId !== id) {
+        state.history.push(state.nodeId);
       }
       state.nodeId = id;
       render();
@@ -13,6 +17,18 @@
     }
 
     function getNode() { return gameData.nodes[state.nodeId]; }
+
+    function canGoBack() { return Array.isArray(state.history) && state.history.length > 0; }
+
+    function goBack() {
+      if (!canGoBack()) return false;
+      const prev = state.history.pop();
+      if (!gameData.nodes[prev]) { return false; }
+      state.nodeId = prev;
+      render();
+      saveProgress();
+      return true;
+    }
 
     function render() {
       if (elements.titleEl) elements.titleEl.textContent = gameData.title || 'Adventure';
@@ -24,20 +40,32 @@
         b.onclick = () => setNode(c.to);
         elements.choicesEl.appendChild(b);
       });
+      // Update back button state if provided
+      if (elements && elements.backBtn) { elements.backBtn.disabled = !canGoBack(); }
     }
 
     function saveProgress() {
-      StorageUtil.saveJSON('agp_progress', { title: gameData.title, nodeId: state.nodeId });
+      const hist = Array.isArray(state.history) ? state.history.slice() : [];
+      StorageUtil.saveJSON('agp_progress', { title: gameData.title, nodeId: state.nodeId, history: hist });
     }
     function loadProgress() {
       const p = StorageUtil.loadJSON('agp_progress');
-      if (p && p.title === gameData.title && p.nodeId && gameData.nodes[p.nodeId]) {
-        state.nodeId = p.nodeId;
+      if (p && p.title === gameData.title) {
+        if (p.nodeId && gameData.nodes[p.nodeId]) {
+          state.nodeId = p.nodeId;
+        }
+        const hist = Array.isArray(p.history) ? p.history.filter((id) => !!gameData.nodes[id]) : [];
+        state.history = hist;
       }
     }
-    function reset() { state.nodeId = gameData.start || 'start'; saveProgress(); render(); }
+    function reset() { state.nodeId = gameData.start || 'start'; state.history = []; saveProgress(); render(); }
 
-    return { render, setNode, loadProgress, reset };
+    // optional back button wiring
+    if (elements && elements.backBtn) {
+      elements.backBtn.addEventListener('click', () => { goBack(); });
+    }
+
+    return { render, setNode, loadProgress, reset, canGoBack, goBack };
   }
 
   window.GameEngine = { createEngine };

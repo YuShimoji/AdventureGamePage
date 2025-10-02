@@ -4,6 +4,7 @@
     const textEl = document.getElementById('scene');
     const choicesEl = document.getElementById('choices');
     const btnRestart = document.getElementById('btn-restart');
+    const backBtn = document.getElementById('btn-back');
 
     function normalizeSpecToEngine(data){
       if(!data) return null;
@@ -30,7 +31,7 @@
     const normalize = (window.Converters?.normalizeSpecToEngine) || normalizeSpecToEngine;
     const game = normalize(loaded) || window.SAMPLE_GAME;
 
-    const engine = GameEngine.createEngine(game, { titleEl, textEl, choicesEl });
+    const engine = GameEngine.createEngine(game, { titleEl, textEl, choicesEl, backBtn });
     engine.loadProgress();
     // 進行が保存されていればそれを復元、なければ初期ノードが使用される
     // engine.reset() は初期化（リスタート）専用
