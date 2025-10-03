@@ -48,6 +48,7 @@
   - サンプルゲーム（内蔵 `scripts/sampleData.js`）で即プレイ可
   - 進行の保存/復帰、戻る・進む、リスタート
   - ゲームJSON読込（ヘッダーのボタンからインポート、`localStorage: agp_game_data`）
+  - アクセシビリティ: 選択肢の自動フォーカス（最初のボタンに focus）
 
 ### テスト用サンプルJSON
 - `sample-game.json`: 未解決 target（missing-node）を1件含む動作確認用
