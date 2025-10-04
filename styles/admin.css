@@ -26,10 +26,11 @@
   position: relative;
 }
 
-/* Placeholder for empty contenteditable */
-.editor[contenteditable][data-placeholder]:empty:before {
+/* Placeholder for contenteditable (JS toggles data-empty) */
+.editor[contenteditable][data-placeholder][data-empty="true"]::before {
   content: attr(data-placeholder);
   color: var(--muted);
+  pointer-events: none;
 }
 
 .sidebar {

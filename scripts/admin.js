@@ -7,6 +7,12 @@
     // 空のcontenteditableは "\n" を返すことがあるため0扱いにする
     if (text === '\n' || text === '\r\n') text = '';
     counter.textContent = `${text.length} 文字`;
+    // プレースホルダ表示制御（data-empty を付与）
+    try {
+      const t = (text || '').trim();
+      if (t.length === 0) { el.setAttribute('data-empty', 'true'); }
+      else { el.removeAttribute('data-empty'); }
+    } catch {}
   }
 
   function exec(cmd) { document.execCommand(cmd, false, undefined); }
@@ -135,8 +141,10 @@
     }
     if (btnQuickPreview) {
       btnQuickPreview.addEventListener('click', () => {
-        if (savesPanel) { savesPanel.hidden = false; }
-        if (typeof renderSaves === 'function') { renderSaves(); }
+        if (!savesPanel) return;
+        const willOpen = savesPanel.hidden === true;
+        savesPanel.hidden = !willOpen;
+        if (willOpen && typeof renderSaves === 'function') { renderSaves(); }
       });
     }
 
@@ -364,68 +372,86 @@
         : (StorageUtil.loadJSON(KEY_FULL) || fallback);
       exportJSON(obj, `${(obj.title || 'manuscript').replace(/[^\w\-一-龯ぁ-ゔァ-ヴー]/g, '_')}.json`);
     });
-    document.getElementById('file-import').addEventListener('change', (ev) => {
-      const file = ev.target.files && ev.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = () => {
+    (function initJsonImport(){
+      const input = document.getElementById('file-import');
+      if(input){
+        input.addEventListener('change', (ev) => {
+          const file = ev.target.files && ev.target.files[0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = () => {
+            try {
+              const obj = JSON.parse(reader.result);
+              titleInput.value = obj.title || (APP_CONFIG?.strings?.defaultTitle ?? '');
+              editor.innerHTML = obj.html || '';
+              if (bridgeEnabled() && window.StorageBridge) { window.StorageBridge.saveFull(obj); }
+              else { StorageUtil.saveJSON(KEY_FULL, obj); }
+              updateCharCount(editor, count);
+              alert('インポートしました');
+            } catch (e) { alert('JSON の読み込みに失敗しました'); }
+          };
+          reader.readAsText(file);
+          ev.target.value = '';
+        });
+        // ラベルクリック時のフォールバック（確実にダイアログを開く）
         try {
-          const obj = JSON.parse(reader.result);
-          titleInput.value = obj.title || (APP_CONFIG?.strings?.defaultTitle ?? '');
-          editor.innerHTML = obj.html || '';
-          if (bridgeEnabled() && window.StorageBridge) { window.StorageBridge.saveFull(obj); }
-          else { StorageUtil.saveJSON(KEY_FULL, obj); }
-          updateCharCount(editor, count);
-          alert('インポートしました');
-        } catch (e) { alert('JSON の読み込みに失敗しました'); }
-      };
-      reader.readAsText(file);
-      ev.target.value = '';
-    });
+          const label = document.querySelector('label.file-label');
+          if(label){
+            label.addEventListener('click', (e)=>{
+              if(e.target !== input){ e.preventDefault(); input.click(); }
+            });
+          }
+        } catch {}
+      }
+    })();
 
     // Game JSON import (spec -> engine format)
-    document.getElementById('file-import-game').addEventListener('change', (ev) => {
-      const file = ev.target.files && ev.target.files[0]; if(!file) return;
-      const reader = new FileReader();
-      reader.onload = () => {
-        try {
-          const spec = JSON.parse(reader.result);
-          // validate
-          if(window.Validator?.validateGameSpec){
-            const v = window.Validator.validateGameSpec(spec);
-            // show panel
-            try {
-              const panel = document.getElementById('validation-panel');
-              const listEl = document.getElementById('validation-list');
-              if(panel && listEl){
-                listEl.innerHTML = '';
-                (v.errors||[]).forEach(msg => { const li=document.createElement('li'); li.className='err'; li.textContent = msg; listEl.appendChild(li); });
-                (v.warnings||[]).forEach(msg => { const li=document.createElement('li'); li.className='warn'; li.textContent = msg; listEl.appendChild(li); });
-                panel.hidden = !( (v.errors&&v.errors.length) || (v.warnings&&v.warnings.length) );
-              }
-            } catch(e){ /* non-blocking */ }
-            if(!v.ok){ alert('ゲームJSONの検証に失敗しました:\n- ' + v.errors.join('\n- ')); return; }
-            // 警告はalertせず、NodeEditorの未解決targetパネルでの可視化に委ねる
-            if(v.warnings && v.warnings.length){ console.warn('GameSpec warnings:', v.warnings); }
-          }
-          // Convert to engine format (use Converters)
-          const engineData = (window.Converters?.normalizeSpecToEngine)
-            ? window.Converters.normalizeSpecToEngine(spec)
-            : (function(){
-                const title = spec?.meta?.title || spec?.title || (APP_CONFIG?.strings?.defaultTitle ?? '');
-                const start = spec?.meta?.start || spec?.start || 'start';
-                const nodesArr = Array.isArray(spec?.nodes) ? spec.nodes : [];
-                const nodes = {};
-                nodesArr.forEach(n => { if(!n || !n.id) return; nodes[n.id] = { title: n.title || '', text: n.text || '', choices: Array.isArray(n.choices) ? n.choices.map(c => ({ text: c.label ?? c.text ?? '', to: c.target ?? c.to ?? '' })) : [] }; });
-                return { title, start, nodes };
-              })();
-          StorageUtil.saveJSON('agp_game_data', engineData);
-          alert('ゲームJSONをインポートしました（プレイ画面で使用されます）');
-        } catch(e){ console.error(e); alert('ゲームJSON の読み込み/変換に失敗しました'); }
-      };
-      reader.readAsText(file);
-      ev.target.value = '';
-    });
+    (function initGameSpecImport(){
+      const inputGame = document.getElementById('file-import-game');
+      if(!inputGame) return; // admin.html では未配置のため、存在時のみ有効
+      inputGame.addEventListener('change', (ev) => {
+        const file = ev.target.files && ev.target.files[0]; if(!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          try {
+            const spec = JSON.parse(reader.result);
+            // validate
+            if(window.Validator?.validateGameSpec){
+              const v = window.Validator.validateGameSpec(spec);
+              // show panel
+              try {
+                const panel = document.getElementById('validation-panel');
+                const listEl = document.getElementById('validation-list');
+                if(panel && listEl){
+                  listEl.innerHTML = '';
+                  (v.errors||[]).forEach(msg => { const li=document.createElement('li'); li.className='err'; li.textContent = msg; listEl.appendChild(li); });
+                  (v.warnings||[]).forEach(msg => { const li=document.createElement('li'); li.className='warn'; li.textContent = msg; listEl.appendChild(li); });
+                  panel.hidden = !( (v.errors&&v.errors.length) || (v.warnings&&v.warnings.length) );
+                }
+              } catch(e){ /* non-blocking */ }
+              if(!v.ok){ alert('ゲームJSONの検証に失敗しました:\n- ' + v.errors.join('\n- ')); return; }
+              // 警告はalertせず、NodeEditorの未解決targetパネルでの可視化に委ねる
+              if(v.warnings && v.warnings.length){ console.warn('GameSpec warnings:', v.warnings); }
+            }
+            // Convert to engine format (use Converters)
+            const engineData = (window.Converters?.normalizeSpecToEngine)
+              ? window.Converters.normalizeSpecToEngine(spec)
+              : (function(){
+                  const title = spec?.meta?.title || spec?.title || (APP_CONFIG?.strings?.defaultTitle ?? '');
+                  const start = spec?.meta?.start || spec?.start || 'start';
+                  const nodesArr = Array.isArray(spec?.nodes) ? spec.nodes : [];
+                  const nodes = {};
+                  nodesArr.forEach(n => { if(!n || !n.id) return; nodes[n.id] = { title: n.title || '', text: n.text || '', choices: Array.isArray(n.choices) ? n.choices.map(c => ({ text: c.label ?? c.text ?? '', to: c.target ?? c.to ?? '' })) : [] }; });
+                  return { title, start, nodes };
+                })();
+            StorageUtil.saveJSON('agp_game_data', engineData);
+            alert('ゲームJSONをインポートしました（プレイ画面で使用されます）');
+          } catch(e){ console.error(e); alert('ゲームJSON の読み込み/変換に失敗しました'); }
+        };
+        reader.readAsText(file);
+        ev.target.value = '';
+      });
+    })();
 
     // Admin API: allow SavePreview to load/delete by id
     function applyFull(obj){
