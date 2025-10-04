@@ -59,6 +59,11 @@
         b.onclick = () => setNode(c.to);
         elements.choicesEl.appendChild(b);
       });
+      // Accessibility: focus the first choice button if present
+      try {
+        const first = elements.choicesEl.querySelector('button');
+        if (first && typeof first.focus === 'function') first.focus();
+      } catch {}
       // Update back/forward button state if provided
       if (elements && elements.backBtn) { elements.backBtn.disabled = !canGoBack(); }
       if (elements && elements.forwardBtn) { elements.forwardBtn.disabled = !canGoForward(); }
