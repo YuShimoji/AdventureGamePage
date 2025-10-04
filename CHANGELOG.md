@@ -3,6 +3,9 @@
 All notable changes to this project will be documented in this file.
 
 ## [2025-10-03]
+- feat(play) 進む機能を追加（フォワードスタック、`canGoForward()`/`goForward()`、進行保存/復元対応） [#14]
+- docs: README に進む機能と手動テスト手順を追記 [#14]
+- tests: `tests/gameEngine.forward.spec.js` を追加、`tests/test.html` に登録 [#14]
 - fix(admin) 保存プレビューのトグル不具合を修正（🗂 2回目クリックで閉じる） [#19]
 - fix(admin) インポート(JSON) のファイルダイアログが開かない問題を修正 [#19]
 - fix(admin) プレースホルダ表示を `data-empty` 制御に変更し安定化 [#19]
