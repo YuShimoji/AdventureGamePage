@@ -1,0 +1,11 @@
+name: CI (central reusable)
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  call-reusable-ci:
+    uses: YuShimoji/shared-workflows/.github/workflows/ci-smoke.yml@chore/central-init
