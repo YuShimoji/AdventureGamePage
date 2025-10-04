@@ -1,0 +1,14 @@
+name: Sync Issues (central reusable)
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  call-reusable-sync:
+    uses: YuShimoji/shared-workflows/.github/workflows/sync-issues.yml@chore/central-init
