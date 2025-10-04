@@ -175,6 +175,14 @@ flowchart LR
 3. 「進む」をクリックし、元のノードへ進めることを確認
 4. 通常遷移（選択肢クリック）を行うと「進む」が無効化されることを確認（フォワードスタックがクリアされます）
 
+### キーボードショートカット（プレイ画面）
+
+- ←（ArrowLeft）: 戻る（`goBack()`）
+- →（ArrowRight）: 進む（`goForward()`）
+- R: リスタート（`reset()`）
+
+注: `APP_CONFIG.ui.shortcutsEnabled` が true の場合のみ有効。入力中（`input`/`textarea`/`contenteditable`）では無効化されます。
+
 ## 設定
 - `scripts/config.js`
   - `APP_CONFIG.ui.showSavePreview`: 保存プレビュー機能の有効/無効（既定: false）
