@@ -46,12 +46,14 @@ const server = http.createServer((req, res) => {
   const urlPath = decodeURI((req.url || '/').split('?')[0]);
   let filePath = urlPath === '/' ? 'index.html' : urlPath.replace(/^\/+/, '');
   const safePath = safeJoin(ROOT, filePath);
+  try { console.log(`[dev-server] req ${req.method} ${urlPath} => ${filePath} | safe=${safePath}`); } catch {}
   if (!safePath) {
     res.writeHead(400, {'Content-Type':'text/plain; charset=utf-8'});
     res.end('Bad Request');
     return;
   }
   fs.stat(safePath, (err, st) => {
+    if (err) { try { console.warn(`[dev-server] stat err for ${safePath}: ${err.code}`); } catch{} }
     if (!err && st.isDirectory()) {
       const idx = safeJoin(safePath, 'index.html');
       return serveFile(res, idx);
@@ -60,6 +62,7 @@ const server = http.createServer((req, res) => {
     // try fallback for missing extension (e.g., /index)
     const htmlFallback = safePath + '.html';
     fs.stat(htmlFallback, (e2, st2) => {
+      if (e2) { try { console.warn(`[dev-server] fallback stat err for ${htmlFallback}: ${e2.code}`); } catch{} }
       if (!e2 && st2.isFile()) return serveFile(res, htmlFallback);
       res.writeHead(404, {'Content-Type':'text/plain; charset=utf-8'});
       res.end('Not Found');
