@@ -21,12 +21,12 @@
   }
 
   function buildMermaidWithOptions(opts){
-    const { scope='all', seeds=[], showLabels=true } = opts||{};
+    const { scope='all', seeds=[], showLabels=true, direction='TD', markUnreachable=true } = opts||{};
     const spec = getScopedSpec(scope, seeds) || { nodes:[], meta:{} };
     const nodes = Array.isArray(spec.nodes) ? spec.nodes : [];
     const idSet = new Set(nodes.map(n=>n&&n.id).filter(Boolean));
 
-    const lines = ['flowchart TD'];
+    const lines = [`flowchart ${direction || 'TD'}`];
     const unresolvedTargets = [];
     const deadEnds = new Set();
     const startId = spec?.meta?.start;
@@ -68,6 +68,29 @@
     const classes = [];
     if(startId){ classes.push(`  class ${sanitizeId(startId)} start;`); }
     if(deadEnds.size>0){ classes.push(`  class ${Array.from(deadEnds).map(sanitizeId).join(',')} deadEnd;`); }
+    // Mark unreachable nodes from start when scope is 'all'
+    if(markUnreachable && startId && scope === 'all'){
+      const reachable = new Set();
+      const adj = new Map();
+      nodes.forEach(n => {
+        const outs = Array.isArray(n.choices) ? n.choices : [];
+        adj.set(n.id, outs.map(c => (c?.target ?? c?.to)).filter(Boolean));
+      });
+      const q = [startId];
+      reachable.add(startId);
+      while(q.length){
+        const cur = q.shift();
+        const outs = adj.get(cur) || [];
+        for(const t of outs){
+          if(idSet.has(t) && !reachable.has(t)){
+            reachable.add(t);
+            q.push(t);
+          }
+        }
+      }
+      const unreachable = nodes.map(n=>n.id).filter(id => !reachable.has(id));
+      if(unreachable.length){ classes.push(`  class ${unreachable.map(sanitizeId).join(',')} unreachable;`); }
+    }
     if(unresolvedTargets.length>0){
       const ph = Array.from(new Set(unresolvedTargets.map(t => `unresolved__${sanitizeId(t)}`)));
       classes.push(`  class ${ph.join(',')} unresolved;`);
@@ -78,7 +101,8 @@
     lines.push(
       '  classDef start fill:#1b3a2b,stroke:#43a047,color:#e8f5e9;',
       '  classDef unresolved fill:#3b2525,stroke:#ef9a9a,color:#ffebee,stroke-dasharray: 5 3;',
-      '  classDef deadEnd fill:#2f2f2f,stroke:#9e9e9e,color:#eeeeee;'
+      '  classDef deadEnd fill:#2f2f2f,stroke:#9e9e9e,color:#eeeeee;',
+      '  classDef unreachable fill:#2b1b1b,stroke:#ff7043,color:#ffccbc,stroke-dasharray: 2 2;'
     );
 
     return lines.join('\n');
@@ -99,6 +123,10 @@
     const scopeSel = document.getElementById('ne-mermaid-scope');
     const seedSel = document.getElementById('ne-mermaid-seed');
     const showLbl = document.getElementById('ne-mermaid-show-labels');
+    const dirSel = document.getElementById('ne-mermaid-dir');
+    const markUnreach = document.getElementById('ne-mermaid-mark-unreachable');
+    const copyBtn = document.getElementById('ne-mermaid-copy');
+    const dlBtn = document.getElementById('ne-mermaid-download');
     if(!genBtn || !renderBtn || !src || !view) return;
 
     function refreshSeedOptions(){
@@ -118,6 +146,8 @@
     function getSelectedSeeds(){ return seedSel ? Array.from(seedSel.selectedOptions).map(o=>o.value) : []; }
     function getScope(){ return scopeSel ? scopeSel.value : 'all'; }
     function isLabelOn(){ return showLbl ? !!showLbl.checked : true; }
+    function getDir(){ return dirSel ? dirSel.value : 'TD'; }
+    function isMarkUnreachable(){ return markUnreach ? !!markUnreach.checked : true; }
 
     if(scopeSel && seedSel){
       const applySeedEnabled = ()=>{ const v = getScope(); seedSel.disabled = (v !== 'from_selected'); };
@@ -127,19 +157,45 @@
     if(seedSel){ seedSel.addEventListener('focus', refreshSeedOptions); }
 
     genBtn.addEventListener('click', () => {
-      const code = buildMermaidWithOptions({ scope: getScope(), seeds: getSelectedSeeds(), showLabels: isLabelOn() });
+      const code = buildMermaidWithOptions({ scope: getScope(), seeds: getSelectedSeeds(), showLabels: isLabelOn(), direction: getDir(), markUnreachable: isMarkUnreachable() });
       src.value = code;
     });
 
     renderBtn.addEventListener('click', async () => {
       try {
-        const code = src.value && src.value.trim() ? src.value : buildMermaidWithOptions({ scope: getScope(), seeds: getSelectedSeeds(), showLabels: isLabelOn() });
+        const code = src.value && src.value.trim() ? src.value : buildMermaidWithOptions({ scope: getScope(), seeds: getSelectedSeeds(), showLabels: isLabelOn(), direction: getDir(), markUnreachable: isMarkUnreachable() });
         src.value = code; // keep latest
         if(!ensureMermaid()){ view.innerHTML = '<div class="muted">Mermaidが未ロードです。ソースをコピーして外部でレンダリングしてください。</div>'; return; }
         const out = await window.mermaid.render(`mmd-${Date.now()}`, code);
         view.innerHTML = out.svg || '';
       } catch(e){ console.error('Mermaid render error', e); view.textContent = 'Mermaidの描画に失敗しました'; }
     });
+
+    if(copyBtn){
+      copyBtn.addEventListener('click', async () => {
+        const ensureSrc = src.value && src.value.trim() ? src.value : buildMermaidWithOptions({ scope: getScope(), seeds: getSelectedSeeds(), showLabels: isLabelOn(), direction: getDir(), markUnreachable: isMarkUnreachable() });
+        src.value = ensureSrc;
+        try {
+          if(navigator.clipboard && navigator.clipboard.writeText){ await navigator.clipboard.writeText(ensureSrc); }
+          else {
+            src.select(); document.execCommand('copy');
+          }
+        } catch {}
+      });
+    }
+
+    if(dlBtn){
+      dlBtn.addEventListener('click', () => {
+        const svg = view.querySelector('svg');
+        if(!svg){ try{ alert('先に描画してください'); }catch{}; return; }
+        const blob = new Blob([svg.outerHTML], { type: 'image/svg+xml' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'mermaid-preview.svg';
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        setTimeout(()=>URL.revokeObjectURL(a.href), 1000);
+      });
+    }
 
     if(openBtn){
       openBtn.addEventListener('click', () => {
