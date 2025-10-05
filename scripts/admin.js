@@ -32,6 +32,7 @@
     const providerSelect = document.getElementById('storage-provider-select');
     const savesPanel = document.getElementById('saves-panel');
     const savesList = document.getElementById('saves-list');
+    const previewPanel = document.getElementById('preview-panel');
     const autoCfg = window.APP_CONFIG?.editor?.autoScroll || {};
     const fxCfg = window.APP_CONFIG?.editor?.inputFx || {};
 
@@ -137,10 +138,17 @@
     if (btnQuickTheme) btnQuickTheme.addEventListener('click', () => { themePanel.hidden = !themePanel.hidden; });
     // プレビュー機能が無効ならボタンを隠す
     if (btnQuickPreview && !(window.APP_CONFIG?.ui?.showSavePreview)) {
-      btnQuickPreview.style.display = 'none';
+      // フラグがOFFでも、従来の保存一覧（savesPanel）をフォールバックとして使用するため、ボタンは非表示にしない
     }
     if (btnQuickPreview) {
       btnQuickPreview.addEventListener('click', () => {
+        // 新しい保存プレビューを優先
+        if (window.APP_CONFIG?.ui?.showSavePreview && previewPanel) {
+          previewPanel.hidden = false;
+          try { window.SavePreview?.refresh?.(); } catch {}
+          return;
+        }
+        // フォールバック：従来の保存一覧
         if (!savesPanel) return;
         const willOpen = savesPanel.hidden === true;
         savesPanel.hidden = !willOpen;
