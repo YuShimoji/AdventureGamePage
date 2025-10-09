@@ -20,39 +20,38 @@
 
     <aside id="sidebar" class="sidebar" hidden>
       <div class="sidebar-inner">
-        <h2>ツール / 保存</h2>
-        <label class="field">
-          <span>タイトル</span>
-          <input id="title-input" type="text" placeholder="無題" />
-        </label>
+        <details class="agp-accordion" id="acc-tools">
+          <summary>ツール / 保存</summary>
+          <div class="accordion-content">
+            <label class="field">
+              <span>タイトル</span>
+              <input id="title-input" type="text" placeholder="無題" />
+            </label>
 
-        <label class="field">
-          <span>保存先（ストレージ）</span>
-          <select id="storage-provider-select">
-            <option value="idb">IndexedDB（推奨）</option>
-            <option value="local">LocalStorage</option>
-          </select>
-        </label>
+            <label class="field">
+              <span>保存先（ストレージ）</span>
+              <select id="storage-provider-select">
+                <option value="idb">IndexedDB（推奨）</option>
+                <option value="local">LocalStorage</option>
+              </select>
+            </label>
 
-        <!-- 書式ツールはフローティングバーに分離 -->
+            <!-- 書式ツールはフローティングバーに分離 -->
 
-        <div class="actions">
-          <button id="btn-save-simple" class="btn">シンプル保存</button>
-          <button id="btn-load-simple" class="btn">シンプル読込</button>
-          <button id="btn-save-full" class="btn btn-accent">完全保存</button>
-          <button id="btn-load-full" class="btn">完全読込</button>
-          <button id="btn-export" class="btn">エクスポート(JSON)</button>
-          <label class="btn file-label">
-            インポート(JSON)
-            <input id="file-import" type="file" accept="application/json" hidden />
-          </label>
-          <button id="btn-saves-list" class="btn">保存一覧</button>
-        </div>
-
-        <section id="validation-panel" class="card" hidden>
-          <h3>検証メッセージ</h3>
-          <ul id="validation-list"></ul>
-        </section>
+            <div class="actions">
+              <button id="btn-save-simple" class="btn">シンプル保存</button>
+              <button id="btn-load-simple" class="btn">シンプル読込</button>
+              <button id="btn-save-full" class="btn btn-accent">完全保存</button>
+              <button id="btn-load-full" class="btn">完全読込</button>
+              <button id="btn-export" class="btn">エクスポート(JSON)</button>
+              <label class="btn file-label">
+                インポート(JSON)
+                <input id="file-import" type="file" accept="application/json" hidden />
+              </label>
+              <button id="btn-saves-list" class="btn">保存一覧</button>
+            </div>
+          </div>
+        </details>
 
     <!-- 保存一覧パネル -->
     <section id="saves-panel" class="saves-panel" hidden>
@@ -64,119 +63,138 @@
       <div id="saves-list" class="memos-list"></div>
     </section>
 
-        <section id="editor-settings" class="card">
-          <h3>エディタ設定</h3>
-          <div class="field">
-            <label class="muted"><input id="cfg-autoscroll-enabled" type="checkbox" /> 自動スクロールを有効にする</label>
-          </div>
-          <div class="field">
-            <span>安全領域（上） <small id="cfg-safe-top-label">20%</small></span>
-            <input id="cfg-safe-top" type="range" min="5" max="40" step="1" value="20" />
-          </div>
-          <div class="field">
-            <span>安全領域（下） <small id="cfg-safe-bottom-label">60%</small></span>
-            <input id="cfg-safe-bottom" type="range" min="55" max="90" step="1" value="60" />
-          </div>
-          <div class="field">
-            <label class="muted"><input id="cfg-ink-enabled" type="checkbox" /> 入力アニメーションを有効にする</label>
-          </div>
-          <div class="field">
-            <span>アニメーション時間 <small id="cfg-ink-duration-label">160ms</small></span>
-            <input id="cfg-ink-duration" type="range" min="0" max="400" step="10" value="160" />
-          </div>
-          <div class="ne-row">
-            <button id="cfg-save" class="btn btn-accent">設定を保存</button>
-            <button id="cfg-reset" class="btn">既定に戻す</button>
-          </div>
-        </section>
-
-        <section id="node-editor" class="card">
-          <h3>ノード編集（MVP）</h3>
-          <div class="ne-actions">
-            <button id="ne-load" class="btn">取込（agp_game_data）</button>
-            <button id="ne-validate" class="btn">検証</button>
-            <button id="ne-save" class="btn btn-accent">適用保存</button>
-            <button id="ne-export" class="btn">JSON出力</button>
-          </div>
-          <div class="ne-banner" id="ne-dirty-banner" hidden>未保存の変更があります（Ctrl+S で保存）</div>
-          <div class="field">
-            <span>開始ノード</span>
-            <select id="ne-start-select"></select>
-          </div>
-          <div class="field ne-unresolved" id="ne-unresolved-panel" hidden>
-            <span>未解決 target 一覧</span>
-            <ul id="ne-unresolved-list"></ul>
-          </div>
-          <div class="field">
-            <span>ノード選択</span>
-            <div class="ne-row">
-              <select id="ne-node-select"></select>
-              <button id="ne-add-node" class="btn">ノード追加</button>
-              <button id="ne-remove-node" class="btn">ノード削除</button>
-            </div>
-          </div>
-          <div class="field">
-            <span>ノードID</span>
-            <input id="ne-node-id" type="text" placeholder="node:id" />
-          </div>
-          <div class="field">
-            <span>タイトル</span>
-            <input id="ne-node-title" type="text" placeholder="タイトル" />
-          </div>
-          <div class="field">
-            <span>本文</span>
-            <textarea id="ne-node-text" rows="4" placeholder="テキスト"></textarea>
-          </div>
-          <div class="field">
-            <span>選択肢</span>
-            <div id="ne-choices" class="ne-choices"></div>
-            <button id="ne-add-choice" class="btn">選択肢を追加</button>
-          </div>
-          <datalist id="ne-node-id-list"></datalist>
-          <div class="field">
-            <span>部分エクスポート（到達可能サブグラフ）</span>
-            <div class="ne-row">
-              <select id="ne-export-multiselect" multiple size="6" style="flex:1"></select>
-              <div class="ne-subactions" style="display:grid; gap:6px;">
-                <button id="ne-export-select-all" class="btn">全選択</button>
-                <button id="ne-export-select-none" class="btn">全解除</button>
-                <button id="ne-export-partial" class="btn">選択からエクスポート</button>
+        <details class="agp-accordion" id="acc-editor-settings">
+          <summary>エディタ設定</summary>
+          <div class="accordion-content">
+            <section id="editor-settings" class="card">
+              <h3>エディタ設定</h3>
+              <div class="field">
+                <label class="muted"><input id="cfg-autoscroll-enabled" type="checkbox" /> 自動スクロールを有効にする</label>
               </div>
-            </div>
+              <div class="field">
+                <span>安全領域（上） <small id="cfg-safe-top-label">20%</small></span>
+                <input id="cfg-safe-top" type="range" min="5" max="40" step="1" value="20" />
+              </div>
+              <div class="field">
+                <span>安全領域（下） <small id="cfg-safe-bottom-label">60%</small></span>
+                <input id="cfg-safe-bottom" type="range" min="55" max="90" step="1" value="60" />
+              </div>
+              <div class="field">
+                <label class="muted"><input id="cfg-ink-enabled" type="checkbox" /> 入力アニメーションを有効にする</label>
+              </div>
+              <div class="field">
+                <span>アニメーション時間 <small id="cfg-ink-duration-label">160ms</small></span>
+                <input id="cfg-ink-duration" type="range" min="0" max="400" step="10" value="160" />
+              </div>
+              <div class="ne-row">
+                <button id="cfg-save" class="btn btn-accent">設定を保存</button>
+                <button id="cfg-reset" class="btn">既定に戻す</button>
+              </div>
+            </section>
           </div>
-        </section>
+        </details>
 
-        <section id="mermaid-panel" class="card">
-          <h3>分岐プレビュー（Mermaid）</h3>
-          <div class="actions" style="grid-template-columns: 1fr 1fr;">
-            <button id="ne-mermaid-gen" class="btn">生成</button>
-            <button id="ne-mermaid-render" class="btn">描画</button>
+        <details class="agp-accordion" id="acc-node-editor" open>
+          <summary>ノード編集（MVP）</summary>
+          <div class="accordion-content">
+            <section id="validation-panel" class="card" hidden>
+              <h3>検証メッセージ</h3>
+              <ul id="validation-list"></ul>
+            </section>
+            <section id="node-editor" class="card">
+              <h3>ノード編集（MVP）</h3>
+              <div class="ne-actions">
+                <button id="ne-load" class="btn">取込（agp_game_data）</button>
+                <button id="ne-validate" class="btn">検証</button>
+                <button id="ne-save" class="btn btn-accent">適用保存</button>
+                <button id="ne-export" class="btn">JSON出力</button>
+              </div>
+              <div class="ne-banner" id="ne-dirty-banner" hidden>未保存の変更があります（Ctrl+S で保存）</div>
+              <div class="field">
+                <span>開始ノード</span>
+                <select id="ne-start-select"></select>
+              </div>
+              <div class="field ne-unresolved" id="ne-unresolved-panel" hidden>
+                <span>未解決 target 一覧</span>
+                <ul id="ne-unresolved-list"></ul>
+              </div>
+              <div class="field">
+                <span>ノード選択</span>
+                <div class="ne-row">
+                  <select id="ne-node-select"></select>
+                  <button id="ne-add-node" class="btn">ノード追加</button>
+                  <button id="ne-remove-node" class="btn">ノード削除</button>
+                </div>
+              </div>
+              <div class="field">
+                <span>ノードID</span>
+                <input id="ne-node-id" type="text" placeholder="node:id" />
+              </div>
+              <div class="field">
+                <span>タイトル</span>
+                <input id="ne-node-title" type="text" placeholder="タイトル" />
+              </div>
+              <div class="field">
+                <span>本文</span>
+                <textarea id="ne-node-text" rows="4" placeholder="テキスト"></textarea>
+              </div>
+              <div class="field">
+                <span>選択肢</span>
+                <div id="ne-choices" class="ne-choices"></div>
+                <button id="ne-add-choice" class="btn">選択肢を追加</button>
+              </div>
+              <datalist id="ne-node-id-list"></datalist>
+              <div class="field">
+                <span>部分エクスポート（到達可能サブグラフ）</span>
+                <div class="ne-row">
+                  <select id="ne-export-multiselect" multiple size="6" style="flex:1"></select>
+                  <div class="ne-subactions" style="display:grid; gap:6px;">
+                    <button id="ne-export-select-all" class="btn">全選択</button>
+                    <button id="ne-export-select-none" class="btn">全解除</button>
+                    <button id="ne-export-partial" class="btn">選択からエクスポート</button>
+                  </div>
+                </div>
+              </div>
+            </section>
           </div>
-          <div class="ne-row" style="margin:6px 0 0;">
-            <button id="ne-mermaid-open" class="btn">別ウィンドウで開く</button>
-            <div class="spacer"></div>
+        </details>
+
+        <details class="agp-accordion" id="acc-mermaid">
+          <summary>分岐プレビュー（Mermaid）</summary>
+          <div class="accordion-content">
+            <section id="mermaid-panel" class="card">
+              <h3>分岐プレビュー（Mermaid）</h3>
+              <div class="actions" style="grid-template-columns: 1fr 1fr;">
+                <button id="ne-mermaid-gen" class="btn">生成</button>
+                <button id="ne-mermaid-render" class="btn">描画</button>
+              </div>
+              <div class="ne-row" style="margin:6px 0 0;">
+                <button id="ne-mermaid-open" class="btn">別ウィンドウで開く</button>
+                <div class="spacer"></div>
+              </div>
+              <div class="field">
+                <span>対象</span>
+                <div class="ne-row">
+                  <select id="ne-mermaid-scope">
+                    <option value="all">全体</option>
+                    <option value="from_start">開始から到達</option>
+                    <option value="from_selected">選択ノードをseed</option>
+                  </select>
+                  <select id="ne-mermaid-seed" multiple size="5" style="flex:1" disabled></select>
+                </div>
+                <label class="muted"><input id="ne-mermaid-show-labels" type="checkbox" checked /> エッジに選択肢ラベルを表示</label>
+              </div>
+              <label class="field">
+                <span>Mermaid ソース</span>
+                <textarea id="ne-mermaid-src" rows="6" placeholder="flowchart TD..." style="width:100%;"></textarea>
+              </label>
+              <div class="mermaid-view" id="ne-mermaid-view"></div>
+              <p class="muted" style="margin-top:6px;">
+                注: オフライン環境では描画が行われない場合があります。その場合でもソースはコピー可能です。
+              </p>
+            </section>
           </div>
-          <div class="field">
-            <span>対象</span>
-            <div class="ne-row">
-              <select id="ne-mermaid-scope">
-                <option value="all">全体</option>
-                <option value="from_start">開始から到達</option>
-                <option value="from_selected">選択ノードをseed</option>
-              </select>
-              <select id="ne-mermaid-seed" multiple size="5" style="flex:1" disabled></select>
-            </div>
-            <label class="muted"><input id="ne-mermaid-show-labels" type="checkbox" checked /> エッジに選択肢ラベルを表示</label>
-          </div>
-          <label class="field">
-            <span>Mermaid ソース</span>
-            <textarea id="ne-mermaid-src" rows="6" placeholder="flowchart TD..." style="width:100%;"></textarea>
-          </label>
-          <div class="mermaid-view" id="ne-mermaid-view"></div>
-          <p class="muted" style="margin-top:6px;">
-            注: オフライン環境では描画が行われない場合があります。その場合でもソースはコピー可能です。
-          </p>
-        </section>
+        </details>
 
         <details>
           <summary>ヘルプ</summary>
@@ -274,4 +292,8 @@
     <script src="scripts/memos.js"></script>
     <script src="scripts/storageProviders.js"></script>
     <script src="scripts/storageBridge.js"></script>
+    <script src="scripts/converters.js"></script>
+    <script src="scripts/validator.js"></script>
+    <script src="scripts/nodeEditor.js"></script>
+    <script src="scripts/savePreview.js"></script>
     <script src="scripts/admin.js"></script>

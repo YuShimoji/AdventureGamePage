@@ -39,5 +39,38 @@
     engine.render();
 
     btnRestart.addEventListener('click', () => engine.reset());
+
+    // Keyboard shortcuts: ← 戻る / → 進む / R リスタート
+    function shouldHandleShortcut(target){
+      if(!window.APP_CONFIG?.ui?.shortcutsEnabled) return false;
+      const el = target;
+      if(!el) return true;
+      const tag = (el.tagName || '').toUpperCase();
+      if(tag === 'INPUT' || tag === 'TEXTAREA') return false;
+      if(el.isContentEditable) return false;
+      return true;
+    }
+    window.addEventListener('keydown', (e) => {
+      if(!shouldHandleShortcut(e.target)) return;
+      // Back
+      if(e.key === 'ArrowLeft'){
+        const ok = typeof engine.goBack === 'function' && engine.goBack();
+        if(ok){ e.preventDefault(); }
+        return;
+      }
+      // Forward
+      if(e.key === 'ArrowRight'){
+        const ok = typeof engine.goForward === 'function' && engine.goForward();
+        if(ok){ e.preventDefault(); }
+        return;
+      }
+      // Restart
+      if(e.key === 'r' || e.key === 'R'){
+        if(typeof engine.reset === 'function'){
+          engine.reset();
+          e.preventDefault();
+        }
+      }
+    });
   });
 })();
