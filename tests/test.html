@@ -77,7 +77,28 @@
               have: {
                 length: (n)=>{ if(!v || v.length!==n) throw new Error(`expected length ${n}, got ${v && v.length}`); }
               },
-              exist: ()=>{ if(v==null) throw new Error('expected to exist'); }
+              exist: ()=>{ if(v==null) throw new Error('expected to exist'); },
+              throw: (errLike)=>{
+                if(typeof v !== 'function') throw new Error('expected a function');
+                let thrown = null;
+                try { v(); } catch(e){ thrown = e; }
+                if(!thrown) throw new Error('expected function to throw');
+                if(errLike instanceof RegExp){ if(!errLike.test(String(thrown && thrown.message || thrown))) throw new Error('expected thrown error to match regexp'); }
+                else if(typeof errLike === 'string'){ if(!String(thrown && thrown.message || thrown).includes(errLike)) throw new Error('expected thrown error message to include string'); }
+                else if(typeof errLike === 'function'){ if(!(thrown instanceof errLike)) throw new Error('expected thrown error to be instance of provided constructor'); }
+              },
+              not: {
+                throw: (errLike)=>{
+                  if(typeof v !== 'function') throw new Error('expected a function');
+                  let thrown = null;
+                  try { v(); } catch(e){ thrown = e; }
+                  if(!thrown) return; // ok
+                  if(errLike instanceof RegExp){ if(errLike.test(String(thrown && thrown.message || thrown))) throw new Error('expected function not to throw matching regexp'); return; }
+                  if(typeof errLike === 'string'){ if(String(thrown && thrown.message || thrown).includes(errLike)) throw new Error('expected function not to throw message including string'); return; }
+                  if(typeof errLike === 'function'){ if(thrown instanceof errLike) throw new Error('expected function not to throw provided constructor'); return; }
+                  throw new Error('expected function not to throw');
+                }
+              }
             }
           };
         };
