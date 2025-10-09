@@ -50,3 +50,11 @@
 ## 実装タスク
 
 - エンジン実装, UI追加, 配線, テスト作成, テストランナー更新, README更新, 変更ログ更新。
+
+## 実装完了（2025-10-07）
+
+- 実装: `scripts/gameEngine.js` に `canGoForward()` / `goForward()` を追加し、`state.forward` を導入。通常遷移でフォワードスタックをクリアするよう更新。
+- UI: `play.html` に「進む」ボタンを追加し、`scripts/play.js` で戻る/進むボタン状態とショートカット（→キー）を連動。
+- 保存/復元: 進行保存 `agp_progress` に `forward` を含め、`loadProgress()` で履歴と共に復元する処理を追加。
+- テスト: `tests/gameEngine.forward.spec.js` を作成し、`tests/test.html` へ登録。
+- ドキュメント: `README.md` に進む機能の操作手順とショートカットを追記。
