@@ -90,24 +90,24 @@
     const { sel } = readUIRefs(); if(!sel) return;
     sel.innerHTML = '';
     (specData.nodes||[]).forEach(n => {
-      const opt = document.createElement('option');
-      opt.value = n.id; opt.textContent = n.id;
-      sel.appendChild(opt);
+      const opt = document.createElement('option'); opt.value = n.id; opt.textContent = n.id; sel.appendChild(opt);
     });
     if(selectedId && findNodeById(specData.nodes, selectedId)) sel.value = selectedId;
     else if(sel.options.length>0) sel.value = sel.options[0].value;
     renderNodeForm(sel.value);
     refreshStartSelect();
+    notifySpecUpdated();
   }
 
   function renderNodeForm(nodeId){
     const { id, title, text, choices } = readUIRefs();
     const n = findNodeById(specData.nodes, nodeId);
-    if(!n){ id.value = ''; title.value=''; text.value=''; choices.innerHTML=''; return; }
+    if(!n){ id.value = ''; title.value=''; text.value=''; choices.innerHTML=''; notifySelectionChanged(''); return; }
     id.value = n.id || '';
     title.value = n.title || '';
     text.value = n.text || '';
     renderChoices(n);
+    notifySelectionChanged(n.id || '');
   }
 
   function renderChoices(node){
@@ -122,16 +122,16 @@
       const del = document.createElement('button'); del.className = 'btn'; del.textContent = '削除';
       const up = document.createElement('button'); up.className = 'btn'; up.textContent = '↑';
       const down = document.createElement('button'); down.className = 'btn'; down.textContent = '↓';
-      label.addEventListener('input', () => { c.label = label.value; setDirty(true); });
+      label.addEventListener('input', () => { c.label = label.value; setDirty(true); notifySpecUpdated(); });
       function applyTargetValidity(){
         const known = !!findNodeById(specData.nodes, target.value);
         const invalid = !!target.value && !known;
         row.classList.toggle('invalid', invalid);
       }
-      target.addEventListener('input', () => { c.target = target.value; applyTargetValidity(); setDirty(true); refreshUnresolvedPanel(); });
-      del.addEventListener('click', () => { removeChoice(node, idx); renderChoices(node); setDirty(true); refreshUnresolvedPanel(); });
-      up.addEventListener('click', () => { moveChoice(node, idx, Math.max(0, idx-1)); renderChoices(node); setDirty(true); });
-      down.addEventListener('click', () => { moveChoice(node, idx, Math.min(arr.length-1, idx+1)); renderChoices(node); setDirty(true); });
+      target.addEventListener('input', () => { c.target = target.value; applyTargetValidity(); setDirty(true); refreshUnresolvedPanel(); notifySpecUpdated(); });
+      del.addEventListener('click', () => { removeChoice(node, idx); renderChoices(node); setDirty(true); refreshUnresolvedPanel(); notifySpecUpdated(); });
+      up.addEventListener('click', () => { moveChoice(node, idx, Math.max(0, idx-1)); renderChoices(node); setDirty(true); notifySpecUpdated(); });
+      down.addEventListener('click', () => { moveChoice(node, idx, Math.min(arr.length-1, idx+1)); renderChoices(node); setDirty(true); notifySpecUpdated(); });
       row.append(label, target, up, down, del);
       choices.appendChild(row);
       applyTargetValidity();
@@ -180,6 +180,7 @@
       refreshUnresolvedPanel();
       setDirty(false);
       alert('ノード編集に取込みました');
+      notifySpecUpdated();
     } catch(e){ console.error('NodeEditor.load', e); alert('取込に失敗しました'); }
   }
 
@@ -244,7 +245,7 @@
     if(btnExport) btnExport.addEventListener('click', exportJson);
 
     if(sel) sel.addEventListener('change', () => renderNodeForm(sel.value));
-    if(startSel) startSel.addEventListener('change', () => { if(!specData.meta) specData.meta = {}; specData.meta.start = startSel.value; setDirty(true); });
+    if(startSel) startSel.addEventListener('change', () => { if(!specData.meta) specData.meta = {}; specData.meta.start = startSel.value; setDirty(true); notifySpecUpdated(); });
 
     if(btnAddNode) btnAddNode.addEventListener('click', () => {
       const ids = (specData.nodes||[]).map(n => n.id);
@@ -257,6 +258,7 @@
       refreshNodeIdDatalist();
       setDirty(true);
       refreshUnresolvedPanel();
+      notifySpecUpdated();
     });
 
     if(btnRemoveNode) btnRemoveNode.addEventListener('click', () => {
@@ -268,6 +270,7 @@
       refreshNodeIdDatalist();
       setDirty(true);
       refreshUnresolvedPanel();
+      notifySpecUpdated();
     });
 
     if(id) id.addEventListener('change', () => {
@@ -297,11 +300,13 @@
         // 入力欄にも反映
         const { id: idInput } = readUIRefs(); if(idInput) idInput.value = nv;
         setDirty(true);
+        notifySpecUpdated();
       }
     });
     if(text) text.addEventListener('input', () => {
       const { sel } = readUIRefs(); const node = findNodeById(specData.nodes, sel.value); if(!node) return; node.text = text.value;
       setDirty(true);
+      notifySpecUpdated();
     });
 
     if(btnAddChoice) btnAddChoice.addEventListener('click', () => {
@@ -309,6 +314,7 @@
       addChoice(node, { label:'', target:'' });
       renderChoices(node);
       setDirty(true);
+      notifySpecUpdated();
     });
 
     // Partial export UI bindings
@@ -365,6 +371,13 @@
     });
     unresolvedPanel.hidden = items.length === 0;
   }
+
+  function emitEvent(name, detail){
+    try { document.dispatchEvent(new CustomEvent(name, { detail })); } catch{}
+  }
+
+  function notifySelectionChanged(nodeId){ emitEvent('agp-node-selection-changed', { nodeId }); }
+  function notifySpecUpdated(){ emitEvent('agp-spec-updated', {}); }
 
   // Partial export: collect reachable subgraph from seed IDs
   function collectSubgraph(spec, seedIds){

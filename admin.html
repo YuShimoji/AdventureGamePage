@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="ja">
   <head>
     <meta charset="utf-8" />
@@ -171,7 +171,7 @@
             <label class="muted"><input id="ne-mermaid-show-labels" type="checkbox" checked /> 繧ｨ繝・ず縺ｫ驕ｸ謚櫁い繝ｩ繝吶Ν繧定｡ｨ遉ｺ</label>
           </div>
           <div class="field">
-            <span>繝ｬ繧､繧｢繧ｦ繝・/span>
+            <span>レイアウト</span>
             <div class="ne-row">
               <select id="ne-mermaid-dir">
                 <option value="TD">Top-Down (TD)</option>
@@ -179,11 +179,30 @@
                 <option value="TB">Top-Bottom (TB)</option>
                 <option value="RL">Right-Left (RL)</option>
               </select>
-              <label class="muted"><input id="ne-mermaid-mark-unreachable" type="checkbox" checked /> 蛻ｰ驕比ｸ崎・繝弱・繝峨ｒ蠑ｷ隱ｿ</label>
+              <label class="muted"><input id="ne-mermaid-mark-unreachable" type="checkbox" checked /> 到達不能ノードを強調</label>
             </div>
           </div>
+          <div class="field">
+            <span>検索</span>
+            <div class="ne-row" style="gap:8px;">
+              <input id="ne-mermaid-search" type="search" placeholder="ノードID / タイトル / 本文 / 選択肢ラベル" style="flex:1;" />
+              <button id="ne-mermaid-search-clear" class="btn">クリア</button>
+            </div>
+          </div>
+          <div class="field">
+            <span>最短経路</span>
+            <div class="ne-row" style="gap:8px;">
+              <select id="ne-mermaid-path-start" style="flex:1;"></select>
+              <select id="ne-mermaid-path-goal" style="flex:1;"></select>
+              <button id="ne-mermaid-path-apply" class="btn">経路適用</button>
+            </div>
+          </div>
+          <div class="field">
+            <span>ステータス</span>
+            <div id="ne-mermaid-status" class="muted" style="min-height:1.6em; display:flex; align-items:center;"></div>
+          </div>
           <label class="field">
-            <span>Mermaid 繧ｽ繝ｼ繧ｹ</span>
+            <span>Mermaid ソース</span>
             <textarea id="ne-mermaid-src" rows="6" placeholder="flowchart TD..." style="width:100%;"></textarea>
           </label>
           <div class="mermaid-view" id="ne-mermaid-view"></div>

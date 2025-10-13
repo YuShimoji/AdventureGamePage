@@ -3,6 +3,7 @@
 All notable changes to this project will be documented in this file.
 
 ## [2025-10-03]
+- feat(admin) Mermaid 分岐プレビュー Phase 2（検索フィルタ、最短経路強調、NodeEditor 連携、ステータス表示）を実装 [#16]
 - feat(play) 進む機能を追加（フォワードスタック、`canGoForward()`/`goForward()`、進行保存/復元対応） [#14]
 - docs: README に進む機能と手動テスト手順を追記 [#14]
 - tests: `tests/gameEngine.forward.spec.js` を追加、`tests/test.html` に登録 [#14]
