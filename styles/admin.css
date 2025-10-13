@@ -182,3 +182,11 @@ body.zen-mode .sidebar.show { display: block; }
 
 /* Mermaid preview */
 #mermaid-panel .mermaid-view { margin-top: 6px; padding: 8px; border-radius: 8px; border: 1px solid rgba(255,255,255,.2); background: rgba(0,0,0,.15); max-height: 320px; overflow: auto; }
+#mermaid-panel #ne-mermaid-status {
+  gap: 6px;
+  font-size: 13px;
+}
+#mermaid-panel #ne-mermaid-status.status-info { color: var(--muted); }
+#mermaid-panel #ne-mermaid-status.status-ok { color: #80cbc4; }
+#mermaid-panel #ne-mermaid-status.status-warn { color: #ffd54f; }
+#mermaid-panel #ne-mermaid-status.status-error { color: #ff8a80; }

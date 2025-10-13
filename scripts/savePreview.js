@@ -27,23 +27,25 @@
       listEl.appendChild(empty);
       return;
     }
-
     items.forEach(item => {
       const row = document.createElement('div'); row.className = 'preview-item';
       const head = document.createElement('div'); head.className = 'preview-head';
       const title = document.createElement('strong'); title.textContent = item.title || '(無題)';
       const cb = document.createElement('input'); cb.type='checkbox'; cb.className='preview-select'; cb.title='選択';
       cb.addEventListener('change', () => { if(cb.checked) selected.add(item.id); else selected.delete(item.id); updateDeleteSelectedBtn(); });
-      const meta = document.createElement('span'); meta.className='preview-meta'; meta.textContent = [fmtDate(item.savedAt), item.type, humanSize(item.size)].filter(Boolean).join(' / ');
+      const meta = document.createElement('span'); meta.className = 'preview-meta';
+      const kind = item.kind || item.type || '';
+      meta.textContent = [fmtDate(item.savedAt), kind, humanSize(item.size)].filter(Boolean).join(' / ');
       head.append(cb, title, meta);
 
-      const body = document.createElement('div'); body.className = 'preview-body'; body.textContent = item.excerpt || '';
+      const body = document.createElement('div'); body.className = 'preview-body';
+      body.textContent = item.textPreview || item.excerpt || '';
       const actions = document.createElement('div'); actions.className = 'preview-actions';
       const btnLoad = document.createElement('button'); btnLoad.className = 'btn'; btnLoad.textContent = '読込';
       const btnDel = document.createElement('button'); btnDel.className = 'btn'; btnDel.textContent = '削除';
       // snapshot: allow label edit
       let btnLabel = null;
-      if(item.type === 'snapshot'){
+      if((item.kind || item.type) === 'snapshot'){
         btnLabel = document.createElement('button'); btnLabel.className='btn'; btnLabel.textContent='ラベル編集';
         btnLabel.addEventListener('click', async () => {
           try {
