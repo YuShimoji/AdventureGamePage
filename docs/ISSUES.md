@@ -59,3 +59,12 @@
 
 ## Admin: ノード編集/保存プレビュー/Mermaidの組込み修正（Issue #13）
 詳細: ./issues/13-admin-editor-save-mermaid.md
+
+## プレイ画面に「進む」機能を追加
+詳細: ./issues/14-forward-navigation.md
+
+## Mermaid 分岐プレビュー拡張 (Phase 1)
+詳細: ./issues/15-mermaid-branch-preview-extended.md
+
+## Mermaid 分岐プレビュー Phase 2
+詳細: ./issues/16-mermaid-branch-preview-phase2.md
