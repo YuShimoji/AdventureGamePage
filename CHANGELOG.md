@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2025-10-08]
+
+- feat(admin): サイドバー各セクションへヒントトグルと説明パネルを追加し、操作ガイダンスを拡充 [#22]
+- feat(admin): アコーディオンの複数同時展開モードを追加し、排他/非排他を切り替え可能に [#22]
+- style(admin): ヒントトグルと説明パネル、モードトグルUIのスタイルを整備 [#22]
+
 ## [2025-10-07]
 
 - feat(admin): 管理画面サイドバーをアコーディオン化（details/summary、独占開閉、開状態の永続化） [#21]

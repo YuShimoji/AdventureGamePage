@@ -20,9 +20,21 @@
 
     <aside id="sidebar" class="sidebar" hidden>
       <div class="sidebar-inner">
-        <details class="agp-accordion" id="acc-tools">
-          <summary>ツール / 保存</summary>
+        <div class="accordion-mode" data-accordion-mode-toggle>
+          <label class="accordion-mode-toggle">
+            <input type="checkbox" id="accordion-multi-open" />
+            <span data-toggle-label>複数セクションを同時に開く (OFF)</span>
+          </label>
+          <p class="accordion-mode-note">排他モードでは最後に開いたセクションのみ保持されます。</p>
+        </div>
+
+        <details class="agp-accordion" id="acc-tools" data-accordion-id="tools">
+          <summary data-has-hint>
+            <span class="summary-label">ツール / 保存</span>
+            <button class="accordion-hint-toggle" type="button" aria-expanded="false" aria-label="ツール / 保存のヒント" data-accordion-hint="tools">?</button>
+          </summary>
           <div class="accordion-content">
+            <div class="accordion-hint" data-hint-for="tools" hidden></div>
             <label class="field">
               <span>タイトル</span>
               <input id="title-input" type="text" placeholder="無題" />
@@ -63,9 +75,13 @@
       <div id="saves-list" class="memos-list"></div>
     </section>
 
-        <details class="agp-accordion" id="acc-editor-settings">
-          <summary>エディタ設定</summary>
+        <details class="agp-accordion" id="acc-editor-settings" data-accordion-id="editor-settings">
+          <summary data-has-hint>
+            <span class="summary-label">エディタ設定</span>
+            <button class="accordion-hint-toggle" type="button" aria-expanded="false" aria-label="エディタ設定のヒント" data-accordion-hint="editor-settings">?</button>
+          </summary>
           <div class="accordion-content">
+            <div class="accordion-hint" data-hint-for="editor-settings" hidden></div>
             <section id="editor-settings" class="card">
               <h3>エディタ設定</h3>
               <div class="field">
@@ -94,9 +110,13 @@
           </div>
         </details>
 
-        <details class="agp-accordion" id="acc-node-editor" open>
-          <summary>ノード編集（MVP）</summary>
+        <details class="agp-accordion" id="acc-node-editor" data-accordion-id="node-editor" open>
+          <summary data-has-hint>
+            <span class="summary-label">ノード編集（MVP）</span>
+            <button class="accordion-hint-toggle" type="button" aria-expanded="false" aria-label="ノード編集（MVP）のヒント" data-accordion-hint="node-editor">?</button>
+          </summary>
           <div class="accordion-content">
+            <div class="accordion-hint" data-hint-for="node-editor" hidden></div>
             <section id="validation-panel" class="card" hidden>
               <h3>検証メッセージ</h3>
               <ul id="validation-list"></ul>
@@ -159,9 +179,13 @@
           </div>
         </details>
 
-        <details class="agp-accordion" id="acc-mermaid">
-          <summary>分岐プレビュー（Mermaid）</summary>
+        <details class="agp-accordion" id="acc-mermaid" data-accordion-id="mermaid">
+          <summary data-has-hint>
+            <span class="summary-label">分岐プレビュー（Mermaid）</span>
+            <button class="accordion-hint-toggle" type="button" aria-expanded="false" aria-label="分岐プレビュー（Mermaid）のヒント" data-accordion-hint="mermaid">?</button>
+          </summary>
           <div class="accordion-content">
+            <div class="accordion-hint" data-hint-for="mermaid" hidden></div>
             <section id="mermaid-panel" class="card">
               <h3>分岐プレビュー（Mermaid）</h3>
               <div class="actions" style="grid-template-columns: 1fr 1fr;">

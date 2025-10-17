@@ -51,3 +51,9 @@
 - Tab/Enter/Space で同等操作が可能。
 - マルチ展開設定オン/オフ後、再読込でも設定が維持される。
 - 既存ショートカットやNodeEditor機能が影響を受けないことを確認。
+
+## 実装状況（2025-10-08）
+
+- `admin.html` にヒントトグル用DOMと複数展開トグルUIを追加。
+- `styles/admin.css` にヒント表示およびモードトグルスタイルを追加。
+- `scripts/admin.js` にヒント生成ロジックと `agp_sidebar_multi_open` 永続化処理を実装。
