@@ -63,6 +63,36 @@
       sidebar.classList.toggle('show', !sidebar.hidden);
     });
 
+    // Sidebar accordion (details.agp-accordion): exclusive open + persist last open
+    (function initSidebarAccordion(){
+      try {
+        const accs = Array.from(document.querySelectorAll('details.agp-accordion'));
+        if(accs.length === 0) return;
+        const KEY = 'agp_sidebar_open';
+        // restore last open
+        try {
+          const last = localStorage.getItem(KEY);
+          if(last && document.getElementById(last)){
+            accs.forEach(d => { if(d.id !== last) d.open = false; });
+            document.getElementById(last).open = true;
+          }
+        } catch{}
+        accs.forEach(d => {
+          d.addEventListener('toggle', () => {
+            if(d.open){
+              // close others
+              accs.forEach(o => { if(o !== d) o.open = false; });
+              try { localStorage.setItem(KEY, d.id || ''); } catch{}
+            } else {
+              // if all closed, clear state
+              const anyOpen = accs.some(x => x.open);
+              if(!anyOpen){ try { localStorage.removeItem(KEY); } catch{} }
+            }
+          });
+        });
+      } catch(e){ console.warn('initSidebarAccordion failed', e); }
+    })();
+
     // ---------- 保存一覧（Providerベース） ----------
     const btnOpenList = document.getElementById('btn-saves-list');
     const btnCloseList = document.getElementById('saves-close');
@@ -413,6 +443,68 @@
       }
     })();
 
+    // Ensure Game JSON import UI exists in NodeEditor actions (robust)
+    function __ensureGameImportUI(){
+      try {
+        let container = document.querySelector('#node-editor .ne-actions');
+        // ensure hidden file input early (even if container is not yet available)
+        let input = document.getElementById('file-import-game');
+        if(!input){
+          input = document.createElement('input');
+          input.type = 'file'; input.accept = 'application/json'; input.id = 'file-import-game';
+          input.style.display = 'none';
+          (container || document.body).appendChild(input);
+          try { console.debug('[admin] added hidden #file-import-game'); } catch{}
+        }
+        if(!container){
+          // retry shortly to attach visible controls when sidebar DOM is ready
+          setTimeout(__ensureGameImportUI, 200);
+          return;
+        }
+        // ensure a visible button to trigger input
+        let btn = document.getElementById('ne-import-game-btn');
+        if(!btn){
+          btn = document.createElement('button');
+          btn.id = 'ne-import-game-btn';
+          btn.className = 'btn';
+          btn.type = 'button';
+          btn.textContent = 'ゲームJSONインポート';
+          btn.title = 'ゲーム仕様のJSONを取り込みます';
+          btn.addEventListener('click', () => input && input.click());
+          container.appendChild(btn);
+          try { console.debug('[admin] added import button in NodeEditor actions'); } catch{}
+        }
+        // optional: label fallback (in case styles expect .file-label)
+        if(!container.querySelector('label.file-label[data-kind="game-import"]')){
+          const label = document.createElement('label');
+          label.className = 'btn file-label';
+          label.setAttribute('data-kind','game-import');
+          label.title = 'ゲーム仕様のJSONを取り込みます';
+          label.textContent = 'ゲームJSONインポート';
+          label.addEventListener('click', (e)=>{ e.preventDefault(); input && input.click(); });
+          container.appendChild(label);
+          try { console.debug('[admin] added label fallback for game import'); } catch{}
+        }
+        // header fallback to ensure visibility somewhere on screen
+        const header = document.querySelector('.header-actions');
+        if(header && !document.getElementById('ne-import-game-btn-header')){
+          const hbtn = document.createElement('button');
+          hbtn.id = 'ne-import-game-btn-header';
+          hbtn.className = 'btn';
+          hbtn.type = 'button';
+          hbtn.textContent = 'ゲームJSONインポート';
+          hbtn.title = 'ゲーム仕様のJSONを取り込みます';
+          hbtn.addEventListener('click', () => input && input.click());
+          header.appendChild(hbtn);
+          try { console.debug('[admin] added header fallback button for game import'); } catch{}
+        }
+      } catch(e){ console.warn('ensureGameImportUI failed', e); }
+    }
+    __ensureGameImportUI();
+    try {
+      const tgl = document.getElementById('btn-toggle-sidebar');
+      if(tgl){ tgl.addEventListener('click', () => setTimeout(__ensureGameImportUI, 0)); }
+    } catch{}
     // Game JSON import (spec -> engine format)
     (function initGameSpecImport(){
       const inputGame = document.getElementById('file-import-game');
@@ -453,7 +545,8 @@
                   return { title, start, nodes };
                 })();
             StorageUtil.saveJSON('agp_game_data', engineData);
-            alert('ゲームJSONをインポートしました（プレイ画面で使用されます）');
+            try { document.getElementById('ne-load')?.click(); } catch{}
+            alert('ゲームJSONをインポートしました（プレイ画面/NodeEditorで使用されます）');
           } catch(e){ console.error(e); alert('ゲームJSON の読み込み/変換に失敗しました'); }
         };
         reader.readAsText(file);
