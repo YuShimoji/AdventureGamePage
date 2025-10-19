@@ -7,9 +7,10 @@
   - ルール: `docs/Windsurf_AI_Collab_Rules_v1.1.md`
 
 ## プロジェクト概要
-- リポジトリ: AdventureGamePage（静的Web: index/admin/play）
+- リポジトリ: AdventureGamePage（static-web-app+node-tooling）
 - 目的: ゼンライク編集・保存（IndexedDB優先）・簡易プレイ
 - 言語/ツール: HTML/CSS/JS（Vanilla）
+- 検出結果: `detect-project-type.js` により `static-web-app+node-tooling` と判定（package.json, scripts/, htmlファイル, docs/ 存在）
 
 ## 最近の主要決定・状態
 - 保存アーキテクチャ抽象化（LocalStorage/IndexedDB）を導入済み

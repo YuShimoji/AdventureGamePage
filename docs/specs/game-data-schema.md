@@ -227,3 +227,14 @@ flowchart LR
 ## 6. 実装メモ
 - `scripts/play.js` は既存の `sampleData.js` を読む設計。今後、`game-data-schema` に準拠したJSONをインポートできるよう拡張する。
 - 保存はローカル（localStorage/IndexedDB）。プレビューやスナップショットは `StorageProvider`/`StorageBridge` を共通利用。
+
+## 7. サンプルデータ
+拡張スキーマに対応したサンプルデータは `samples/` 配下に配置されています。`scripts/generate-samples.js` を実行して生成してください。
+
+- `samples/items.json`: アイテム（武器、消耗品）の例
+- `samples/characters.json`: キャラクター（プレイヤー、NPC）の例
+- `samples/lore.json`: Wikiエントリの例
+- `samples/state.json`: プレイヤー状態（所持品、フラグ、変数、履歴）の例
+
+## 8. データマイグレーション
+既存のレガシーデータ（`agp_manuscript_full`）を新しい拡張スキーマに移行する `scripts/dataMigration.js` が用意されています。ページ読み込み時に自動実行され、古いデータをアイテム・キャラクター・Wiki・状態に変換します。

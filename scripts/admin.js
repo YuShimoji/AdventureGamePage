@@ -503,4 +503,16 @@
     }
     window.AdminAPI = { loadById, deleteById };
   });
+
+  // Data migration on load
+  document.addEventListener('DOMContentLoaded', () => {
+    if (window.DataMigration && typeof window.DataMigration.migrateLegacyToExtended === 'function') {
+      const migrated = window.DataMigration.migrateLegacyToExtended();
+      if (migrated) {
+        console.log('Legacy data migration completed.');
+        // Optional: alert user about migration
+        // alert('古いデータが新しい形式に移行されました。');
+      }
+    }
+  });
 })();
