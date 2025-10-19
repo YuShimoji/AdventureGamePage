@@ -38,13 +38,65 @@
 - `nodes[*].text`: プレーンテキスト。将来、マークアップや装飾を拡張可能
 - `choices[*]`: 分岐先を指す。将来 `conditions` や `effects` を導入
 
-## 2. 追加要素（将来拡張の提案）
-- `nodes[*].image`: 画像URL（大容量対応はIndexedDB/FS APIで）
-- `choices[*].conditions`: 所持フラグや履歴に応じた分岐条件
-- `choices[*].effects`: 選択時にセットするフラグやカウンタの更新
-- `variables`: ゲーム全体の汎用フラグ/カウンタ
+## 2. ドメイン拡張（所持品・キャラクター・Wiki）
+ゲーム内で参照頻度の高い情報を一元管理するため、以下のモジュールを追加します。
 
-## 3. JSON Schema（最小版）
+```json
+{
+  "items": [
+    {
+      "id": "item:sword",
+      "name": "古代の剣",
+      "description": "伝説の勇者が使ったとされる剣",
+      "tags": ["武器", "遺物"],
+      "effects": ["attack+2"]
+    }
+  ],
+  "characters": [
+    {
+      "id": "char:mentor",
+      "name": "導師セレス",
+      "roles": ["ガイド"],
+      "summary": "主人公を導く老賢者。",
+      "relationships": [
+        { "target": "char:hero", "type": "mentor" }
+      ]
+    }
+  ],
+  "lore": {
+    "entries": [
+      {
+        "id": "lore:ancient-ruin",
+        "title": "古代遺跡",
+        "body": "かつて栄えた文明の中心地。",
+        "relatedNodes": ["scene:start"],
+        "tags": ["地名", "歴史"],
+        "summary": "古代文明が眠る遺跡。",
+        "sources": ["char:mentor"]
+      }
+    ]
+  }
+}
+```
+
+## 3. プレイヤー状態とセーブデータ
+- `state.inventory`: 所持品のID配列（`items[*].id`と対応）
+- `state.flags`: 条件分岐に用いるフラグ辞書（`{ "metMentor": true }` など）
+- `state.variables`: 数値/文字列の汎用ステータス
+- `state.history`: 訪問ノード履歴。Wiki自動解放や回想参照に利用
+
+```json
+{
+  "state": {
+    "inventory": ["item:sword"],
+    "flags": { "metMentor": true },
+    "variables": { "reputation": 12 },
+    "history": ["scene:start", "scene:intro"]
+  }
+}
+```
+
+## 4. JSON Schema（拡張版）
 （バリデーション用ラフ案）
 ```json
 {
@@ -91,12 +143,80 @@
           }
         }
       }
+    },
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "name"],
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "description": { "type": "string" },
+          "tags": { "type": "array", "items": { "type": "string" } },
+          "effects": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    "characters": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "name"],
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "roles": { "type": "array", "items": { "type": "string" } },
+          "summary": { "type": "string" },
+          "relationships": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["target", "type"],
+              "properties": {
+                "target": { "type": "string" },
+                "type": { "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "lore": {
+      "type": "object",
+      "properties": {
+        "entries": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "title", "body"],
+            "properties": {
+              "id": { "type": "string" },
+              "title": { "type": "string" },
+              "body": { "type": "string" },
+              "summary": { "type": "string" },
+              "tags": { "type": "array", "items": { "type": "string" } },
+              "relatedNodes": { "type": "array", "items": { "type": "string" } },
+              "sources": { "type": "array", "items": { "type": "string" } }
+            }
+          }
+        }
+      }
+    },
+    "state": {
+      "type": "object",
+      "properties": {
+        "inventory": { "type": "array", "items": { "type": "string" } },
+        "flags": { "type": "object", "additionalProperties": { "type": ["boolean", "number", "string"] } },
+        "variables": { "type": "object", "additionalProperties": { "type": ["number", "string"] } },
+        "history": { "type": "array", "items": { "type": "string" } }
+      }
     }
   }
 }
 ```
 
-## 4. フロー（Mermaid）
+## 5. フロー（Mermaid）
 ```mermaid
 flowchart LR
   S[meta.start] --> N1[scene:start]
@@ -104,6 +224,6 @@ flowchart LR
   N2 -- back / 戻る --> N1
 ```
 
-## 5. 実装メモ
+## 6. 実装メモ
 - `scripts/play.js` は既存の `sampleData.js` を読む設計。今後、`game-data-schema` に準拠したJSONをインポートできるよう拡張する。
 - 保存はローカル（localStorage/IndexedDB）。プレビューやスナップショットは `StorageProvider`/`StorageBridge` を共通利用。
