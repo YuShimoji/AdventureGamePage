@@ -48,6 +48,15 @@
 - 結合: `play.js` でボタン有効化が描画後に反映されることを手動確認（READMEに手順追記）。
 
 ## 実装タスク
+- [ ] `scripts/gameEngine.js` にフォワードスタック (`forward`) を追加し、履歴操作 API (`canGoForward`, `goForward`) を実装
+- [ ] `scripts/play.js` で「進む」ボタンの状態制御とクリックハンドラを実装し、履歴イベントと連携
+- [ ] `play.html` に「進む」ボタンを追加し、`goForward()` と連動
+- [ ] 進行保存 (`agp_progress`) に `forward` を保存・復元する処理を追加
+- [ ] `tests/gameEngine.forward.spec.js`（新規）を作成し、フォワード履歴のユニットテストを追加
+- [ ] `tests/test.html` に新テストを読み込む設定を追加
+- [ ] `README.md` に操作説明とフォワード履歴の挙動を追記
+- [ ] `CHANGELOG.md` に機能追加を記載
+- [ ] 手動テスト手順を `docs/test_plan.md` に追加し、回帰チェックを実施
 
 - エンジン実装, UI追加, 配線, テスト作成, テストランナー更新, README更新, 変更ログ更新。
 

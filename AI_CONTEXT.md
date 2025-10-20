@@ -7,9 +7,10 @@
   - ルール: `docs/Windsurf_AI_Collab_Rules_v1.1.md`
 
 ## プロジェクト概要
-- リポジトリ: AdventureGamePage（静的Web: index/admin/play）
+- リポジトリ: AdventureGamePage（static-web-app+node-tooling）
 - 目的: ゼンライク編集・保存（IndexedDB優先）・簡易プレイ
 - 言語/ツール: HTML/CSS/JS（Vanilla）
+- 検出結果: `detect-project-type.js` により `static-web-app+node-tooling` と判定（package.json, scripts/, htmlファイル, docs/ 存在）
 
 ## 最近の主要決定・状態
 - 保存アーキテクチャ抽象化（LocalStorage/IndexedDB）を導入済み
@@ -32,6 +33,8 @@
 ## 既知のリスク/ToDo
 - docs/ISSUES.md の構造は「カテゴリ＋箇条書き」。中央Syncは `##` 見出し単位でIssue化するため、必要に応じて1Issue=1見出しへ再構成を検討
 - main の保護設定（レビュー/必須チェック）を有効化する
+- **UI/UXモダン化**: 絵文字アイコンをミニマル文字ラベル（ZEN, SB, T, PV, ME）へ置き換え、アクセシビリティ向上（aria-label追加）
+- **ヘルプドキュメント整備**: `docs/help/admin-guide.md` に操作ガイドを統合。UI内説明文を段階的にヘルプリンクへ移行
 
 ## 次の一手（提案）
 - 旧 localStorage データの移行ウィザード

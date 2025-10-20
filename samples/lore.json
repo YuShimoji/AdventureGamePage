@@ -1,0 +1,28 @@
+{
+  "lore": [
+    {
+      "id": "kingdom1",
+      "title": "王国史",
+      "content": "この王国は古代から存在し、多くの英雄を生み出してきた。",
+      "tags": [
+        "history",
+        "kingdom"
+      ],
+      "related": [
+        "hero1"
+      ]
+    },
+    {
+      "id": "artifact1",
+      "title": "伝説の剣",
+      "content": "古代の英雄が使用した剣。強大な力を持つ。",
+      "tags": [
+        "artifact",
+        "weapon"
+      ],
+      "related": [
+        "sword1"
+      ]
+    }
+  ]
+}
