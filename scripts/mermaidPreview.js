@@ -500,7 +500,13 @@
     };
     setUIRefs(refs);
     const { genBtn, renderBtn, src, view, openBtn, scopeSel, seedSel, copyBtn, dlBtn, searchInput, searchClear, pathStartSel, pathGoalSel, pathApplyBtn } = refs;
-    if(!genBtn || !renderBtn || !src || !view) return;
+    if(!genBtn || !src || !view) return;
+
+    // Fullscreen modal elements
+    const fullscreenBtn = document.getElementById('ne-mermaid-fullscreen');
+    const fullscreenModal = document.getElementById('mermaid-fullscreen-modal');
+    const fullscreenView = document.getElementById('mermaid-fullscreen-view');
+    const fullscreenClose = document.getElementById('mermaid-fullscreen-close');
 
     if(scopeSel && seedSel){
       const applySeedEnabled = ()=>{ const v = getScope(); seedSel.disabled = (v !== 'from_selected'); };
@@ -512,8 +518,44 @@
       seedSel.addEventListener('change', renderDiagram);
     }
 
-    genBtn.addEventListener('click', () => { generateSource(); });
-    renderBtn.addEventListener('click', () => { renderDiagram(); });
+    // Unified generate and render
+    genBtn.addEventListener('click', async () => {
+      generateSource();
+      await renderDiagram();
+    });
+
+    // Legacy render button support (if exists)
+    if(renderBtn){
+      renderBtn.addEventListener('click', () => { renderDiagram(); });
+    }
+
+    // Fullscreen functionality
+    if(fullscreenBtn && fullscreenModal && fullscreenView && fullscreenClose){
+      fullscreenBtn.addEventListener('click', async () => {
+        if(!view.querySelector('svg')){
+          generateSource();
+          await renderDiagram();
+        }
+        const svg = view.querySelector('svg');
+        if(svg){
+          fullscreenView.innerHTML = svg.outerHTML;
+          fullscreenModal.hidden = false;
+        }
+      });
+
+      fullscreenClose.addEventListener('click', () => {
+        fullscreenModal.hidden = true;
+        fullscreenView.innerHTML = '';
+      });
+
+      // Close on Escape
+      document.addEventListener('keydown', (ev) => {
+        if(ev.key === 'Escape' && !fullscreenModal.hidden){
+          fullscreenModal.hidden = true;
+          fullscreenView.innerHTML = '';
+        }
+      });
+    }
 
     if(copyBtn){
       copyBtn.addEventListener('click', async () => {
