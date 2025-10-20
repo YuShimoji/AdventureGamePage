@@ -281,3 +281,121 @@ body.zen-mode .sidebar.show { display: block; }
   .actions { grid-template-columns: 1fr; }
   .header-actions { flex-wrap: wrap; }
 }
+
+/* Mermaid Fullscreen Modal */
+.mermaid-fullscreen-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.95);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  backdrop-filter: blur(8px);
+}
+
+.mermaid-fullscreen-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 24px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+.mermaid-fullscreen-header h3 {
+  margin: 0;
+  flex: 1;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.mermaid-fullscreen-content {
+  flex: 1;
+  overflow: auto;
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mermaid-fullscreen-content .mermaid-view {
+  width: 100%;
+  max-width: 1400px;
+  min-height: 400px;
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  box-shadow: var(--shadow-xl);
+}
+
+/* Improved Mermaid styles */
+#ne-mermaid-view svg {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Button group */
+.btn-group {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* Toast notifications */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 16px;
+  box-shadow: var(--shadow-lg);
+  z-index: 10000;
+  animation: slideInRight 0.3s ease;
+  max-width: 400px;
+}
+
+.toast-success {
+  border-left: 4px solid var(--success);
+}
+
+.toast-error {
+  border-left: 4px solid var(--error);
+}
+
+.toast-info {
+  border-left: 4px solid var(--info);
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Improved accordion styles */
+.agp-accordion {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+}
+
+.agp-accordion summary {
+  transition: var(--transition);
+}
+
+.agp-accordion summary:hover {
+  background: var(--surface-hover);
+}
+
+.agp-accordion[open] summary {
+  background: var(--surface-active);
+  border-bottom: 1px solid var(--border);
+}
+

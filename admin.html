@@ -51,16 +51,16 @@
             <!-- 書式ツールはフローティングバーに分離 -->
 
             <div class="actions">
-              <button id="btn-save-simple" class="btn">シンプル保存</button>
-              <button id="btn-load-simple" class="btn">シンプル読込</button>
+              <button id="btn-save-simple" class="btn btn-primary">クイック保存</button>
+              <button id="btn-load-simple" class="btn btn-ghost">クイック読込</button>
               <button id="btn-save-full" class="btn btn-accent">完全保存</button>
-              <button id="btn-load-full" class="btn">完全読込</button>
-              <button id="btn-export" class="btn">エクスポート(JSON)</button>
-              <label class="btn file-label">
-                インポート(JSON)
+              <button id="btn-load-full" class="btn btn-ghost">完全読込</button>
+              <button id="btn-export" class="btn btn-ghost">エクスポート</button>
+              <label class="btn btn-ghost file-label">
+                インポート
                 <input id="file-import" type="file" accept="application/json" hidden />
               </label>
-              <button id="btn-saves-list" class="btn">保存一覧</button>
+              <button id="btn-saves-list" class="btn btn-ghost">保存一覧</button>
             </div>
           </div>
         </details>
@@ -124,10 +124,10 @@
             <section id="node-editor" class="card">
               <h3>ノード編集（MVP）</h3>
               <div class="ne-actions">
-                <button id="ne-load" class="btn">取込（agp_game_data）</button>
-                <button id="ne-validate" class="btn">検証</button>
-                <button id="ne-save" class="btn btn-accent">適用保存</button>
-                <button id="ne-export" class="btn">JSON出力</button>
+                <button id="ne-load" class="btn btn-ghost">取込</button>
+                <button id="ne-validate" class="btn btn-ghost">検証</button>
+                <button id="ne-save" class="btn btn-primary">保存</button>
+                <button id="ne-export" class="btn btn-ghost">出力</button>
               </div>
               <div class="ne-banner" id="ne-dirty-banner" hidden>未保存の変更があります（Ctrl+S で保存）</div>
               <div class="field">
@@ -188,13 +188,10 @@
             <div class="accordion-hint" data-hint-for="mermaid" hidden></div>
             <section id="mermaid-panel" class="card">
               <h3>分岐プレビュー（Mermaid）</h3>
-              <div class="actions" style="grid-template-columns: 1fr 1fr;">
-                <button id="ne-mermaid-gen" class="btn">生成</button>
-                <button id="ne-mermaid-render" class="btn">描画</button>
-              </div>
-              <div class="ne-row" style="margin:6px 0 0;">
-                <button id="ne-mermaid-open" class="btn">別ウィンドウで開く</button>
-                <div class="spacer"></div>
+              <div class="btn-group" style="margin-bottom: 12px;">
+                <button id="ne-mermaid-gen" class="btn btn-primary">生成・描画</button>
+                <button id="ne-mermaid-fullscreen" class="btn btn-ghost">フルスクリーン</button>
+                <button id="ne-mermaid-open" class="btn btn-ghost">別ウィンドウ</button>
               </div>
               <div class="field">
                 <span>対象</span>
@@ -309,6 +306,17 @@
       </div>
       <div id="preview-list" class="preview-list"></div>
     </section>
+
+    <!-- Mermaid Fullscreen Modal -->
+    <div id="mermaid-fullscreen-modal" class="mermaid-fullscreen-modal" hidden>
+      <div class="mermaid-fullscreen-header">
+        <h3>分岐プレビュー（フルスクリーン）</h3>
+        <button id="mermaid-fullscreen-close" class="btn btn-ghost">閉じる</button>
+      </div>
+      <div class="mermaid-fullscreen-content">
+        <div id="mermaid-fullscreen-view" class="mermaid-view"></div>
+      </div>
+    </div>
 
     <script src="scripts/storage.js"></script>
     <script src="scripts/theme.js"></script>
