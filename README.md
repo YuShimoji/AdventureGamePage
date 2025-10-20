@@ -48,6 +48,7 @@
   - サンプルゲーム（内蔵 `scripts/sampleData.js`）で即プレイ可
   - 進行の保存/復帰、戻る・進む、リスタート
   - ゲームJSON読込（ヘッダーのボタンからインポート、`localStorage: agp_game_data`）
+  - アクセシビリティ: 選択肢の自動フォーカス（最初のボタンに focus）
 
 ### テスト用サンプルJSON
 - `sample-game.json`: 未解決 target（missing-node）を1件含む動作確認用
@@ -174,6 +175,14 @@ flowchart LR
 2. 2 ノード以上遷移 → 「戻る」で1手前へ
 3. 「進む」をクリックし、元のノードへ進めることを確認
 4. 通常遷移（選択肢クリック）を行うと「進む」が無効化されることを確認（フォワードスタックがクリアされます）
+
+### キーボードショートカット（プレイ画面）
+
+- ←（ArrowLeft）: 戻る（`goBack()`）
+- →（ArrowRight）: 進む（`goForward()`）
+- R: リスタート（`reset()`）
+
+注: `APP_CONFIG.ui.shortcutsEnabled` が true の場合のみ有効。入力中（`input`/`textarea`/`contenteditable`）では無効化されます。
 
 ## 設定
 - `scripts/config.js`

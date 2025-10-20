@@ -3,219 +3,229 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>邂｡逅・ｼ・en繝ｩ繧､繧ｯ蝓ｷ遲・お繝・ぅ繧ｿ・・/title>
+    <title>管理（Zenライク執筆エディタ）</title>
     <link rel="stylesheet" href="styles/common.css" />
     <link rel="stylesheet" href="styles/admin.css" />
   </head>
   <body>
     <header class="app-header">
-      <a class="btn" href="index.html">竊・繝医ャ繝・/a>
-      <h1>Zen繝ｩ繧､繧ｯ繧ｨ繝・ぅ繧ｿ</h1>
+      <a class="btn" href="index.html">← トップ</a>
+      <h1>Zenライクエディタ</h1>
       <div class="header-actions">
-        <span id="char-count" class="muted">0 譁・ｭ・/span>
-        <button id="btn-theme" class="icon-btn" title="繝・・繝櫁ｨｭ螳・>耳</button>
-        <button id="btn-toggle-sidebar" class="icon-btn" title="繝・・繝ｫ">笘ｰ</button>
+        <span id="char-count" class="muted">0 文字</span>
+        <button id="btn-theme" class="icon-btn" title="テーマ設定">🎨</button>
+        <button id="btn-toggle-sidebar" class="icon-btn" title="ツール">☰</button>
       </div>
     </header>
 
     <aside id="sidebar" class="sidebar" hidden>
       <div class="sidebar-inner">
-        <h2>繝・・繝ｫ / 菫晏ｭ・/h2>
-        <label class="field">
-          <span>繧ｿ繧､繝医Ν</span>
-          <input id="title-input" type="text" placeholder="辟｡鬘・ />
-        </label>
-
-        <label class="field">
-          <span>菫晏ｭ伜・・医せ繝医Ξ繝ｼ繧ｸ・・/span>
-          <select id="storage-provider-select">
-            <option value="idb">IndexedDB・域耳螂ｨ・・/option>
-            <option value="local">LocalStorage</option>
-          </select>
-        </label>
-
-        <!-- 譖ｸ蠑上ヤ繝ｼ繝ｫ縺ｯ繝輔Ο繝ｼ繝・ぅ繝ｳ繧ｰ繝舌・縺ｫ蛻・屬 -->
-
-        <div class="actions">
-          <button id="btn-save-simple" class="btn">繧ｷ繝ｳ繝励Ν菫晏ｭ・/button>
-          <button id="btn-load-simple" class="btn">繧ｷ繝ｳ繝励Ν隱ｭ霎ｼ</button>
-          <button id="btn-save-full" class="btn btn-accent">螳悟・菫晏ｭ・/button>
-          <button id="btn-load-full" class="btn">螳悟・隱ｭ霎ｼ</button>
-          <button id="btn-export" class="btn">繧ｨ繧ｯ繧ｹ繝昴・繝・JSON)</button>
-          <label class="btn file-label">
-            繧､繝ｳ繝昴・繝・JSON)
-            <input id="file-import" type="file" accept="application/json" hidden />
+        <div class="accordion-mode" data-accordion-mode-toggle>
+          <label class="accordion-mode-toggle">
+            <input type="checkbox" id="accordion-multi-open" />
+            <span data-toggle-label>複数セクションを同時に開く (OFF)</span>
           </label>
-          <button id="btn-saves-list" class="btn">菫晏ｭ倅ｸ隕ｧ</button>
+          <p class="accordion-mode-note">排他モードでは最後に開いたセクションのみ保持されます。</p>
         </div>
 
-        <section id="validation-panel" class="card" hidden>
-          <h3>讀懆ｨｼ繝｡繝・そ繝ｼ繧ｸ</h3>
-          <ul id="validation-list"></ul>
-        </section>
+        <details class="agp-accordion" id="acc-tools" data-accordion-id="tools">
+          <summary data-has-hint>
+            <span class="summary-label">ツール / 保存</span>
+            <button class="accordion-hint-toggle" type="button" aria-expanded="false" aria-label="ツール / 保存のヒント" data-accordion-hint="tools">?</button>
+          </summary>
+          <div class="accordion-content">
+            <div class="accordion-hint" data-hint-for="tools" hidden></div>
+            <label class="field">
+              <span>タイトル</span>
+              <input id="title-input" type="text" placeholder="無題" />
+            </label>
 
-    <!-- 菫晏ｭ倅ｸ隕ｧ繝代ロ繝ｫ -->
+            <label class="field">
+              <span>保存先（ストレージ）</span>
+              <select id="storage-provider-select">
+                <option value="idb">IndexedDB（推奨）</option>
+                <option value="local">LocalStorage</option>
+              </select>
+            </label>
+
+            <!-- 書式ツールはフローティングバーに分離 -->
+
+            <div class="actions">
+              <button id="btn-save-simple" class="btn">シンプル保存</button>
+              <button id="btn-load-simple" class="btn">シンプル読込</button>
+              <button id="btn-save-full" class="btn btn-accent">完全保存</button>
+              <button id="btn-load-full" class="btn">完全読込</button>
+              <button id="btn-export" class="btn">エクスポート(JSON)</button>
+              <label class="btn file-label">
+                インポート(JSON)
+                <input id="file-import" type="file" accept="application/json" hidden />
+              </label>
+              <button id="btn-saves-list" class="btn">保存一覧</button>
+            </div>
+          </div>
+        </details>
+
+    <!-- 保存一覧パネル -->
     <section id="saves-panel" class="saves-panel" hidden>
       <header class="memos-header">
-        <h3>菫晏ｭ倅ｸ隕ｧ</h3>
-        <button id="saves-refresh" class="btn">譖ｴ譁ｰ</button>
-        <button id="saves-close" class="icon-btn" title="髢峨§繧・>笨・/button>
+        <h3>保存一覧</h3>
+        <button id="saves-refresh" class="btn">更新</button>
+        <button id="saves-close" class="icon-btn" title="閉じる">✕</button>
       </header>
       <div id="saves-list" class="memos-list"></div>
     </section>
 
-        <section id="editor-settings" class="card">
-          <h3>繧ｨ繝・ぅ繧ｿ險ｭ螳・/h3>
-          <div class="field">
-            <label class="muted"><input id="cfg-autoscroll-enabled" type="checkbox" /> 閾ｪ蜍輔せ繧ｯ繝ｭ繝ｼ繝ｫ繧呈怏蜉ｹ縺ｫ縺吶ｋ</label>
-          </div>
-          <div class="field">
-            <span>螳牙・鬆伜沺・井ｸ奇ｼ・<small id="cfg-safe-top-label">20%</small></span>
-            <input id="cfg-safe-top" type="range" min="5" max="40" step="1" value="20" />
-          </div>
-          <div class="field">
-            <span>螳牙・鬆伜沺・井ｸ具ｼ・<small id="cfg-safe-bottom-label">60%</small></span>
-            <input id="cfg-safe-bottom" type="range" min="55" max="90" step="1" value="60" />
-          </div>
-          <div class="field">
-            <label class="muted"><input id="cfg-ink-enabled" type="checkbox" /> 蜈･蜉帙い繝九Γ繝ｼ繧ｷ繝ｧ繝ｳ繧呈怏蜉ｹ縺ｫ縺吶ｋ</label>
-          </div>
-          <div class="field">
-            <span>繧｢繝九Γ繝ｼ繧ｷ繝ｧ繝ｳ譎る俣 <small id="cfg-ink-duration-label">160ms</small></span>
-            <input id="cfg-ink-duration" type="range" min="0" max="400" step="10" value="160" />
-          </div>
-          <div class="ne-row">
-            <button id="cfg-save" class="btn btn-accent">險ｭ螳壹ｒ菫晏ｭ・/button>
-            <button id="cfg-reset" class="btn">譌｢螳壹↓謌ｻ縺・/button>
-          </div>
-        </section>
-
-        <section id="node-editor" class="card">
-          <h3>繝弱・繝臥ｷｨ髮・ｼ・VP・・/h3>
-          <div class="ne-actions">
-            <button id="ne-load" class="btn">蜿冶ｾｼ・・gp_game_data・・/button>
-            <button id="ne-validate" class="btn">讀懆ｨｼ</button>
-            <button id="ne-save" class="btn btn-accent">驕ｩ逕ｨ菫晏ｭ・/button>
-            <button id="ne-export" class="btn">JSON蜃ｺ蜉・/button>
-          </div>
-          <div class="ne-banner" id="ne-dirty-banner" hidden>譛ｪ菫晏ｭ倥・螟画峩縺後≠繧翫∪縺呻ｼ・trl+S 縺ｧ菫晏ｭ假ｼ・/div>
-          <div class="field">
-            <span>髢句ｧ九ヮ繝ｼ繝・/span>
-            <select id="ne-start-select"></select>
-          </div>
-          <div class="field ne-unresolved" id="ne-unresolved-panel" hidden>
-            <span>譛ｪ隗｣豎ｺ target 荳隕ｧ</span>
-            <ul id="ne-unresolved-list"></ul>
-          </div>
-          <div class="field">
-            <span>繝弱・繝蛾∈謚・/span>
-            <div class="ne-row">
-              <select id="ne-node-select"></select>
-              <button id="ne-add-node" class="btn">繝弱・繝芽ｿｽ蜉</button>
-              <button id="ne-remove-node" class="btn">繝弱・繝牙炎髯､</button>
-            </div>
-          </div>
-          <div class="field">
-            <span>繝弱・繝迂D</span>
-            <input id="ne-node-id" type="text" placeholder="node:id" />
-          </div>
-          <div class="field">
-            <span>繧ｿ繧､繝医Ν</span>
-            <input id="ne-node-title" type="text" placeholder="繧ｿ繧､繝医Ν" />
-          </div>
-          <div class="field">
-            <span>譛ｬ譁・/span>
-            <textarea id="ne-node-text" rows="4" placeholder="繝・く繧ｹ繝・></textarea>
-          </div>
-          <div class="field">
-            <span>驕ｸ謚櫁い</span>
-            <div id="ne-choices" class="ne-choices"></div>
-            <button id="ne-add-choice" class="btn">驕ｸ謚櫁い繧定ｿｽ蜉</button>
-          </div>
-          <datalist id="ne-node-id-list"></datalist>
-          <div class="field">
-            <span>驛ｨ蛻・お繧ｯ繧ｹ繝昴・繝茨ｼ亥芦驕泌庄閭ｽ繧ｵ繝悶げ繝ｩ繝包ｼ・/span>
-            <div class="ne-row">
-              <select id="ne-export-multiselect" multiple size="6" style="flex:1"></select>
-              <div class="ne-subactions" style="display:grid; gap:6px;">
-                <button id="ne-export-select-all" class="btn">蜈ｨ驕ｸ謚・/button>
-                <button id="ne-export-select-none" class="btn">蜈ｨ隗｣髯､</button>
-                <button id="ne-export-partial" class="btn">驕ｸ謚槭°繧峨お繧ｯ繧ｹ繝昴・繝・/button>
+        <details class="agp-accordion" id="acc-editor-settings" data-accordion-id="editor-settings">
+          <summary data-has-hint>
+            <span class="summary-label">エディタ設定</span>
+            <button class="accordion-hint-toggle" type="button" aria-expanded="false" aria-label="エディタ設定のヒント" data-accordion-hint="editor-settings">?</button>
+          </summary>
+          <div class="accordion-content">
+            <div class="accordion-hint" data-hint-for="editor-settings" hidden></div>
+            <section id="editor-settings" class="card">
+              <h3>エディタ設定</h3>
+              <div class="field">
+                <label class="muted"><input id="cfg-autoscroll-enabled" type="checkbox" /> 自動スクロールを有効にする</label>
               </div>
-            </div>
+              <div class="field">
+                <span>安全領域（上） <small id="cfg-safe-top-label">20%</small></span>
+                <input id="cfg-safe-top" type="range" min="5" max="40" step="1" value="20" />
+              </div>
+              <div class="field">
+                <span>安全領域（下） <small id="cfg-safe-bottom-label">60%</small></span>
+                <input id="cfg-safe-bottom" type="range" min="55" max="90" step="1" value="60" />
+              </div>
+              <div class="field">
+                <label class="muted"><input id="cfg-ink-enabled" type="checkbox" /> 入力アニメーションを有効にする</label>
+              </div>
+              <div class="field">
+                <span>アニメーション時間 <small id="cfg-ink-duration-label">160ms</small></span>
+                <input id="cfg-ink-duration" type="range" min="0" max="400" step="10" value="160" />
+              </div>
+              <div class="ne-row">
+                <button id="cfg-save" class="btn btn-accent">設定を保存</button>
+                <button id="cfg-reset" class="btn">既定に戻す</button>
+              </div>
+            </section>
           </div>
-        </section>
+        </details>
 
-        <section id="mermaid-panel" class="card">
-          <h3>蛻・ｲ舌・繝ｬ繝薙Η繝ｼ・・ermaid・・/h3>
-          <div class="actions" style="grid-template-columns: repeat(4, 1fr);">
-            <button id="ne-mermaid-gen" class="btn">逕滓・</button>
-            <button id="ne-mermaid-render" class="btn">謠冗判</button>
-            <button id="ne-mermaid-copy" class="btn">繧ｳ繝斐・</button>
-            <button id="ne-mermaid-download" class="btn">SVG繝繧ｦ繝ｳ繝ｭ繝ｼ繝・/button>
+        <details class="agp-accordion" id="acc-node-editor" data-accordion-id="node-editor" open>
+          <summary data-has-hint>
+            <span class="summary-label">ノード編集（MVP）</span>
+            <button class="accordion-hint-toggle" type="button" aria-expanded="false" aria-label="ノード編集（MVP）のヒント" data-accordion-hint="node-editor">?</button>
+          </summary>
+          <div class="accordion-content">
+            <div class="accordion-hint" data-hint-for="node-editor" hidden></div>
+            <section id="validation-panel" class="card" hidden>
+              <h3>検証メッセージ</h3>
+              <ul id="validation-list"></ul>
+            </section>
+            <section id="node-editor" class="card">
+              <h3>ノード編集（MVP）</h3>
+              <div class="ne-actions">
+                <button id="ne-load" class="btn">取込（agp_game_data）</button>
+                <button id="ne-validate" class="btn">検証</button>
+                <button id="ne-save" class="btn btn-accent">適用保存</button>
+                <button id="ne-export" class="btn">JSON出力</button>
+              </div>
+              <div class="ne-banner" id="ne-dirty-banner" hidden>未保存の変更があります（Ctrl+S で保存）</div>
+              <div class="field">
+                <span>開始ノード</span>
+                <select id="ne-start-select"></select>
+              </div>
+              <div class="field ne-unresolved" id="ne-unresolved-panel" hidden>
+                <span>未解決 target 一覧</span>
+                <ul id="ne-unresolved-list"></ul>
+              </div>
+              <div class="field">
+                <span>ノード選択</span>
+                <div class="ne-row">
+                  <select id="ne-node-select"></select>
+                  <button id="ne-add-node" class="btn">ノード追加</button>
+                  <button id="ne-remove-node" class="btn">ノード削除</button>
+                </div>
+              </div>
+              <div class="field">
+                <span>ノードID</span>
+                <input id="ne-node-id" type="text" placeholder="node:id" />
+              </div>
+              <div class="field">
+                <span>タイトル</span>
+                <input id="ne-node-title" type="text" placeholder="タイトル" />
+              </div>
+              <div class="field">
+                <span>本文</span>
+                <textarea id="ne-node-text" rows="4" placeholder="テキスト"></textarea>
+              </div>
+              <div class="field">
+                <span>選択肢</span>
+                <div id="ne-choices" class="ne-choices"></div>
+                <button id="ne-add-choice" class="btn">選択肢を追加</button>
+              </div>
+              <datalist id="ne-node-id-list"></datalist>
+              <div class="field">
+                <span>部分エクスポート（到達可能サブグラフ）</span>
+                <div class="ne-row">
+                  <select id="ne-export-multiselect" multiple size="6" style="flex:1"></select>
+                  <div class="ne-subactions" style="display:grid; gap:6px;">
+                    <button id="ne-export-select-all" class="btn">全選択</button>
+                    <button id="ne-export-select-none" class="btn">全解除</button>
+                    <button id="ne-export-partial" class="btn">選択からエクスポート</button>
+                  </div>
+                </div>
+              </div>
+            </section>
           </div>
-          <div class="ne-row" style="margin:6px 0 0;">
-            <button id="ne-mermaid-open" class="btn">蛻･繧ｦ繧｣繝ｳ繝峨え縺ｧ髢九￥</button>
-            <div class="spacer"></div>
+        </details>
+
+        <details class="agp-accordion" id="acc-mermaid" data-accordion-id="mermaid">
+          <summary data-has-hint>
+            <span class="summary-label">分岐プレビュー（Mermaid）</span>
+            <button class="accordion-hint-toggle" type="button" aria-expanded="false" aria-label="分岐プレビュー（Mermaid）のヒント" data-accordion-hint="mermaid">?</button>
+          </summary>
+          <div class="accordion-content">
+            <div class="accordion-hint" data-hint-for="mermaid" hidden></div>
+            <section id="mermaid-panel" class="card">
+              <h3>分岐プレビュー（Mermaid）</h3>
+              <div class="actions" style="grid-template-columns: 1fr 1fr;">
+                <button id="ne-mermaid-gen" class="btn">生成</button>
+                <button id="ne-mermaid-render" class="btn">描画</button>
+              </div>
+              <div class="ne-row" style="margin:6px 0 0;">
+                <button id="ne-mermaid-open" class="btn">別ウィンドウで開く</button>
+                <div class="spacer"></div>
+              </div>
+              <div class="field">
+                <span>対象</span>
+                <div class="ne-row">
+                  <select id="ne-mermaid-scope">
+                    <option value="all">全体</option>
+                    <option value="from_start">開始から到達</option>
+                    <option value="from_selected">選択ノードをseed</option>
+                  </select>
+                  <select id="ne-mermaid-seed" multiple size="5" style="flex:1" disabled></select>
+                </div>
+                <label class="muted"><input id="ne-mermaid-show-labels" type="checkbox" checked /> エッジに選択肢ラベルを表示</label>
+              </div>
+              <label class="field">
+                <span>Mermaid ソース</span>
+                <textarea id="ne-mermaid-src" rows="6" placeholder="flowchart TD..." style="width:100%;"></textarea>
+              </label>
+              <div class="mermaid-view" id="ne-mermaid-view"></div>
+              <p class="muted" style="margin-top:6px;">
+                注: オフライン環境では描画が行われない場合があります。その場合でもソースはコピー可能です。
+              </p>
+            </section>
           </div>
-          <div class="field">
-            <span>蟇ｾ雎｡</span>
-            <div class="ne-row">
-              <select id="ne-mermaid-scope">
-                <option value="all">蜈ｨ菴・/option>
-                <option value="from_start">髢句ｧ九°繧牙芦驕・/option>
-                <option value="from_selected">驕ｸ謚槭ヮ繝ｼ繝峨ｒseed</option>
-              </select>
-              <select id="ne-mermaid-seed" multiple size="5" style="flex:1" disabled></select>
-            </div>
-            <label class="muted"><input id="ne-mermaid-show-labels" type="checkbox" checked /> 繧ｨ繝・ず縺ｫ驕ｸ謚櫁い繝ｩ繝吶Ν繧定｡ｨ遉ｺ</label>
-          </div>
-          <div class="field">
-            <span>レイアウト</span>
-            <div class="ne-row">
-              <select id="ne-mermaid-dir">
-                <option value="TD">Top-Down (TD)</option>
-                <option value="LR">Left-Right (LR)</option>
-                <option value="TB">Top-Bottom (TB)</option>
-                <option value="RL">Right-Left (RL)</option>
-              </select>
-              <label class="muted"><input id="ne-mermaid-mark-unreachable" type="checkbox" checked /> 到達不能ノードを強調</label>
-            </div>
-          </div>
-          <div class="field">
-            <span>検索</span>
-            <div class="ne-row" style="gap:8px;">
-              <input id="ne-mermaid-search" type="search" placeholder="ノードID / タイトル / 本文 / 選択肢ラベル" style="flex:1;" />
-              <button id="ne-mermaid-search-clear" class="btn">クリア</button>
-            </div>
-          </div>
-          <div class="field">
-            <span>最短経路</span>
-            <div class="ne-row" style="gap:8px;">
-              <select id="ne-mermaid-path-start" style="flex:1;"></select>
-              <select id="ne-mermaid-path-goal" style="flex:1;"></select>
-              <button id="ne-mermaid-path-apply" class="btn">経路適用</button>
-            </div>
-          </div>
-          <div class="field">
-            <span>ステータス</span>
-            <div id="ne-mermaid-status" class="muted" style="min-height:1.6em; display:flex; align-items:center;"></div>
-          </div>
-          <label class="field">
-            <span>Mermaid ソース</span>
-            <textarea id="ne-mermaid-src" rows="6" placeholder="flowchart TD..." style="width:100%;"></textarea>
-          </label>
-          <div class="mermaid-view" id="ne-mermaid-view"></div>
-          <p class="muted" style="margin-top:6px;">
-            豕ｨ: 繧ｪ繝輔Λ繧､繝ｳ迺ｰ蠅・〒縺ｯ謠冗判縺瑚｡後ｏ繧後↑縺・ｴ蜷医′縺ゅｊ縺ｾ縺吶ゅ◎縺ｮ蝣ｴ蜷医〒繧ゅた繝ｼ繧ｹ縺ｯ繧ｳ繝斐・蜿ｯ閭ｽ縺ｧ縺吶・          </p>
-        </section>
+        </details>
 
         <details>
-          <summary>繝倥Ν繝・/summary>
+          <summary>ヘルプ</summary>
           <ul>
-            <li>繧ｨ繝・ぅ繧ｿ縺ｯ Zen 繝ｩ繧､繧ｯ縺ｧ縲∵悽譁・↓髮・ｸｭ縺ｧ縺阪∪縺吶・/li>
-            <li>譁・ｭ玲焚繧ｫ繧ｦ繝ｳ繝医・閾ｪ蜍墓峩譁ｰ縺輔ｌ縺ｾ縺吶・/li>
-            <li>菫晏ｭ倥・繝悶Λ繧ｦ繧ｶ縺ｮ localStorage 繧剃ｽｿ逕ｨ縺励∪縺吶・/li>
+            <li>エディタは Zen ライクで、本文に集中できます。</li>
+            <li>文字数カウントは自動更新されます。</li>
+            <li>保存はブラウザの localStorage を使用します。</li>
           </ul>
         </details>
       </div>
@@ -227,74 +237,75 @@
 
     <div id="theme-panel" class="theme-panel" hidden></div>
 
-    <!-- 繝輔Ο繝ｼ繝・ぅ繝ｳ繧ｰ・壽嶌蠑上ヤ繝ｼ繝ｫ繝舌・ -->
+    <!-- フローティング：書式ツールバー -->
     <div id="formatbar" class="formatbar-floating">
-      <button data-cmd="bold" title="螟ｪ蟄・><b>B</b></button>
-      <button data-cmd="italic" title="譁應ｽ・><i>I</i></button>
-      <button data-cmd="underline" title="荳狗ｷ・><u>U</u></button>
+      <button data-cmd="bold" title="太字"><b>B</b></button>
+      <button data-cmd="italic" title="斜体"><i>I</i></button>
+      <button data-cmd="underline" title="下線"><u>U</u></button>
       <span class="spacer"></span>
-      <button data-cmd="justifyLeft" title="蟾ｦ謠・∴">筺ｸ</button>
-      <button data-cmd="justifyCenter" title="荳ｭ螟ｮ">竍・/button>
-      <button data-cmd="justifyRight" title="蜿ｳ謠・∴">筺ｹ</button>
+      <button data-cmd="justifyLeft" title="左揃え">⟸</button>
+      <button data-cmd="justifyCenter" title="中央">⇔</button>
+      <button data-cmd="justifyRight" title="右揃え">⟹</button>
     </div>
 
-    <!-- 繝輔Ο繝ｼ繝・ぅ繝ｳ繧ｰ・壽桃菴懶ｼ・en/繧ｵ繧､繝峨ヰ繝ｼ/繝・・繝橸ｼ・-->
+    <!-- フローティング：操作（Zen/サイドバー/テーマ） -->
     <div class="floating-controls">
-      <button id="btn-quick-zen" class="icon-btn" title="Zen蛻・崛">ｧ・/button>
-      <button id="btn-quick-sidebar" class="icon-btn" title="繝・・繝ｫ蛻・崛">笘ｰ</button>
-      <button id="btn-quick-theme" class="icon-btn" title="繝・・繝櫁ｨｭ螳・>耳</button>
-      <button id="btn-quick-preview" class="icon-btn" title="菫晏ｭ倥・繝ｬ繝薙Η繝ｼ">翌</button>
-      <button id="btn-quick-memos" class="icon-btn" title="繝｡繝｢">統</button>
+      <button id="btn-quick-zen" class="icon-btn" title="Zen切替">🧘</button>
+      <button id="btn-quick-sidebar" class="icon-btn" title="ツール切替">☰</button>
+      <button id="btn-quick-theme" class="icon-btn" title="テーマ設定">🎨</button>
+      <button id="btn-quick-preview" class="icon-btn" title="保存プレビュー">🗂</button>
+      <button id="btn-quick-memos" class="icon-btn" title="メモ">📝</button>
     </div>
 
-    <!-- 繝｡繝｢繝代ロ繝ｫ -->
+    <!-- メモパネル -->
     <section id="memos-panel" class="memos-panel" hidden>
       <header class="memos-header">
-        <h3>繝｡繝｢</h3>
+        <h3>メモ</h3>
         <select id="memos-sort">
-          <option value="createdAt_desc">菴懈・譌･譎・譁ｰ竊呈立)</option>
-          <option value="createdAt_asc">菴懈・譌･譎・譌ｧ竊呈眠)</option>
-          <option value="rank_desc">鬆・ｽ・鬮倪・菴・</option>
-          <option value="rank_asc">鬆・ｽ・菴寂・鬮・</option>
+          <option value="createdAt_desc">作成日時(新→旧)</option>
+          <option value="createdAt_asc">作成日時(旧→新)</option>
+          <option value="rank_desc">順位(高→低)</option>
+          <option value="rank_asc">順位(低→高)</option>
         </select>
-        <button id="memos-close" class="icon-btn" title="髢峨§繧・>笨・/button>
+        <button id="memos-close" class="icon-btn" title="閉じる">✕</button>
       </header>
       <div class="memos-new">
-        <input id="memo-label" type="text" placeholder="繝ｩ繝吶Ν" />
-        <textarea id="memo-text" rows="3" placeholder="繝｡繝｢譛ｬ譁・></textarea>
-        <button id="memo-quote" class="btn" title="繧ｨ繝・ぅ繧ｿ縺ｮ驕ｸ謚樒ｯ・峇繧貞ｼ慕畑">驕ｸ謚槭ｒ蠑慕畑</button>
-        <button id="memo-add" class="btn btn-accent">霑ｽ蜉</button>
+        <input id="memo-label" type="text" placeholder="ラベル" />
+        <textarea id="memo-text" rows="3" placeholder="メモ本文"></textarea>
+        <button id="memo-quote" class="btn" title="エディタの選択範囲を引用">選択を引用</button>
+        <button id="memo-add" class="btn btn-accent">追加</button>
       </div>
       <div id="memos-list" class="memos-list"></div>
     </section>
 
-    <!-- 菫晏ｭ倥・繝ｬ繝薙Η繝ｼ繝代ロ繝ｫ・医Δ繝・け・・-->
+    <!-- 保存プレビューパネル（モック） -->
     <section id="preview-panel" class="preview-panel" hidden>
       <header class="preview-header">
-        <h3>菫晏ｭ倥・繝ｬ繝薙Η繝ｼ</h3>
-        <label class="muted">遞ｮ鬘・          <select id="preview-filter-type">
-            <option value="all">縺吶∋縺ｦ</option>
-            <option value="simple">繧ｷ繝ｳ繝励Ν</option>
-            <option value="full">螳悟・</option>
-            <option value="snapshot">繧ｹ繝翫ャ繝励す繝ｧ繝・ヨ</option>
+        <h3>保存プレビュー</h3>
+        <label class="muted">種類
+          <select id="preview-filter-type">
+            <option value="all">すべて</option>
+            <option value="simple">シンプル</option>
+            <option value="full">完全</option>
+            <option value="snapshot">スナップショット</option>
           </select>
         </label>
-        <label class="muted">荳ｦ縺ｳ
+        <label class="muted">並び
           <select id="preview-sort">
-            <option value="date_desc">菫晏ｭ俶律譎・譁ｰ竊呈立)</option>
-            <option value="date_asc">菫晏ｭ俶律譎・譌ｧ竊呈眠)</option>
-            <option value="size_desc">繧ｵ繧､繧ｺ(螟ｧ竊貞ｰ・</option>
-            <option value="size_asc">繧ｵ繧､繧ｺ(蟆鞘・螟ｧ)</option>
+            <option value="date_desc">保存日時(新→旧)</option>
+            <option value="date_asc">保存日時(旧→新)</option>
+            <option value="size_desc">サイズ(大→小)</option>
+            <option value="size_asc">サイズ(小→大)</option>
           </select>
         </label>
         <div class="spacer"></div>
-        <button id="preview-delete-selected" class="btn" disabled>驕ｸ謚槫炎髯､</button>
-        <button id="preview-refresh" class="btn">譖ｴ譁ｰ</button>
-        <button id="preview-close" class="icon-btn" title="髢峨§繧・>笨・/button>
+        <button id="preview-delete-selected" class="btn" disabled>選択削除</button>
+        <button id="preview-refresh" class="btn">更新</button>
+        <button id="preview-close" class="icon-btn" title="閉じる">✕</button>
       </header>
       <div class="snapshot-bar">
-        <input id="snapshot-label" type="text" placeholder="繧ｹ繝翫ャ繝励す繝ｧ繝・ヨ縺ｮ繝ｩ繝吶Ν (莉ｻ諢・" />
-        <button id="snapshot-create" class="btn btn-accent">繧ｹ繝翫ャ繝励す繝ｧ繝・ヨ菴懈・</button>
+        <input id="snapshot-label" type="text" placeholder="スナップショットのラベル (任意)" />
+        <button id="snapshot-create" class="btn btn-accent">スナップショット作成</button>
       </div>
       <div id="preview-list" class="preview-list"></div>
     </section>
@@ -303,13 +314,10 @@
     <script src="scripts/theme.js"></script>
     <script src="scripts/config.js"></script>
     <script src="scripts/memos.js"></script>
-    <script src="scripts/previewUtils.js"></script>
     <script src="scripts/storageProviders.js"></script>
     <script src="scripts/storageBridge.js"></script>
     <script src="scripts/converters.js"></script>
     <script src="scripts/validator.js"></script>
     <script src="scripts/nodeEditor.js"></script>
     <script src="scripts/savePreview.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
-    <script src="scripts/mermaidPreview.js"></script>
     <script src="scripts/admin.js"></script>
