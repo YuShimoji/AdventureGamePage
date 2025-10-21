@@ -399,3 +399,39 @@ body.zen-mode .sidebar.show { display: block; }
   border-bottom: 1px solid var(--border);
 }
 
+.summary-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  cursor: pointer;
+}
+
+.summary-wrapper summary {
+  margin: 0;
+  padding: 0;
+  background: none;
+  border: none;
+  font-size: inherit;
+  font-family: inherit;
+  cursor: pointer;
+  list-style: none;
+}
+
+.summary-wrapper .accordion-hint-toggle {
+  margin-left: 8px;
+  padding: 2px 6px;
+  border: none;
+  background: var(--surface-hover);
+  color: var(--text-secondary);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 12px;
+  transition: var(--transition);
+}
+
+.summary-wrapper .accordion-hint-toggle:hover {
+  background: var(--surface-active);
+  color: var(--text-color);
+}
+
