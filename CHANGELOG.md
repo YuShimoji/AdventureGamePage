@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 
 ## [2025-10-20]
 
+- fix(mermaid): Mermaid CDN追加と初期化で分岐プレビューの描画を修正
+
 - feat(ui): 管理画面のUIを洗練、アイコン導入、ボタン統一、アクセシビリティ向上 [#25]
 
 - feat(admin): モダン・ミニマル・スタイリッシュなデザインシステムを導入 [#24]
