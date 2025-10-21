@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 
 ## [2025-10-20]
 
+- feat(ui): 管理画面のUIを洗練、アイコン導入、ボタン統一、アクセシビリティ向上 [#25]
+
 - feat(admin): モダン・ミニマル・スタイリッシュなデザインシステムを導入 [#24]
 - feat(admin): JSONボタンの統合と名称変更（シンプル保存→クイック保存、ボタン階層の明確化） [#24]
 - feat(admin): Mermaid「生成・描画」を統合、フルスクリーンモーダルを追加 [#24]
