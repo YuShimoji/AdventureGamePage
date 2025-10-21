@@ -227,6 +227,27 @@
           </div>
         </details>
 
+        <details class="agp-accordion" id="acc-playtest" data-accordion-id="playtest">
+          <div class="summary-wrapper">
+            <summary data-has-hint>
+              <span class="summary-label">プレイテスト</span>
+            </summary>
+            <button class="accordion-hint-toggle" type="button" aria-expanded="false" aria-label="プレイテストのヒント" data-accordion-hint="playtest">?</button>
+          </div>
+          <div class="accordion-content">
+            <div class="accordion-hint" data-hint-for="playtest" hidden></div>
+            <section id="playtest-panel" class="card">
+              <h3>プレイテスト</h3>
+              <p class="muted">現在のエディタ内容をプレイモードで確認できます。</p>
+              <div class="btn-group" style="margin-bottom: 12px;">
+                <button id="playtest-inline" class="btn btn-primary">インラインプレビュー</button>
+                <button id="playtest-window" class="btn btn-ghost">別ウィンドウで開く</button>
+              </div>
+              <div id="playtest-status" class="muted" style="margin-top: 8px;"></div>
+            </section>
+          </div>
+        </details>
+
         <details>
           <summary>ヘルプ</summary>
           <ul>
@@ -328,6 +349,17 @@
       </div>
     </div>
 
+    <!-- Playtest Modal -->
+    <div id="playtest-modal" class="playtest-modal" hidden>
+      <div class="playtest-modal-header">
+        <h3>プレイテスト</h3>
+        <button id="playtest-modal-close" class="btn btn-ghost btn-sm" title="閉じる">✕</button>
+      </div>
+      <div class="playtest-modal-content">
+        <iframe id="playtest-iframe" style="width: 100%; height: 100%; border: none;"></iframe>
+      </div>
+    </div>
+
     <script src="scripts/storage.js"></script>
     <script src="scripts/theme.js"></script>
     <script src="scripts/config.js"></script>
@@ -338,4 +370,5 @@
     <script src="scripts/validator.js"></script>
     <script src="scripts/nodeEditor.js"></script>
     <script src="scripts/savePreview.js"></script>
+    <script src="scripts/playtest.js"></script>
     <script src="scripts/admin.js"></script>

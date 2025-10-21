@@ -287,45 +287,60 @@ body.zen-mode .sidebar.show { display: block; }
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.95);
-  z-index: 9999;
+  z-index: 200;
   display: flex;
   flex-direction: column;
-  backdrop-filter: blur(8px);
 }
 
 .mermaid-fullscreen-header {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 12px;
   padding: 16px 24px;
   background: var(--surface);
   border-bottom: 1px solid var(--border);
-}
-
-.mermaid-fullscreen-header h3 {
-  margin: 0;
-  flex: 1;
-  font-size: 18px;
-  font-weight: 600;
 }
 
 .mermaid-fullscreen-content {
   flex: 1;
   overflow: auto;
   padding: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .mermaid-fullscreen-content .mermaid-view {
-  width: 100%;
-  max-width: 1400px;
-  min-height: 400px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100%;
   background: var(--surface);
   border-radius: var(--radius-lg);
   padding: 24px;
   box-shadow: var(--shadow-xl);
+}
+
+/* Playtest Modal */
+.playtest-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.95);
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+}
+
+.playtest-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+.playtest-modal-content {
+  flex: 1;
+  overflow: hidden;
+  background: var(--background);
 }
 
 /* Improved Mermaid styles */

@@ -22,7 +22,48 @@
     return null;
   }
 
+  // Check for autoload parameter
+  function checkAutoload(){
+    const params = new URLSearchParams(window.location.search);
+    const autoloadKey = params.get('autoload');
+    
+    if(!autoloadKey) return;
+    
+    try {
+      // Load from storage
+      const data = window.StorageBridge?.load?.(autoloadKey);
+      
+      if(!data){
+        console.warn('Autoload: No data found for key:', autoloadKey);
+        return;
+      }
+      
+      // Normalize and save
+      const engine = (window.Converters?.normalizeSpecToEngine)
+        ? window.Converters.normalizeSpecToEngine(data)
+        : normalizeSpecToEngine(data);
+      
+      if(!engine){
+        console.error('Autoload: Failed to normalize data');
+        return;
+      }
+      
+      StorageUtil.saveJSON('agp_game_data', engine);
+      console.log('Autoload: Game data loaded successfully');
+      
+      // Remove autoload parameter from URL
+      const newUrl = window.location.pathname;
+      window.history.replaceState({}, '', newUrl);
+      
+    } catch(e){
+      console.error('Autoload error:', e);
+    }
+  }
+
   document.addEventListener('DOMContentLoaded', () => {
+    // Check autoload first
+    checkAutoload();
+    
     const fileEl = document.getElementById('play-file-import');
     if(!fileEl) return;
     fileEl.addEventListener('change', (ev) => {
