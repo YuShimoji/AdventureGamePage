@@ -306,34 +306,59 @@
       <div id="memos-list" class="memos-list"></div>
     </section>
 
-    <!-- 保存プレビューパネル（モック） -->
-    <section id="preview-panel" class="preview-panel" hidden>
-      <header class="preview-header">
-        <h3>保存プレビュー</h3>
-        <label class="muted">種類
-          <select id="preview-filter-type">
-            <option value="all">すべて</option>
-            <option value="simple">シンプル</option>
-            <option value="full">完全</option>
-            <option value="snapshot">スナップショット</option>
-          </select>
-        </label>
-        <label class="muted">並び
-          <select id="preview-sort">
-            <option value="date_desc">保存日時(新→旧)</option>
-            <option value="date_asc">保存日時(旧→新)</option>
-            <option value="size_desc">サイズ(大→小)</option>
-            <option value="size_asc">サイズ(小→大)</option>
-          </select>
-        </label>
-        <div class="spacer"></div>
-        <button id="preview-delete-selected" class="btn btn-ghost" disabled title="選択削除">🗑 選択削除</button>
-        <button id="preview-refresh" class="btn btn-ghost btn-sm" title="更新">↻</button>
-        <button id="preview-close" class="btn btn-ghost btn-sm" title="閉じる">✕</button>
+    <!-- 保存プレビューパネル -->
+    <section id="preview-panel" class="preview-panel overlay-panel" hidden>
+      <header class="preview-header" style="flex-direction: column; align-items: stretch; gap: 12px;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <h3 style="margin: 0;">保存プレビュー</h3>
+          <div class="spacer"></div>
+          <button id="snapshot-compare-btn" class="btn" disabled>比較 (0/2)</button>
+          <button id="preview-delete-selected" class="btn" disabled>選択削除</button>
+          <button id="preview-refresh" class="btn">再読込</button>
+          <button id="preview-close" class="icon-btn" title="閉じる">✕</button>
+        </div>
+        
+        <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center; font-size: 13px;">
+          <label class="muted">検索
+            <input id="preview-search" type="text" placeholder="タイトル・内容・ラベル" style="width: 150px;" />
+          </label>
+          <label class="muted">タグ
+            <select id="preview-filter-tag">
+              <option value="all">全て</option>
+              <option value="draft">下書き</option>
+              <option value="final">最終版</option>
+              <option value="backup">バックアップ</option>
+            </select>
+          </label>
+          <label class="muted">種類
+            <select id="preview-filter-type">
+              <option value="all">全て</option>
+              <option value="simple">シンプル保存</option>
+              <option value="full">完全保存</option>
+              <option value="snapshot">スナップショット</option>
+            </select>
+          </label>
+          <label class="muted">開始日
+            <input id="preview-date-from" type="date" style="width: 130px;" />
+          </label>
+          <label class="muted">終了日
+            <input id="preview-date-to" type="date" style="width: 130px;" />
+          </label>
+          <label class="muted">並び替え
+            <select id="preview-sort">
+              <option value="date_desc">保存日時（新しい順）</option>
+              <option value="date_asc">保存日時（古い順）</option>
+              <option value="size_desc">サイズ（大→小）</option>
+              <option value="size_asc">サイズ（小→大）</option>
+              <option value="title_asc">タイトル（A→Z）</option>
+              <option value="title_desc">タイトル（Z→A）</option>
+            </select>
+          </label>
+        </div>
       </header>
       <div class="snapshot-bar">
-        <input id="snapshot-label" type="text" placeholder="スナップショットのラベル (任意)" />
-        <button id="snapshot-create" class="btn btn-primary" title="スナップショット作成">📷 作成</button>
+        <input id="snapshot-label" type="text" placeholder="スナップショット名（任意）" />
+        <button id="snapshot-create" class="btn btn-accent">スナップショット作成</button>
       </div>
       <div id="preview-list" class="preview-list"></div>
     </section>
@@ -364,11 +389,19 @@
     <script src="scripts/theme.js"></script>
     <script src="scripts/config.js"></script>
     <script src="scripts/memos.js"></script>
+    <script src="scripts/previewUtils.js"></script>
+    <script src="scripts/errorHandler.js"></script>
     <script src="scripts/storageProviders.js"></script>
     <script src="scripts/storageBridge.js"></script>
     <script src="scripts/converters.js"></script>
     <script src="scripts/validator.js"></script>
+    <script src="scripts/dataValidator.js"></script>
     <script src="scripts/nodeEditor.js"></script>
+    <script src="scripts/dataMigration.js"></script>
+    <script src="scripts/migrationWizard.js"></script>
+    <script src="scripts/snapshotCompare.js"></script>
     <script src="scripts/savePreview.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script src="scripts/mermaidPreview.js"></script>
     <script src="scripts/playtest.js"></script>
     <script src="scripts/admin.js"></script>

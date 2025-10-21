@@ -26,24 +26,62 @@
   }
 
   async function saveFull(obj){
-    const p = getProvider(); if(!p || !p.isAvailable()) throw new Error('No provider');
-    const rec = { ...obj, type: 'manuscript', kind: 'full' };
-    const id = await p.save(rec);
-    try { localStorage.setItem(PTR_FULL, id); } catch{}
-    return id;
-  }
-  async function loadFull(){
-    const p = getProvider(); if(!p || !p.isAvailable()) return null;
-    let id = null; try { id = localStorage.getItem(PTR_FULL); } catch{}
-    if(!id){
-      const list = await p.list();
-      const item = (list||[]).find(x=>x.kind==='full');
-      if(!item) return null; id = item.id;
+    try {
+      const p = getProvider(); 
+      if(!p || !p.isAvailable()) throw new Error('Storage provider not available');
+      const rec = { ...obj, type: 'manuscript', kind: 'full' };
+      
+      // Use retry mechanism if ErrorHandler is available
+      if (window.ErrorHandler && window.ErrorHandler.withRetry) {
+        return await window.ErrorHandler.withRetry(() => p.save(rec));
+      }
+      const id = await p.save(rec);
+      try { localStorage.setItem(PTR_FULL, id); } catch{}
+      return id;
+    } catch (e) {
+      if (window.ErrorHandler) window.ErrorHandler.showError(e, { operation: 'saveFull' });
+      throw e;
     }
-    return await p.load(id);
   }
-  async function get(id){ const p=getProvider(); if(!p||!p.isAvailable()) return null; return await p.load(id); }
-  async function remove(id){ const p=getProvider(); if(!p||!p.isAvailable()) return; return await p.remove(id); }
+
+  async function loadFull(){
+    try {
+      const p = getProvider(); 
+      if(!p || !p.isAvailable()) return null;
+      let id = null; try { id = localStorage.getItem(PTR_FULL); } catch{}
+      if(!id){
+        const list = await p.list();
+        const item = (list||[]).find(x=>x.kind==='full');
+        if(!item) return null; id = item.id;
+      }
+      return await p.load(id);
+    } catch (e) {
+      console.error('loadFull error:', e);
+      return null;
+    }
+  }
+
+  async function get(id){ 
+    try {
+      const p = getProvider(); 
+      if(!p || !p.isAvailable()) return null; 
+      return await p.load(id);
+    } catch (e) {
+      console.error('get error:', e);
+      return null;
+    }
+  }
+
+  async function remove(id){ 
+    try {
+      const p = getProvider(); 
+      if(!p || !p.isAvailable()) return; 
+      return await p.remove(id);
+    } catch (e) {
+      if (window.ErrorHandler) window.ErrorHandler.showError(e, { operation: 'remove', id });
+      throw e;
+    }
+  }
 
   window.StorageBridge = { saveSimple, loadSimple, saveFull, loadFull, get, remove };
 })();

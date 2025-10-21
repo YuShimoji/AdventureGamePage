@@ -43,10 +43,11 @@
       const actions = document.createElement('div'); actions.className = 'preview-actions';
       const btnLoad = document.createElement('button'); btnLoad.className = 'btn'; btnLoad.textContent = '読込';
       const btnDel = document.createElement('button'); btnDel.className = 'btn'; btnDel.textContent = '削除';
-      // snapshot: allow label edit
+      // snapshot: allow label edit and comparison
       let btnLabel = null;
+      let btnCompare = null;
       if((item.kind || item.type) === 'snapshot'){
-        btnLabel = document.createElement('button'); btnLabel.className='btn'; btnLabel.textContent='ラベル編集';
+        btnLabel = document.createElement('button'); btnLabel.className='btn'; btnLabel.textContent='編集';
         btnLabel.addEventListener('click', async () => {
           try {
             let obj = null;
@@ -56,11 +57,19 @@
               const maybe = p?.get?.(item.id);
               obj = (maybe && typeof maybe.then === 'function') ? await maybe : maybe;
             }
-            if(!obj || typeof obj !== 'object' || !obj.meta){ alert('ラベル編集に対応していないデータです'); return; }
-            const cur = obj.meta?.label || '';
-            const nv = prompt('新しいラベルを入力', cur);
-            if(nv == null) return; // cancel
-            obj.meta.label = nv.trim();
+            if(!obj || typeof obj !== 'object' || !obj.meta){ alert('編集に対応していないデータです'); return; }
+            const curLabel = obj.meta?.label || '';
+            const curTags = (obj.meta?.tags || []).join(', ');
+
+            const newLabel = prompt('新しいラベルを入力', curLabel);
+            if(newLabel == null) return; // cancel
+
+            const newTagsStr = prompt('タグをカンマ区切りで入力（例: draft, important）', curTags);
+            if(newTagsStr == null) return; // cancel
+
+            obj.meta.label = newLabel.trim();
+            obj.meta.tags = newTagsStr.split(',').map(t => t.trim()).filter(t => t);
+
             if(window.StorageBridge && window.StorageBridge.set){ await window.StorageBridge.set(item.id, obj); }
             else {
               const p = window.StorageHub?.getProvider?.();
@@ -68,11 +77,33 @@
               if(maybe && typeof maybe.then === 'function') await maybe;
             }
             await refresh();
-          } catch(e){ console.error('label-edit', e); alert('ラベル編集に失敗しました'); }
+          } catch(e){ console.error('edit-snapshot', e); alert('編集に失敗しました'); }
+        });
+
+        // Add compare button for snapshots
+        btnCompare = document.createElement('button');
+        btnCompare.className = 'btn';
+        btnCompare.textContent = '比較選択';
+        btnCompare.setAttribute('data-snapshot-id', item.id);
+        btnCompare.addEventListener('click', () => {
+          if (window.SnapshotCompare && window.SnapshotCompare.selectSnapshotForComparison) {
+            window.SnapshotCompare.selectSnapshotForComparison(item.id);
+            
+            // Toggle button appearance
+            const selected = window.SnapshotCompare.getSelectedSnapshots();
+            if (selected.includes(item.id)) {
+              btnCompare.style.background = 'var(--accent, #4a9eff)';
+              btnCompare.style.color = '#fff';
+            } else {
+              btnCompare.style.background = '';
+              btnCompare.style.color = '';
+            }
+          }
         });
       }
       actions.append(btnLoad, btnDel);
       if(btnLabel) actions.append(btnLabel);
+      if(btnCompare) actions.append(btnCompare);
 
       btnLoad.addEventListener('click', async () => {
         const ok = await window.AdminAPI?.loadById?.(item.id);
@@ -110,6 +141,9 @@
         const opts = window.PreviewUtils?.readControls?.();
         if(opts && window.PreviewUtils){
           items = window.PreviewUtils.filterItems(items, opts.type);
+          items = window.PreviewUtils.searchItems(items, opts.search);
+          items = window.PreviewUtils.filterByTag(items, opts.tag);
+          items = window.PreviewUtils.filterByDateRange(items, opts.dateFrom, opts.dateTo);
           items = window.PreviewUtils.sortItems(items, opts.sort);
         }
       } catch(e){ /* non-fatal */ }
@@ -130,6 +164,11 @@
     const snapLabel = document.getElementById('snapshot-label');
     const typeSel = document.getElementById('preview-filter-type');
     const sortSel = document.getElementById('preview-sort');
+    const searchInput = document.getElementById('preview-search');
+    const tagSel = document.getElementById('preview-filter-tag');
+    const dateFromInput = document.getElementById('preview-date-from');
+    const dateToInput = document.getElementById('preview-date-to');
+    const compareBtn = document.getElementById('snapshot-compare-btn');
     const delSelBtn = document.getElementById('preview-delete-selected');
 
     if(!panel) return;
@@ -141,6 +180,15 @@
     if(refreshBtn) refreshBtn.addEventListener('click', () => { selected.clear(); updateDeleteSelectedBtn(); refresh(); });
     if(typeSel) typeSel.addEventListener('change', () => { refresh(); });
     if(sortSel) sortSel.addEventListener('change', () => { refresh(); });
+    if(searchInput) searchInput.addEventListener('input', () => { refresh(); });
+    if(tagSel) tagSel.addEventListener('change', () => { refresh(); });
+    if(dateFromInput) dateFromInput.addEventListener('change', () => { refresh(); });
+    if(dateToInput) dateToInput.addEventListener('change', () => { refresh(); });
+    if(compareBtn) compareBtn.addEventListener('click', () => {
+      if (window.SnapshotCompare && window.SnapshotCompare.compareSnapshots) {
+        window.SnapshotCompare.compareSnapshots();
+      }
+    });
     if(delSelBtn) delSelBtn.addEventListener('click', async () => {
       if(selected.size === 0) return;
       if(!confirm(`選択中の ${selected.size} 件を削除しますか？`)) return;
@@ -174,7 +222,12 @@
             title: (titleEl?.value || '').trim() || (window.APP_CONFIG?.strings?.defaultTitle ?? ''),
             html: editor?.innerHTML || '',
             text: editor?.innerText || '',
-            meta: { savedAt: now, theme, label: (snapLabel?.value || '').trim() }
+            meta: {
+              savedAt: now,
+              theme,
+              label: (snapLabel?.value || '').trim(),
+              tags: [] // initialize tags array for future extension
+            }
           };
           if(window.StorageBridge){ await window.StorageBridge.set(id, obj); }
           else {
