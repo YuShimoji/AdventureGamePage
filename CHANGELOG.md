@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2025-10-21]
+
+- feat(workflow): エディタ→プレイのワークフロー統合、プレイテスト機能追加 [#26]
+  - admin.htmlに「プレイテスト」セクション追加
+  - インラインプレビューと別ウィンドウの2モード対応
+  - エディタ内容を直接プレイ可能に
+  - play.htmlのautoloadパラメータ対応
+
 ## [2025-10-20]
 
 - fix(mermaid): Mermaid CDN追加と初期化で分岐プレビューの描画を修正
