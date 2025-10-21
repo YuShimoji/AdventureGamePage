@@ -478,6 +478,15 @@
   }
 
   function bind(){
+    // Initialize Mermaid
+    if(window.mermaid){
+      try {
+        window.mermaid.initialize({ startOnLoad: false });
+      } catch(e){
+        console.warn('Mermaid initialization failed:', e);
+      }
+    }
+
     const refs = {
       genBtn: document.getElementById('ne-mermaid-gen'),
       renderBtn: document.getElementById('ne-mermaid-render'),
