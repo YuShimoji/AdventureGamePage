@@ -6,6 +6,9 @@
     <title>管理（Zenライク執筆エディタ）</title>
     <link rel="stylesheet" href="styles/common.css" />
     <link rel="stylesheet" href="styles/admin.css" />
+    <!-- Lucide Icons -->
+    <link rel="stylesheet" href="https://unpkg.com/lucide@latest/dist/umd/lucide.css" />
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
   </head>
   <body>
     <header class="app-header">
@@ -13,8 +16,8 @@
       <h1>Zenライクエディタ</h1>
       <div class="header-actions">
         <span id="char-count" class="muted">0 文字</span>
-        <button id="btn-theme" class="icon-btn" title="テーマ設定">🎨</button>
-        <button id="btn-toggle-sidebar" class="icon-btn" title="ツール">☰</button>
+        <button id="btn-theme" class="btn btn-ghost btn-sm" title="テーマ設定"><i data-lucide="palette"></i></button>
+        <button id="btn-toggle-sidebar" class="btn btn-ghost btn-sm" title="ツール"><i data-lucide="sidebar"></i></button>
       </div>
     </header>
 
@@ -69,8 +72,8 @@
     <section id="saves-panel" class="saves-panel" hidden>
       <header class="memos-header">
         <h3>保存一覧</h3>
-        <button id="saves-refresh" class="btn">更新</button>
-        <button id="saves-close" class="icon-btn" title="閉じる">✕</button>
+        <button id="saves-refresh" class="btn btn-ghost btn-sm" title="更新"><i data-lucide="refresh-cw"></i></button>
+        <button id="saves-close" class="btn btn-ghost btn-sm" title="閉じる"><i data-lucide="x"></i></button>
       </header>
       <div id="saves-list" class="memos-list"></div>
     </section>
@@ -236,22 +239,22 @@
 
     <!-- フローティング：書式ツールバー -->
     <div id="formatbar" class="formatbar-floating">
-      <button data-cmd="bold" title="太字"><b>B</b></button>
-      <button data-cmd="italic" title="斜体"><i>I</i></button>
-      <button data-cmd="underline" title="下線"><u>U</u></button>
+      <button data-cmd="bold" class="btn btn-ghost btn-sm" title="太字"><b>B</b></button>
+      <button data-cmd="italic" class="btn btn-ghost btn-sm" title="斜体"><i>I</i></button>
+      <button data-cmd="underline" class="btn btn-ghost btn-sm" title="下線"><u>U</u></button>
       <span class="spacer"></span>
-      <button data-cmd="justifyLeft" title="左揃え">⟸</button>
-      <button data-cmd="justifyCenter" title="中央">⇔</button>
-      <button data-cmd="justifyRight" title="右揃え">⟹</button>
+      <button data-cmd="justifyLeft" class="btn btn-ghost btn-sm" title="左揃え"><i data-lucide="align-left"></i></button>
+      <button data-cmd="justifyCenter" class="btn btn-ghost btn-sm" title="中央"><i data-lucide="align-center"></i></button>
+      <button data-cmd="justifyRight" class="btn btn-ghost btn-sm" title="右揃え"><i data-lucide="align-right"></i></button>
     </div>
 
     <!-- フローティング：操作（Zen/サイドバー/テーマ） -->
     <div class="floating-controls">
-      <button id="btn-quick-zen" class="icon-btn" title="Zen切替">🧘</button>
-      <button id="btn-quick-sidebar" class="icon-btn" title="ツール切替">☰</button>
-      <button id="btn-quick-theme" class="icon-btn" title="テーマ設定">🎨</button>
-      <button id="btn-quick-preview" class="icon-btn" title="保存プレビュー">🗂</button>
-      <button id="btn-quick-memos" class="icon-btn" title="メモ">📝</button>
+      <button id="btn-quick-zen" class="btn btn-ghost btn-sm" title="Zen切替"><i data-lucide="focus"></i></button>
+      <button id="btn-quick-sidebar" class="btn btn-ghost btn-sm" title="ツール切替"><i data-lucide="sidebar"></i></button>
+      <button id="btn-quick-theme" class="btn btn-ghost btn-sm" title="テーマ設定"><i data-lucide="palette"></i></button>
+      <button id="btn-quick-preview" class="btn btn-ghost btn-sm" title="保存プレビュー"><i data-lucide="archive"></i></button>
+      <button id="btn-quick-memos" class="btn btn-ghost btn-sm" title="メモ"><i data-lucide="sticky-note"></i></button>
     </div>
 
     <!-- メモパネル -->
@@ -264,13 +267,13 @@
           <option value="rank_desc">順位(高→低)</option>
           <option value="rank_asc">順位(低→高)</option>
         </select>
-        <button id="memos-close" class="icon-btn" title="閉じる">✕</button>
+        <button id="memos-close" class="btn btn-ghost btn-sm" title="閉じる"><i data-lucide="x"></i></button>
       </header>
       <div class="memos-new">
         <input id="memo-label" type="text" placeholder="ラベル" />
         <textarea id="memo-text" rows="3" placeholder="メモ本文"></textarea>
-        <button id="memo-quote" class="btn" title="エディタの選択範囲を引用">選択を引用</button>
-        <button id="memo-add" class="btn btn-accent">追加</button>
+        <button id="memo-quote" class="btn btn-ghost" title="エディタの選択範囲を引用"><i data-lucide="quote"></i> 選択を引用</button>
+        <button id="memo-add" class="btn btn-primary" title="追加"><i data-lucide="plus"></i> 追加</button>
       </div>
       <div id="memos-list" class="memos-list"></div>
     </section>
@@ -296,13 +299,13 @@
           </select>
         </label>
         <div class="spacer"></div>
-        <button id="preview-delete-selected" class="btn" disabled>選択削除</button>
-        <button id="preview-refresh" class="btn">更新</button>
-        <button id="preview-close" class="icon-btn" title="閉じる">✕</button>
+        <button id="preview-delete-selected" class="btn btn-ghost" disabled title="選択削除"><i data-lucide="trash-2"></i> 選択削除</button>
+        <button id="preview-refresh" class="btn btn-ghost btn-sm" title="更新"><i data-lucide="refresh-cw"></i></button>
+        <button id="preview-close" class="btn btn-ghost btn-sm" title="閉じる"><i data-lucide="x"></i></button>
       </header>
       <div class="snapshot-bar">
         <input id="snapshot-label" type="text" placeholder="スナップショットのラベル (任意)" />
-        <button id="snapshot-create" class="btn btn-accent">スナップショット作成</button>
+        <button id="snapshot-create" class="btn btn-primary" title="スナップショット作成"><i data-lucide="camera"></i> 作成</button>
       </div>
       <div id="preview-list" class="preview-list"></div>
     </section>
@@ -311,7 +314,7 @@
     <div id="mermaid-fullscreen-modal" class="mermaid-fullscreen-modal" hidden>
       <div class="mermaid-fullscreen-header">
         <h3>分岐プレビュー（フルスクリーン）</h3>
-        <button id="mermaid-fullscreen-close" class="btn btn-ghost">閉じる</button>
+        <button id="mermaid-fullscreen-close" class="btn btn-ghost btn-sm" title="閉じる"><i data-lucide="x"></i></button>
       </div>
       <div class="mermaid-fullscreen-content">
         <div id="mermaid-fullscreen-view" class="mermaid-view"></div>
@@ -329,3 +332,12 @@
     <script src="scripts/nodeEditor.js"></script>
     <script src="scripts/savePreview.js"></script>
     <script src="scripts/admin.js"></script>
+
+    <!-- Initialize Lucide Icons -->
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        if (window.lucide) {
+          window.lucide.createIcons();
+        }
+      });
+    </script>
