@@ -71,7 +71,9 @@ function waitForServer(url, timeout = SERVER_START_TIMEOUT) {
     function check() {
       http.get(url, (res) => {
         if (res.statusCode === 200) {
-          resolve();
+          // Get actual port from response URL if redirected
+          const actualPort = new URL(res.headers.location || url).port || PORT;
+          resolve(actualPort);
           return;
         }
         res.resume();
@@ -138,6 +140,7 @@ function runTests() {
 // Main test runner
 async function main() {
   let serverProcess = null;
+  let actualPort = PORT;
 
   try {
     log('Starting test runner...');
@@ -145,14 +148,7 @@ async function main() {
     // Check if port is in use
     const isPortInUse = await checkPort(PORT);
     if (isPortInUse) {
-      log(`Port ${PORT} is in use, attempting to free it...`);
-      await killPortProcess(PORT);
-    }
-
-    // Verify port is free
-    const stillInUse = await checkPort(PORT);
-    if (stillInUse) {
-      throw new Error(`Cannot free port ${PORT}`);
+      log(`Port ${PORT} is in use, but dev-server will find an available port automatically...`);
     }
 
     log('Starting development server...');
@@ -166,11 +162,17 @@ async function main() {
       error(`Server process error: ${err.message}`);
     });
 
-    // Wait for server to be ready
+    // Wait for server to be ready and get actual port
     log('Waiting for server to be ready...');
-    await waitForServer(`http://${HOST}:${PORT}/`);
+    actualPort = await waitForServer(`http://${HOST}:${PORT}/`);
 
-    log('Server is ready, running tests...');
+    const actualTestUrl = `http://${HOST}:${actualPort}/tests/test.html`;
+    log(`Server is ready on port ${actualPort}, running tests...`);
+
+    // Override TEST_URL with actual port
+    const originalTestUrl = TEST_URL;
+    TEST_URL = actualTestUrl;
+
     await runTests();
 
     log('All tests completed successfully!');

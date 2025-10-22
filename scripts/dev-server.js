@@ -70,6 +70,29 @@ const server = http.createServer((req, res) => {
   });
 });
 
-server.listen(PORT, () => {
-  console.log(`[dev-server] Serving ${ROOT} at http://127.0.0.1:${PORT}/`);
+function findAvailablePort(startPort) {
+  return new Promise((resolve, reject) => {
+    const server = require('http').createServer();
+    server.listen(startPort, () => {
+      const port = server.address().port;
+      server.close(() => resolve(port));
+    });
+    server.on('error', () => {
+      // Port is in use, try next port
+      findAvailablePort(startPort + 1).then(resolve).catch(reject);
+    });
+  });
+}
+
+// Use available port
+findAvailablePort(PORT).then(availablePort => {
+  server.listen(availablePort, () => {
+    console.log(`[dev-server] Serving ${ROOT} at http://127.0.0.1:${availablePort}/`);
+    if (availablePort !== PORT) {
+      console.log(`[dev-server] Note: Using port ${availablePort} instead of ${PORT} (was in use)`);
+    }
+  });
+}).catch(err => {
+  console.error('[dev-server] Failed to find available port:', err);
+  process.exit(1);
 });
