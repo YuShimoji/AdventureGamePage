@@ -1,25 +1,49 @@
 # Issues (Backlog)
 
+## ✅ 完了済み（フェーズ1）
+### マイグレーション機能強化
+- プログレスバー・詳細ログ表示
+- バックアップ/復元機能
+- データバリデーション・自動修復
+
+### スナップショット機能拡張
+- 日時範囲フィルタ
+- スナップショット比較（差分表示）
+- 高度な検索・タグフィルタ
+
+### エラーハンドリング強化
+- 統合エラーハンドリング
+- 自動リトライ機能
+- ユーザーフレンドリーなエラーメッセージ
+
+## フェーズ2 プレイヤー状態管理（優先度: 高）
+### インベントリシステム実装
+詳細: ./issues/30-player-inventory-system.md
+
+### ゲーム状態永続化
+詳細: ./issues/31-game-state-persistence.md
+
+### マルチセッション保存
+詳細: ./issues/32-multi-session-save.md
+
+## フェーズ3 UI/UX改善（優先度: 中）
+### アクセシビリティ向上
+- キーボードナビゲーション
+- スクリーンリーダー対応
+- フォーカス管理
+
+### レスポンシブデザイン強化
+詳細: ./issues/23-admin-responsive.md
+
+### テーマシステム拡張
+詳細: ./issues/33-theme-system-enhancement.md
+
+## 既存課題（優先度順）
 ## 空のエディタで文字数が1になる
 詳細: ./issues/01-char-count-initial-one.md
 
 ## .html起動が不安定（運用切替）
 詳細: ./issues/02-browser-open-unstable.md
-
-## プレースホルダ/設定のハードコーディング解消
-詳細: ./issues/03-config-placeholder-i18n.md
-
-## 装飾UIとメタUIの分離設計
-詳細: ./issues/04-format-vs-meta-separation.md
-
-## 保存アーキテクチャの再設計（5MB制限/プレビュー）
-詳細: ./issues/05-save-architecture.md
-
-## Zenモード既定ON（上部要素を隠す）
-詳細: ./issues/06-zen-mode-default.md
-
-## 付箋メモ機能（MVP）
-詳細: ./issues/07-memos-mvp.md
 
 ## 管理→プレイへのデータ連携（ゲームデータフォーマット定義）
 メモ: 仕様のドラフトと相互変換のテスト整備
@@ -56,15 +80,3 @@
 
 ## Lint/Format 自動化（Husky + lint-staged）検討
 メモ: 導入是非を評価
-
-## Admin: ノード編集/保存プレビュー/Mermaidの組込み修正（Issue #13）
-詳細: ./issues/13-admin-editor-save-mermaid.md
-
-## プレイ画面に「進む」機能を追加
-詳細: ./issues/14-forward-navigation.md
-
-## Mermaid 分岐プレビュー拡張 (Phase 1)
-詳細: ./issues/15-mermaid-branch-preview-extended.md
-
-## Mermaid 分岐プレビュー Phase 2
-詳細: ./issues/16-mermaid-branch-preview-phase2.md
