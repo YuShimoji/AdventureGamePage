@@ -8,8 +8,9 @@
     "test": "tests"
   },
   "scripts": {
-    "test": "start /B node scripts/dev-server.js && timeout /T 3 /NOBREAK >nul && curl -f http://localhost:8080/tests/test.html >nul 2>&1 && echo Tests passed || echo Tests failed",
+    "test": "node scripts/run-tests.js",
     "test:manual": "node scripts/dev-server.js",
+    "test:ci": "node scripts/dev-check.js && node scripts/run-tests.js --ci",
     "dev": "node scripts/dev-server.js",
     "check": "node scripts/dev-check.js",
     "lint": "echo 'No linter configured yet'",
