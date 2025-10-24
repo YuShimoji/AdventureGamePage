@@ -14,6 +14,7 @@
       <div class="header-actions">
         <button id="btn-back" class="btn">戻る</button>
         <button id="btn-forward" class="btn">進む</button>
+        <button id="btn-inventory" class="btn" title="インベントリ">🎒</button>
         <button id="btn-restart" class="btn">リスタート</button>
         <button id="btn-theme" class="icon-btn" title="テーマ設定">🎨</button>
         <label class="btn file-label">
@@ -27,6 +28,18 @@
       <article id="scene" class="scene"></article>
       <div id="choices" class="choices"></div>
     </main>
+
+    <!-- Inventory Panel -->
+    <aside id="inventory-panel" class="inventory-panel" hidden>
+      <header class="inventory-header">
+        <h3>インベントリ</h3>
+        <span id="inventory-count" class="inventory-count">0/20</span>
+        <button id="inventory-close" class="btn btn-ghost btn-sm" title="閉じる">✕</button>
+      </header>
+      <div id="inventory-list" class="inventory-list">
+        <p class="inventory-empty">アイテムがありません</p>
+      </div>
+    </aside>
 
     <div id="theme-panel" class="theme-panel" hidden></div>
 
