@@ -53,7 +53,27 @@
 - 自動リトライ・ユーザーフレンドリーなメッセージ
 - 全保存操作にエラーハンドリング適用
 
+## フェーズ2進行中（2025-10-24）
+### ✅ フェーズ2.1: インベントリシステム基本実装
+- gameEngine.js: インベントリ管理API実装
+  - addItem/removeItem/hasItem/getItemCount/getInventory/clearInventory
+  - 永続化サポート（saveProgress/loadProgress統合）
+  - 最大スロット制限（デフォルト20）
+- gameEngine.inventory.spec.js: 包括的ユニットテスト
+
+### ✅ フェーズ2.2: インベントリUI実装
+- play.html: インベントリパネル追加
+- play.css: インベントリスタイル実装（レスポンシブ対応）
+- play.js: インベントリUI制御ロジック
+  - 動的アイテム表示
+  - キーボードショートカット（I）
+
+### 🚧 フェーズ2.3: ノードエディタ統合（次）
+- ノードアクションでアイテム追加/削除
+- 条件分岐でアイテム所持チェック
+
 ## 次の一手（提案）
 - ~~旧 localStorage データの移行ウィザード~~ ✅ 完了（migrationWizard.js実装、データプレビュー・手動実行・フィードバック機能付き）
 - ~~スナップショット機能の本実装と検索/タグ~~ ✅ 完了（searchItems/filterByTag拡張、UI追加、ラベル/タグ編集機能）
 - ~~play 側のセーブ/ロードを Provider 抽象化へ統合~~ ✅ 完了（play.js/gameEngine.js/playImport.jsをStorageBridge統合、play.htmlに必要なスクリプト追加）
+- ~~インベントリシステム実装~~ ✅ 完了（Phase 2.1-2.2）
