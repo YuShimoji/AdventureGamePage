@@ -53,10 +53,52 @@
 
 .header-actions { display: flex; gap: 8px; align-items: center; }
 
-/* Zen mode: header/controls hidden by default when zen-mode is on body */
-body.zen-mode .app-header { height: 0; padding: 0; overflow: hidden; border: 0; }
-body.zen-mode .sidebar { display: none; }
-body.zen-mode .sidebar.show { display: block; }
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+  .editor-container {
+    width: calc(100% - 16px);
+    margin: 16px auto 32px;
+  }
+
+  .sidebar {
+    width: calc(100% - 16px);
+    left: 8px;
+    right: 8px;
+    top: 72px;
+    max-height: calc(100vh - 88px);
+  }
+
+  .floating-controls {
+    right: 8px;
+    bottom: 8px;
+  }
+
+  .formatbar-floating {
+    left: 8px;
+    right: 8px;
+    bottom: 8px;
+    width: auto;
+  }
+
+  .formatbar-floating .spacer { display: block; height: 8px; }
+  .formatbar-floating button { padding: 8px 12px; }
+}
+
+@media (max-width: 480px) {
+  .editor-container {
+    margin: 8px auto 16px;
+  }
+
+  .sidebar {
+    left: 4px;
+    right: 4px;
+    top: 64px;
+    max-height: calc(100vh - 80px);
+  }
+
+  .header-actions { gap: 4px; }
+  .header-actions span { display: none; } /* Hide char count on very small screens */
+}
 
 /* Floating format bar */
 .formatbar-floating {
@@ -256,30 +298,260 @@ body.zen-mode .sidebar.show { display: block; }
 .agp-accordion .accordion-content { padding: 10px 12px 12px; }
 .agp-accordion .actions { margin-top: 8px; }
 
-/* Responsive design */
+/* Enhanced mobile responsiveness */
 @media (max-width: 768px) {
   .editor-container {
     width: 100%;
     margin: 16px 16px 48px;
+    padding: 0;
   }
+
+  .editor {
+    min-height: calc(100vh - 200px);
+    font-size: 16px; /* Prevent zoom on iOS */
+    line-height: 1.6;
+    padding: 16px 12px;
+  }
+
   .sidebar {
     position: static;
     width: 100%;
     margin: 16px 0;
     max-height: none;
+    border-radius: 0;
   }
+
+  .sidebar-inner {
+    padding: 16px 12px;
+  }
+
   .floating-controls {
     right: 8px;
     bottom: 8px;
+    gap: 6px;
   }
+
+  .floating-controls .btn {
+    width: 44px;
+    height: 44px;
+    font-size: 18px;
+  }
+
   .formatbar-floating {
     bottom: 8px;
+    padding: 8px 12px;
+    gap: 8px;
+  }
+
+  .formatbar-floating button {
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+
+  /* Touch-friendly buttons */
+  .agp-accordion summary {
+    padding: 14px 16px;
+    min-height: 48px;
+  }
+
+  .btn {
+    min-height: 44px;
+    padding: 10px 16px;
+    font-size: 16px; /* Prevent zoom on iOS */
+  }
+
+  .ne-actions .btn,
+  .ne-choices .btn {
+    min-height: 40px;
+    padding: 8px 12px;
+  }
+
+  /* Node editor mobile optimizations */
+  .ne-row {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .ne-choices {
+    gap: 12px;
+  }
+
+  .ne-choice-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+  }
+
+  .ne-choice-row input[type="text"] {
+    width: 100%;
+  }
+
+  .ne-condition-row {
+    flex-direction: column;
+    gap: 8px;
+    padding: 8px;
+    background: rgba(0,0,0,0.05);
+    border-radius: 6px;
   }
 }
 
+/* Extra small screens */
 @media (max-width: 480px) {
-  .actions { grid-template-columns: 1fr; }
-  .header-actions { flex-wrap: wrap; }
+  .editor-container {
+    margin: 12px 12px 48px;
+  }
+
+  .editor {
+    min-height: calc(100vh - 180px);
+    font-size: 15px;
+    padding: 12px 8px;
+  }
+
+  .sidebar-inner {
+    padding: 12px 8px;
+  }
+
+  .floating-controls {
+    right: 4px;
+    bottom: 4px;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    max-width: calc(100vw - 8px);
+  }
+
+  .floating-controls .btn {
+    width: 40px;
+    height: 40px;
+    font-size: 16px;
+  }
+
+  .formatbar-floating {
+    bottom: 4px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 6px 8px;
+  }
+
+  .formatbar-floating button {
+    padding: 6px 10px;
+    font-size: 13px;
+  }
+
+  /* Compact memos panel */
+  .memos-panel {
+    top: 40px;
+    right: 4px;
+    left: 4px;
+    width: auto;
+    max-height: calc(100vh - 56px);
+  }
+
+  /* Compact preview panel */
+  .preview-panel {
+    top: 40px;
+    right: 4px;
+    left: 4px;
+    width: auto;
+    padding: 8px;
+  }
+
+  .preview-header {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .preview-search {
+    width: 120px !important;
+  }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+  .editor {
+    -webkit-touch-callout: none;
+    -webkit-user-select: text;
+    user-select: text;
+  }
+
+  .btn:active,
+  .agp-accordion summary:active,
+  .floating-controls .btn:active {
+    transform: scale(0.96);
+    transition: transform 0.1s;
+  }
+
+  .ne-choice-row,
+  .ne-condition-row,
+  .inventory-item {
+    transition: background 0.2s;
+  }
+
+  .ne-choice-row:active,
+  .ne-condition-row:active,
+  .inventory-item:active {
+    background: var(--surface-active);
+  }
+
+  /* Prevent text selection on touch */
+  .sidebar,
+  .floating-controls,
+  .formatbar-floating {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+}
+
+/* Landscape orientation on mobile */
+@media (max-height: 500px) and (orientation: landscape) {
+  .editor-container {
+    margin: 8px 8px 32px;
+  }
+
+  .editor {
+    min-height: calc(100vh - 120px);
+    font-size: 14px;
+    line-height: 1.4;
+    padding: 8px;
+  }
+
+  .sidebar {
+    margin: 8px 0;
+  }
+
+  .floating-controls {
+    bottom: 2px;
+  }
+
+  .floating-controls .btn {
+    width: 36px;
+    height: 36px;
+    font-size: 14px;
+  }
+
+  .formatbar-floating {
+    bottom: 2px;
+    padding: 4px 6px;
+  }
+
+  .formatbar-floating button {
+    padding: 4px 8px;
+    font-size: 12px;
+  }
+}
+
+/* High DPI displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .editor {
+    -webkit-font-smoothing: antialiased;
+    font-smooth: always;
+    text-rendering: optimizeLegibility;
+  }
 }
 
 /* Mermaid Fullscreen Modal */

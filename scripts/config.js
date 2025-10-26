@@ -3,7 +3,7 @@
   window.APP_CONFIG = {
     editor: {
       placeholder: "入力を開始……",
-      startZen: true,
+      startZen: false,
       autoScroll: {
         enabled: true,
         safeTopRatio: 0.20,
@@ -36,6 +36,16 @@
     },
     strings: {
       defaultTitle: "無題"
+    },
+    debug: {
+      enabled: true, // 開発時にtrueに設定してデバッグUIを表示
+      showConsoleLogs: true
+    },
+    game: {
+      autoSave: {
+        enabled: true, // ノード遷移時の自動セーブ
+        delayMs: 100  // 連続遷移時の負荷軽減
+      }
     }
   };
 })();

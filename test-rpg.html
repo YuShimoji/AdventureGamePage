@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AdventureGamePage - RPGサンプルテスト</title>
+    <link rel="stylesheet" href="styles/play.css">
+    <link rel="stylesheet" href="styles/debug.css">
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <h1 id="game-title">RPGサンプルテスト</h1>
+            <div class="header-actions">
+                <button id="btn-back" class="btn" aria-label="前のノードに戻る">戻る</button>
+                <button id="btn-forward" class="btn" aria-label="次のノードに進む">進む</button>
+                <button id="btn-inventory" class="btn" title="インベントリ" aria-label="インベントリを開く" aria-expanded="false">🎒</button>
+                <button id="btn-restart" class="btn" aria-label="ゲームを最初からやり直す">リスタート</button>
+                <button id="btn-theme" class="icon-btn" title="テーマ設定" aria-label="テーマ設定を開く">🎨</button>
+                <button id="btn-sample-select" class="btn" title="サンプル選択">📚 サンプル選択</button>
+                <button id="btn-run-tests" class="btn" title="テスト実行" style="background: #ff6b6b; color: white;">🧪 テスト実行</button>
+                <label class="btn file-label" aria-label="ゲームデータを読み込む">
+                    ゲームJSON読込
+                    <input id="play-file-import" type="file" accept="application/json" hidden />
+                </label>
+            </div>
+        </div>
+    </header>
+
+    <main class="container play-container">
+        <!-- Scene Image -->
+        <div id="scene-image" class="scene-image" hidden></div>
+
+        <article id="scene" class="scene" aria-live="polite" aria-atomic="true"></article>
+        <div id="choices" class="choices" role="radiogroup" aria-label="選択肢"></div>
+    </main>
+
+    <!-- Inventory Panel -->
+    <aside id="inventory-panel" class="inventory-panel" hidden role="dialog" aria-modal="true" aria-labelledby="inventory-header">
+        <header class="inventory-header" id="inventory-header">
+            <h3>インベントリ</h3>
+            <span id="inventory-count" class="inventory-count" aria-live="polite"></span>
+            <button id="inventory-close" class="btn btn-ghost btn-sm" title="閉じる" aria-label="インベントリを閉じる">✕</button>
+        </header>
+        <div id="inventory-list" class="inventory-list" role="list" aria-label="所持アイテム"></div>
+    </aside>
+
+    <!-- Sample Selection Modal -->
+    <div id="sample-modal" class="sample-modal" hidden>
+        <div class="sample-modal-content">
+            <h3>サンプルゲーム選択</h3>
+            <div class="sample-list">
+                <button class="sample-btn" data-sample="basic">基本サンプル</button>
+                <button class="sample-btn" data-sample="rpg">RPG風サンプル</button>
+                <button class="sample-btn" data-sample="complex">複雑ストーリー</button>
+            </div>
+            <button id="sample-close" class="btn">閉じる</button>
+        </div>
+    </div>
+
+    <div id="theme-panel" class="theme-panel" hidden></div>
+
+    <!-- Debug UI -->
+    <div id="debug-ui" class="debug-ui" hidden>
+        <button id="debug-toggle" class="debug-toggle" title="デバッグツール" aria-label="デバッグツールを開く">🔧</button>
+        <div id="debug-panel" class="debug-panel" hidden>
+            <div class="debug-header">
+                <h4>デバッグツール</h4>
+                <button id="debug-close" class="debug-close" aria-label="デバッグパネルを閉じる">✕</button>
+            </div>
+            <div class="debug-content">
+                <div class="debug-section">
+                    <h5>インベントリ</h5>
+                    <div class="debug-buttons">
+                        <button id="debug-add-item" class="debug-btn">アイテム追加</button>
+                        <button id="debug-remove-item" class="debug-btn">アイテム削除</button>
+                        <button id="debug-clear-inventory" class="debug-btn">インベントリクリア</button>
+                    </div>
+                </div>
+                <div class="debug-section">
+                    <h5>ゲーム状態</h5>
+                    <div class="debug-buttons">
+                        <button id="debug-save" class="debug-btn">セーブ</button>
+                        <button id="debug-load" class="debug-btn">ロード</button>
+                        <button id="debug-reset" class="debug-btn">リセット</button>
+                    </div>
+                </div>
+                <div class="debug-section">
+                    <h5>変数操作</h5>
+                    <div class="debug-buttons">
+                        <button id="debug-set-variable" class="debug-btn">変数設定</button>
+                        <button id="debug-show-variables" class="debug-btn">変数表示</button>
+                    </div>
+                </div>
+                <div class="debug-section">
+                    <h5>ノード操作</h5>
+                    <input id="debug-node-id" type="text" placeholder="ノードID" style="width: 100%; margin-bottom: 8px;">
+                    <button id="debug-jump-node" class="debug-btn">ノードジャンプ</button>
+                    <button id="debug-show-state" class="debug-btn">状態表示</button>
+                    <button id="debug-show-inventory" class="debug-btn">インベントリ表示</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Test Status Panel -->
+    <div id="test-status" class="test-status">
+        <div class="test-info">
+            <span id="test-current-node">現在のノード: -</span>
+            <span id="test-variables">変数: -</span>
+            <span id="test-inventory">インベントリ: -</span>
+        </div>
+    </div>
+
+    <script src="scripts/storage.js"></script>
+    <script src="scripts/theme.js"></script>
+    <script src="scripts/config.js"></script>
+    <script src="scripts/sample-game-basic.js"></script>
+    <script src="scripts/sample-game-rpg.js"></script>
+    <script src="scripts/gameEngine.js"></script>
+    <script src="scripts/play.js"></script>
+    <script src="scripts/debug.js"></script>
+    <script src="scripts/tests.js"></script>
+    <script>
+        // テスト用拡張
+        (function() {
+            // サンプル選択機能
+            const sampleModal = document.getElementById('sample-modal');
+            const btnSampleSelect = document.getElementById('btn-sample-select');
+            const sampleClose = document.getElementById('sample-close');
+
+            btnSampleSelect?.addEventListener('click', () => {
+                sampleModal.hidden = false;
+            });
+
+            sampleClose?.addEventListener('click', () => {
+                sampleModal.hidden = true;
+            });
+
+            // テスト実行機能
+            const btnRunTests = document.getElementById('btn-run-tests');
+            btnRunTests?.addEventListener('click', () => {
+                if (confirm('テストを実行しますか？コンソールで詳細な結果を確認できます。')) {
+                    window.runTests();
+                }
+            });
+
+            // サンプルボタンのイベント
+            document.querySelectorAll('.sample-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const sampleType = btn.dataset.sample;
+                    let gameData;
+
+                    switch(sampleType) {
+                        case 'basic':
+                            gameData = window.SAMPLE_GAME;
+                            break;
+                        case 'rpg':
+                            gameData = window.SAMPLE_GAME_RPG;
+                            break;
+                        case 'complex':
+                            // TODO: より複雑なサンプルを作成
+                            alert('複雑サンプルは準備中です');
+                            return;
+                    }
+
+                    if (gameData && window.gameEngine) {
+                        // 現在のゲームをリセットして新しいゲームを開始
+                        window.gameEngine.reset();
+                        // ゲームデータを変更（これは簡易実装）
+                        window.gameEngine = GameEngine.createEngine(gameData, {
+                            titleEl: document.getElementById('game-title'),
+                            textEl: document.getElementById('scene'),
+                            choicesEl: document.getElementById('choices'),
+                            sceneImageEl: document.getElementById('scene-image'),
+                            backBtn: document.getElementById('btn-back'),
+                            forwardBtn: document.getElementById('btn-forward')
+                        });
+                        window.gameEngine.loadProgress();
+                        window.gameEngine.render();
+
+                        // インベントリ更新
+                        if (window.updateInventoryUI) {
+                            window.updateInventoryUI();
+                        }
+                    }
+
+                    sampleModal.hidden = true;
+                    alert(`${btn.textContent}を読み込みました`);
+                });
+            });
+
+            // テストステータス更新
+            function updateTestStatus() {
+                const statusNode = document.getElementById('test-current-node');
+                const statusVars = document.getElementById('test-variables');
+                const statusInv = document.getElementById('test-inventory');
+
+                if (window.gameEngine) {
+                    // 現在のノードID表示
+                    const currentNodeId = window.gameEngine.currentNodeId || '不明';
+                    statusNode.textContent = `現在のノード: ${currentNodeId}`;
+
+                    // 変数表示（簡易版）
+                    try {
+                        const state = window.gameEngine.getState ? window.gameEngine.getState() : {};
+                        const vars = state.variables || {};
+                        const varKeys = Object.keys(vars);
+                        statusVars.textContent = `変数: ${varKeys.length}個`;
+                    } catch(e) {
+                        statusVars.textContent = '変数: エラー';
+                    }
+
+                    // インベントリ表示
+                    try {
+                        const inventory = window.gameEngine.getInventory ? window.gameEngine.getInventory() : {};
+                        const itemCount = inventory.items ? inventory.items.length : 0;
+                        statusInv.textContent = `インベントリ: ${itemCount}個`;
+                    } catch(e) {
+                        statusInv.textContent = 'インベントリ: エラー';
+                    }
+                }
+            }
+
+            // 定期的にステータス更新
+            setInterval(updateTestStatus, 1000);
+            updateTestStatus();
+
+        })();
+    </script>
+</body>
+</html>

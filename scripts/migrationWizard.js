@@ -1,18 +1,12 @@
 // Data Migration Wizard
 // Provides user-controlled migration from legacy data to extended schema
 
-const STORAGE_KEY_LEGACY = 'agp_manuscript_full';
-const STORAGE_KEY_ITEMS = 'agp_items';
-const STORAGE_KEY_CHARACTERS = 'agp_characters';
-const STORAGE_KEY_LORE = 'agp_lore';
-const STORAGE_KEY_STATE = 'agp_state';
-
 function showMigrationWizard() {
   if (typeof localStorage === 'undefined') return;
 
   // Check if legacy data exists and migration not done
-  const legacyData = localStorage.getItem(STORAGE_KEY_LEGACY);
-  if (!legacyData || localStorage.getItem(STORAGE_KEY_ITEMS)) return;
+  const legacyData = localStorage.getItem('agp_manuscript_full');
+  if (!legacyData || localStorage.getItem('agp_items')) return;
 
   // Create wizard overlay
   const overlay = document.createElement('div');
@@ -132,7 +126,7 @@ function showMigrationWizard() {
 }
 
 function previewMigration() {
-  const legacyData = localStorage.getItem(STORAGE_KEY_LEGACY);
+  const legacyData = localStorage.getItem('agp_manuscript_full');
   if (!legacyData) return;
 
   try {
@@ -157,7 +151,7 @@ function previewMigration() {
 
 function createBackup() {
   try {
-    const legacyData = localStorage.getItem(STORAGE_KEY_LEGACY);
+    const legacyData = localStorage.getItem('agp_manuscript_full');
     if (!legacyData) return false;
     
     const backupKey = 'agp_backup_legacy';
@@ -182,13 +176,13 @@ function restoreFromBackup() {
     if (!backupStr) return false;
     
     const backup = JSON.parse(backupStr);
-    localStorage.setItem(STORAGE_KEY_LEGACY, backup.data);
+    localStorage.setItem('agp_manuscript_full', backup.data);
     
     // Clear migrated data
-    localStorage.removeItem(STORAGE_KEY_ITEMS);
-    localStorage.removeItem(STORAGE_KEY_CHARACTERS);
-    localStorage.removeItem(STORAGE_KEY_LORE);
-    localStorage.removeItem(STORAGE_KEY_STATE);
+    localStorage.removeItem('agp_items');
+    localStorage.removeItem('agp_characters');
+    localStorage.removeItem('agp_lore');
+    localStorage.removeItem('agp_state');
     
     console.log('Restored from backup successfully');
     return true;
@@ -221,7 +215,7 @@ async function performMigrationWithProgress() {
 
   try {
     updateProgress(10, 'レガシーデータ読み込み中...', 'データ取得開始');
-    const legacyData = localStorage.getItem(STORAGE_KEY_LEGACY);
+    const legacyData = localStorage.getItem('agp_manuscript_full');
     if (!legacyData) {
       throw new Error('レガシーデータが見つかりません');
     }
@@ -238,7 +232,7 @@ async function performMigrationWithProgress() {
     // Migrate items
     updateProgress(30, 'アイテム変換中...', 'アイテムデータを抽出しています');
     const items = extractItemsFromText(parsed.text || parsed.html || '');
-    localStorage.setItem(STORAGE_KEY_ITEMS, JSON.stringify({ items }));
+    localStorage.setItem('agp_items', JSON.stringify({ items }));
     result.stats.items = items.length;
     updateProgress(45, `アイテム変換完了 (${items.length}件)`, `${items.length}件のアイテムを保存しました`);
 
@@ -247,7 +241,7 @@ async function performMigrationWithProgress() {
     // Migrate characters
     updateProgress(55, 'キャラクター変換中...', 'キャラクターデータを抽出しています');
     const characters = extractCharactersFromText(parsed.text || parsed.html || '');
-    localStorage.setItem(STORAGE_KEY_CHARACTERS, JSON.stringify({ characters }));
+    localStorage.setItem('agp_characters', JSON.stringify({ characters }));
     result.stats.characters = characters.length;
     updateProgress(70, `キャラクター変換完了 (${characters.length}件)`, `${characters.length}件のキャラクターを保存しました`);
 
@@ -256,7 +250,7 @@ async function performMigrationWithProgress() {
     // Migrate lore
     updateProgress(80, 'Wiki変換中...', 'Wikiエントリを抽出しています');
     const lore = extractLoreFromText(parsed.text || parsed.html || '');
-    localStorage.setItem(STORAGE_KEY_LORE, JSON.stringify({ lore }));
+    localStorage.setItem('agp_lore', JSON.stringify({ lore }));
     result.stats.lore = lore.length;
     updateProgress(90, `Wiki変換完了 (${lore.length}件)`, `${lore.length}件のWikiエントリを保存しました`);
 
@@ -270,7 +264,7 @@ async function performMigrationWithProgress() {
       variables: { migratedFromLegacy: true, migrationDate: new Date().toISOString() },
       history: parsed.history || []
     };
-    localStorage.setItem(STORAGE_KEY_STATE, JSON.stringify({ state }));
+    localStorage.setItem('agp_state', JSON.stringify({ state }));
     updateProgress(100, '移行完了！', 'すべてのデータ変換が完了しました');
 
     result.success = true;

@@ -167,9 +167,18 @@
                 <textarea id="ne-node-text" rows="4" placeholder="テキスト"></textarea>
               </div>
               <div class="field">
+                <span>画像URL（任意）</span>
+                <input id="ne-node-image" type="url" placeholder="https://example.com/image.jpg" />
+              </div>
+              <div class="field">
                 <span>選択肢</span>
                 <div id="ne-choices" class="ne-choices"></div>
                 <button id="ne-add-choice" class="btn">選択肢を追加</button>
+              </div>
+              <div class="field">
+                <span>アクション</span>
+                <div id="ne-actions" class="ne-actions-list"></div>
+                <button id="ne-add-action" class="btn">アクションを追加</button>
               </div>
               <datalist id="ne-node-id-list"></datalist>
               <div class="field">
@@ -396,6 +405,7 @@
     <script src="scripts/converters.js"></script>
     <script src="scripts/validator.js"></script>
     <script src="scripts/dataValidator.js"></script>
+    <script src="scripts/audioManager.js"></script>
     <script src="scripts/nodeEditor.js"></script>
     <script src="scripts/dataMigration.js"></script>
     <script src="scripts/migrationWizard.js"></script>
@@ -404,4 +414,5 @@
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <script src="scripts/mermaidPreview.js"></script>
     <script src="scripts/playtest.js"></script>
+    <script src="scripts/admin-boot.js"></script>
     <script src="scripts/admin.js"></script>

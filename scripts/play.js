@@ -3,6 +3,7 @@
     const titleEl = document.getElementById('game-title');
     const textEl = document.getElementById('scene');
     const choicesEl = document.getElementById('choices');
+    const sceneImageEl = document.getElementById('scene-image');
     const btnRestart = document.getElementById('btn-restart');
     const backBtn = document.getElementById('btn-back');
     const forwardBtn = document.getElementById('btn-forward');
@@ -37,7 +38,7 @@
     const normalize = (window.Converters?.normalizeSpecToEngine) || normalizeSpecToEngine;
     const game = normalize(loaded) || window.SAMPLE_GAME;
 
-    const engine = GameEngine.createEngine(game, { titleEl, textEl, choicesEl, backBtn, forwardBtn });
+    const engine = GameEngine.createEngine(game, { titleEl, textEl, choicesEl, sceneImageEl, backBtn, forwardBtn });
     engine.loadProgress();
     // 進行が保存されていればそれを復元、なければ初期ノードが使用される
     // engine.reset() は初期化（リスタート）専用
@@ -70,10 +71,14 @@
           items.forEach(item => {
             const itemEl = document.createElement('div');
             itemEl.className = 'inventory-item';
+            itemEl.setAttribute('role', 'listitem');
+            itemEl.setAttribute('tabindex', '0');
+            itemEl.setAttribute('aria-label', `${item.name || item.id}、数量 ${item.quantity || 1}${item.description ? `、${item.description}` : ''}`);
             
             const icon = document.createElement('div');
             icon.className = 'inventory-item-icon';
             icon.textContent = item.icon || '📦';
+            icon.setAttribute('aria-hidden', 'true');
             
             const info = document.createElement('div');
             info.className = 'inventory-item-info';
@@ -94,6 +99,7 @@
             const quantity = document.createElement('span');
             quantity.className = 'inventory-item-quantity';
             quantity.textContent = `×${item.quantity || 1}`;
+            quantity.setAttribute('aria-label', `数量 ${item.quantity || 1}`);
             
             itemEl.appendChild(icon);
             itemEl.appendChild(info);
@@ -108,8 +114,21 @@
     if (btnInventory && inventoryPanel) {
       btnInventory.addEventListener('click', () => {
         inventoryPanel.hidden = !inventoryPanel.hidden;
+        btnInventory.setAttribute('aria-expanded', !inventoryPanel.hidden);
         if (!inventoryPanel.hidden) {
           updateInventoryUI();
+          // Focus first inventory item or close button
+          setTimeout(() => {
+            const firstItem = inventoryList.querySelector('.inventory-item');
+            if (firstItem) {
+              firstItem.focus();
+            } else {
+              inventoryClose?.focus();
+            }
+          }, 100);
+        } else {
+          // Return focus to inventory button
+          btnInventory.focus();
         }
       });
     }
@@ -117,11 +136,41 @@
     if (inventoryClose && inventoryPanel) {
       inventoryClose.addEventListener('click', () => {
         inventoryPanel.hidden = true;
+        // Return focus to inventory button
+        btnInventory?.focus();
       });
     }
 
     // Expose inventory update function globally for testing
     window.updateInventoryUI = updateInventoryUI;
+
+    // Inventory keyboard navigation
+    inventoryList.addEventListener('keydown', (e) => {
+      if (!shouldHandleShortcut(e.target)) return;
+      
+      const items = Array.from(inventoryList.querySelectorAll('.inventory-item'));
+      const currentIndex = items.indexOf(document.activeElement);
+      
+      if (currentIndex === -1) return;
+      
+      switch (e.key) {
+        case 'ArrowUp':
+          e.preventDefault();
+          const prevIndex = currentIndex > 0 ? currentIndex - 1 : items.length - 1;
+          items[prevIndex]?.focus();
+          break;
+        case 'ArrowDown':
+          e.preventDefault();
+          const nextIndex = currentIndex < items.length - 1 ? currentIndex + 1 : 0;
+          items[nextIndex]?.focus();
+          break;
+        case 'Escape':
+          e.preventDefault();
+          inventoryPanel.hidden = true;
+          btnInventory?.focus();
+          break;
+      }
+    });
 
     // Keyboard shortcuts: ← 戻る / → 進む / R リスタート / I インベントリ
     function shouldHandleShortcut(target){
@@ -133,6 +182,35 @@
       if(el.isContentEditable) return false;
       return true;
     }
+
+    // Choice navigation within choices container
+    choicesEl.addEventListener('keydown', (e) => {
+      if (!shouldHandleShortcut(e.target)) return;
+      
+      const buttons = Array.from(choicesEl.querySelectorAll('button'));
+      const currentIndex = buttons.indexOf(document.activeElement);
+      
+      if (currentIndex === -1) return;
+      
+      switch (e.key) {
+        case 'ArrowUp':
+          e.preventDefault();
+          const prevIndex = currentIndex > 0 ? currentIndex - 1 : buttons.length - 1;
+          buttons[prevIndex]?.focus();
+          break;
+        case 'ArrowDown':
+          e.preventDefault();
+          const nextIndex = currentIndex < buttons.length - 1 ? currentIndex + 1 : 0;
+          buttons[nextIndex]?.focus();
+          break;
+        case 'Enter':
+        case ' ':
+          e.preventDefault();
+          document.activeElement?.click();
+          break;
+      }
+    });
+
     window.addEventListener('keydown', (e) => {
       if(!shouldHandleShortcut(e.target)) return;
       // Back
@@ -155,7 +233,7 @@
         }
       }
       // Inventory
-      if(e.key === 'i' || e.key === 'I'){
+      if(e.key === 'i' || e.key === 'I' || e.key === 'z' || e.key === 'Z'){
         if(btnInventory && inventoryPanel){
           inventoryPanel.hidden = !inventoryPanel.hidden;
           if(!inventoryPanel.hidden){

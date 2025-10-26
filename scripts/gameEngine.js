@@ -7,12 +7,15 @@
       inventory: {
         items: [],
         maxSlots: 20
-      }
+      },
+      variables: {} //汎用変数システム
     };
 
     function setNode(id) {
       if (!gameData.nodes[id]) {
-        console.warn('Unknown node:', id);
+        if (window.APP_CONFIG?.debug?.showConsoleLogs) {
+          console.warn('Unknown node:', id);
+        }
         return;
       }
       // push current to history when moving to a different node
@@ -22,8 +25,23 @@
       // normal navigation clears forward stack
       state.forward = [];
       state.nodeId = id;
+      
+      // Execute node actions before rendering
+      executeNodeActions(gameData.nodes[id]);
+      
       render();
-      saveProgress();
+      
+      // Auto-save after node transition
+      if (window.APP_CONFIG?.game?.autoSave?.enabled) {
+        const delay = window.APP_CONFIG.game.autoSave.delayMs || 0;
+        setTimeout(() => {
+          try {
+            saveProgress();
+          } catch (e) {
+            console.warn('Auto-save failed:', e);
+          }
+        }, delay);
+      }
     }
 
     function getNode() { return gameData.nodes[state.nodeId]; }
@@ -60,9 +78,25 @@
     function render() {
       if (elements.titleEl) elements.titleEl.textContent = gameData.title || 'Adventure';
       const node = getNode();
+      
+      // Scene image
+      if (elements.sceneImageEl) {
+        if (node.image) {
+          elements.sceneImageEl.innerHTML = `<img src="${node.image}" alt="${node.title || 'Scene'}" onerror="this.parentElement.hidden=true">`;
+          elements.sceneImageEl.hidden = false;
+        } else {
+          elements.sceneImageEl.hidden = true;
+        }
+      }
+      
       elements.textEl.textContent = node.text || '';
       elements.choicesEl.innerHTML = '';
       (node.choices || []).forEach((c) => {
+        // Check conditions for choice visibility
+        if (c.conditions && !checkConditions(c.conditions)) {
+          return; // Skip this choice if conditions not met
+        }
+        
         const b = document.createElement('button'); b.className = 'btn'; b.textContent = c.text;
         b.onclick = () => setNode(c.to);
         elements.choicesEl.appendChild(b);
@@ -143,9 +177,243 @@
       };
     }
 
+    function executeItemEffect(effect) {
+      if (!effect || typeof effect !== 'object') return;
+      
+      switch (effect.type) {
+        case 'show_text':
+          if (effect.text) {
+            // 現在のノードテキストに効果テキストを追加
+            const currentNode = getNode();
+            if (currentNode) {
+              currentNode.text += '\n\n' + effect.text;
+              render(); // 再レンダリング
+            }
+          }
+          break;
+          
+        case 'set_variable':
+          if (effect.key !== undefined) {
+            const operation = effect.operation || 'set';
+            const currentValue = state.variables[effect.key];
+            let newValue = effect.value;
+            
+            switch (operation) {
+              case 'set':
+                // 直接設定
+                break;
+              case 'add':
+                newValue = (typeof currentValue === 'number' ? currentValue : 0) + (typeof effect.value === 'number' ? effect.value : 0);
+                break;
+              case 'subtract':
+                newValue = (typeof currentValue === 'number' ? currentValue : 0) - (typeof effect.value === 'number' ? effect.value : 0);
+                break;
+              case 'multiply':
+                newValue = (typeof currentValue === 'number' ? currentValue : 0) * (typeof effect.value === 'number' ? effect.value : 0);
+                break;
+              case 'divide':
+                const divisor = typeof effect.value === 'number' ? effect.value : 1;
+                if (divisor !== 0) {
+                  newValue = (typeof currentValue === 'number' ? currentValue : 0) / divisor;
+                }
+                break;
+              default:
+                if (window.APP_CONFIG?.debug?.showConsoleLogs) {
+                  console.warn('Unknown variable operation:', operation);
+                }
+                return;
+            }
+            
+            state.variables[effect.key] = newValue;
+            if (window.APP_CONFIG?.debug?.showConsoleLogs) {
+              console.log(`変数操作: ${effect.key} ${operation} → ${newValue}`);
+            }
+          }
+          break;
+          
+        case 'custom':
+          // カスタム効果（コールバック関数）
+          if (typeof effect.callback === 'function') {
+            try {
+              effect.callback(state, gameData);
+            } catch (e) {
+              if (window.APP_CONFIG?.debug?.showConsoleLogs) {
+                console.error('Custom effect failed:', e);
+              }
+            }
+          }
+          break;
+          
+        default:
+          if (window.APP_CONFIG?.debug?.showConsoleLogs) {
+            console.warn('Unknown effect type:', effect.type);
+          }
+      }
+    }
+
+    function checkConditions(conditions) {
+      if (!Array.isArray(conditions)) return true;
+      
+      return conditions.every(condition => {
+        if (!condition || typeof condition !== 'object') return true;
+        
+        switch (condition.type) {
+          case 'has_item':
+            return condition.itemId ? hasItem(condition.itemId) : true;
+            
+          case 'item_count':
+            const count = condition.itemId ? getItemCount(condition.itemId) : 0;
+            const required = condition.count || 0;
+            switch (condition.operator || '>=') {
+              case '>=': return count >= required;
+              case '>': return count > required;
+              case '==': return count === required;
+              case '!=': return count !== required;
+              case '<=': return count <= required;
+              case '<': return count < required;
+              default: return true;
+            }
+            
+          case 'inventory_empty':
+            return state.inventory.items.length === 0;
+            
+          case 'inventory_full':
+            return state.inventory.items.length >= state.inventory.maxSlots;
+            
+          case 'variable_equals':
+            const varValue = state.variables[condition.key];
+            const expectedValue = condition.value;
+            const operator = condition.operator || '===';
+            
+            switch (operator) {
+              case '===': return varValue === expectedValue;
+              case '!==': return varValue !== expectedValue;
+              case '>': return (typeof varValue === 'number' && typeof expectedValue === 'number') && varValue > expectedValue;
+              case '<': return (typeof varValue === 'number' && typeof expectedValue === 'number') && varValue < expectedValue;
+              case '>=': return (typeof varValue === 'number' && typeof expectedValue === 'number') && varValue >= expectedValue;
+              case '<=': return (typeof varValue === 'number' && typeof expectedValue === 'number') && varValue <= expectedValue;
+              default: return true;
+            }
+            
+          case 'variable_exists':
+            return state.variables.hasOwnProperty(condition.key);
+            
+          default:
+            if (window.APP_CONFIG?.debug?.showConsoleLogs) {
+              console.warn('Unknown condition type:', condition.type);
+            }
+            return true;
+        }
+      });
+    }
+
     function clearInventory() {
       state.inventory.items = [];
       saveProgress();
+    }
+
+    // ===== Node Actions =====
+    function executeNodeActions(node) {
+      if (!node || !Array.isArray(node.actions)) return;
+      
+      node.actions.forEach(action => {
+        try {
+          executeAction(action);
+        } catch (e) {
+          if (window.APP_CONFIG?.debug?.showConsoleLogs) {
+            console.error('Failed to execute action:', action, e);
+          }
+        }
+      });
+    }
+
+    function executeAction(action) {
+      if (!action || typeof action !== 'object') return;
+      
+      switch (action.type) {
+        case 'add_item':
+          if (action.itemId) {
+            const success = addItem(action.itemId, action.quantity || 1);
+            if (!success && action.fallbackText) {
+              if (window.APP_CONFIG?.debug?.showConsoleLogs) {
+                console.warn('Failed to add item:', action.itemId, action.fallbackText);
+              }
+            }
+          }
+          break;
+          
+        case 'remove_item':
+          if (action.itemId) {
+            const success = removeItem(action.itemId, action.quantity || 1);
+            if (!success && action.fallbackText) {
+              if (window.APP_CONFIG?.debug?.showConsoleLogs) {
+                console.warn('Failed to remove item:', action.itemId, action.fallbackText);
+              }
+            }
+          }
+          break;
+          
+        case 'use_item':
+          if (action.itemId) {
+            const hasItem = hasItem(action.itemId);
+            if (hasItem) {
+              // アイテムを使用（消費）
+              if (action.consume !== false) { // デフォルトで消費
+                removeItem(action.itemId, action.quantity || 1);
+              }
+              
+              // 使用効果を実行
+              executeItemEffect(action.effect);
+              
+              if (window.APP_CONFIG?.debug?.showConsoleLogs) {
+                console.log(`アイテム使用: ${action.itemId}`);
+              }
+            } else {
+              if (window.APP_CONFIG?.debug?.showConsoleLogs) {
+                console.warn(`アイテム不足: ${action.itemId}`);
+              }
+            }
+          }
+          break;
+          
+        case 'clear_inventory':
+          clearInventory();
+          break;
+
+        case 'play_bgm':
+          if (action.url && window.AudioManager) {
+            const options = {
+              volume: action.volume || 1.0,
+              loop: action.loop !== false, // デフォルトでループ
+              fadeIn: action.fadeIn !== false,
+              crossfade: action.crossfade !== false
+            };
+            window.AudioManager.playBGM(action.url, options);
+          }
+          break;
+
+        case 'play_sfx':
+          if (action.url && window.AudioManager) {
+            const options = {
+              volume: action.volume || 1.0,
+              loop: action.loop || false
+            };
+            window.AudioManager.playSFX(action.url, options);
+          }
+          break;
+
+        case 'stop_bgm':
+          if (window.AudioManager) {
+            window.AudioManager.stopBGM(action.fadeOut !== false);
+          }
+          break;
+
+        case 'stop_sfx':
+          if (window.AudioManager) {
+            window.AudioManager.stopAllSFX();
+          }
+          break;
+      }
     }
 
     function saveProgress() {
@@ -155,12 +423,14 @@
         items: state.inventory.items.slice(),
         maxSlots: state.inventory.maxSlots
       };
+      const vars = { ...state.variables }; // 変数のコピー
       StorageUtil.saveJSON('agp_progress', { 
         title: gameData.title, 
         nodeId: state.nodeId, 
         history: hist, 
         forward: fwd,
-        inventory: inv
+        inventory: inv,
+        variables: vars
       });
     }
     function loadProgress() {
@@ -179,6 +449,11 @@
           state.inventory.items = Array.isArray(p.inventory.items) ? p.inventory.items.slice() : [];
           state.inventory.maxSlots = p.inventory.maxSlots || 20;
         }
+        
+        // Load variables
+        if (p.variables && typeof p.variables === 'object') {
+          state.variables = { ...p.variables };
+        }
       }
     }
     function reset() { 
@@ -186,6 +461,7 @@
       state.history = []; 
       state.forward = []; 
       state.inventory.items = [];
+      state.variables = {}; // 変数もリセット
       saveProgress(); 
       render(); 
     }
