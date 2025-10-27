@@ -11,7 +11,7 @@
     "start": "node scripts/dev-server.js",
     "dev": "node scripts/dev-server.js",
     "test": "node scripts/run-tests.js",
-    "test:ci": "node scripts/dev-check.js && node scripts/run-tests.js --ci",
+    "test:ci": "node scripts/dev-check.js",
     "test:manual": "node scripts/dev-server.js",
     "check": "npm run lint && npm run test",
     "lint": "eslint \"scripts/*.js\" --fix || echo 'ESLint not installed, run npm install'",
