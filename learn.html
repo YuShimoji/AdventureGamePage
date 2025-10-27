@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Learn | Adventure Game Page</title>
+    <link rel="stylesheet" href="styles/common.css" />
+    <style>
+      .grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+      .code { background: #0b0f16; border: 1px solid var(--border); border-radius: 10px; padding: 12px; overflow: auto; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; }
+      .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+      .badge { font-size: 12px; color: var(--text-secondary); }
+    </style>
+  </head>
+  <body>
+    <header class="app-header">
+      <a class="btn" href="index.html">← トップ</a>
+      <h1>Learn</h1>
+      <nav class="nav">
+        <a class="btn" href="admin.html">管理</a>
+        <a class="btn btn-accent" href="play.html">プレイ</a>
+      </nav>
+    </header>
+
+    <main class="container">
+      <section class="card">
+        <h2>インタラクティブなサンプル</h2>
+        <p class="muted">各カードの「読み込んでプレイ」を押すと、サンプルが保存され <code>play.html</code> で即実行できます。</p>
+      </section>
+
+      <section class="grid">
+        <article class="card">
+          <h3>基本分岐</h3>
+          <p class="badge">ノード/選択肢</p>
+          <pre class="code" id="code-basic"></pre>
+          <div class="actions">
+            <button class="btn btn-primary" id="btn-basic">読み込んでプレイ</button>
+          </div>
+        </article>
+
+        <article class="card">
+          <h3>インベントリ</h3>
+          <p class="badge">add_item / use_item</p>
+          <pre class="code" id="code-inventory"></pre>
+          <div class="actions">
+            <button class="btn btn-primary" id="btn-inventory">読み込んでプレイ</button>
+          </div>
+        </article>
+
+        <article class="card">
+          <h3>変数と条件分岐</h3>
+          <p class="badge">set_variable / variable_equals</p>
+          <pre class="code" id="code-variables"></pre>
+          <div class="actions">
+            <button class="btn btn-primary" id="btn-variables">読み込んでプレイ</button>
+          </div>
+        </article>
+
+        <article class="card">
+          <h3>画像とサウンド</h3>
+          <p class="badge">image / play_bgm / play_sfx</p>
+          <pre class="code" id="code-media"></pre>
+          <div class="actions">
+            <button class="btn btn-primary" id="btn-media">読み込んでプレイ</button>
+          </div>
+        </article>
+      </section>
+    </main>
+
+    <script src="scripts/storage.js"></script>
+    <script>
+      // サンプル定義（エンジン形式）
+      const EXAMPLES = {
+        basic: {
+          title: '基本分岐', start: 'start',
+          nodes: {
+            start: { text: '最初の部屋。', choices: [ { text: '次へ', to: 'next' } ] },
+            next:  { text: 'おめでとう！', choices: [ { text: '最初に戻る', to: 'start' } ] }
+          }
+        },
+        inventory: {
+          title: 'インベントリ', start: 'start',
+          nodes: {
+            start: { text: '剣を拾いますか？', choices: [ { text: '拾う', to: 'got' }, { text: 'やめる', to: 'end' } ], actions:[ { type:'add_item', itemId:'sword', quantity:1 } ] },
+            got:   { text: '剣を手に入れた！', choices: [ { text:'使う', to:'use' } ] },
+            use:   { text: '剣を振る！', choices: [ { text:'終わる', to:'end' } ], actions:[ { type:'use_item', itemId:'sword', effect:{ type:'show_text', text:'華麗な一撃！' } } ] },
+            end:   { text: 'おしまい。', choices: [ { text:'最初へ', to:'start' } ] }
+          }
+        },
+        variables: {
+          title: '変数と条件', start: 'start',
+          nodes: {
+            start: { text: 'スコアを+1します。', choices: [ { text:'加算', to:'next' } ], actions:[ { type:'set_variable', key:'score', operation:'add', value:1 } ] },
+            next:  { text: 'score が 1 以上なら扉が開く。', choices: [ { text:'扉へ', to:'door' } ] },
+            door:  { text: '扉の前。', choices: [ { text:'開ける', to:'open', conditions:[ { type:'variable_equals', key:'score', operator:">=", value:1 } ] } ] },
+            open:  { text: '開いた！', choices: [ { text:'最初へ', to:'start' } ] }
+          }
+        },
+        media: {
+          title: '画像とサウンド', start: 'start',
+          nodes: {
+            start: { title:'森の入口', image:'images/forest-entrance.jpg', text: '音楽が始まる。', choices: [ { text:'進む', to:'deep' } ], actions:[ { type:'play_bgm', url:'audio/forest-bgm.mp3', volume:0.6, loop:true } ] },
+            deep:  { title:'森の奥', image:'images/forest-deep.jpg', text: 'ガサガサ…', choices: [ { text:'音', to:'sfx' }, { text:'やめる', to:'stop' } ] },
+            sfx:   { text: '効果音！', choices: [ { text:'戻る', to:'deep' } ], actions:[ { type:'play_sfx', url:'audio/monster-growl.mp3', volume:0.9 } ] },
+            stop:  { text: '音楽を止める。', choices: [ { text:'最初へ', to:'start' } ], actions:[ { type:'stop_bgm', fadeOut:true } ] }
+          }
+        }
+      };
+
+      function pretty(obj){ return JSON.stringify(obj, null, 2); }
+      function mountCodes(){
+        document.getElementById('code-basic').textContent = pretty(EXAMPLES.basic);
+        document.getElementById('code-inventory').textContent = pretty(EXAMPLES.inventory);
+        document.getElementById('code-variables').textContent = pretty(EXAMPLES.variables);
+        document.getElementById('code-media').textContent = pretty(EXAMPLES.media);
+      }
+      function loadAndPlay(example){
+        try {
+          StorageUtil.saveJSON('agp_game_data', example);
+          window.location.href = 'play.html';
+        } catch(e){ alert('読み込みに失敗しました'); }
+      }
+      document.addEventListener('DOMContentLoaded', () => {
+        mountCodes();
+        document.getElementById('btn-basic').addEventListener('click', () => loadAndPlay(EXAMPLES.basic));
+        document.getElementById('btn-inventory').addEventListener('click', () => loadAndPlay(EXAMPLES.inventory));
+        document.getElementById('btn-variables').addEventListener('click', () => loadAndPlay(EXAMPLES.variables));
+        document.getElementById('btn-media').addEventListener('click', () => loadAndPlay(EXAMPLES.media));
+      });
+    </script>
+  </body>
+</html>

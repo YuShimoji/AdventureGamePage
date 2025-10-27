@@ -12,6 +12,48 @@
     }
   };
 
+  // ノードエディタ モーダル初期化
+  function initNodeEditorModal() {
+    try {
+      const openBtn = document.getElementById('ne-open-modal');
+      const modal = document.getElementById('node-editor-modal');
+      const modalContent = document.getElementById('node-editor-modal-content');
+      const closeBtn = document.getElementById('node-editor-modal-close');
+      const editorSection = document.getElementById('node-editor');
+
+      if (!openBtn || !modal || !modalContent || !closeBtn || !editorSection) {
+        return;
+      }
+
+      const placeholder = document.createComment('node-editor-original-position');
+      let inModal = false;
+
+      openBtn.addEventListener('click', () => {
+        if (inModal) return;
+        if (editorSection.parentNode) {
+          editorSection.parentNode.insertBefore(placeholder, editorSection);
+        }
+        modalContent.appendChild(editorSection);
+        modal.hidden = false;
+        inModal = true;
+        log('info', 'ノードエディタをモーダルへ移動');
+      });
+
+      closeBtn.addEventListener('click', () => {
+        if (!inModal) return;
+        if (placeholder.parentNode) {
+          placeholder.parentNode.insertBefore(editorSection, placeholder);
+          placeholder.parentNode.removeChild(placeholder);
+        }
+        modal.hidden = true;
+        inModal = false;
+        log('info', 'ノードエディタを元の位置へ復帰');
+      });
+    } catch (e) {
+      log('warn', 'initNodeEditorModal failed', { error: e.message });
+    }
+  }
+
   function log(level, message, context = {}) {
     const prefix = '[admin-boot]';
     const msg = `${prefix} ${level.toUpperCase()}: ${message}`;
@@ -155,6 +197,9 @@
 
       // 4. エディタの初期化
       initializeEditor(elements.editor);
+
+      // 4.5 ノードエディタモーダルの初期化
+      initNodeEditorModal();
 
       // 5. 初期フォーカス設定（Zenモード以外）
       if (!window.APP_CONFIG?.editor?.startZen) {

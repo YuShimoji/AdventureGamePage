@@ -18,6 +18,15 @@
         <button id="btn-theme" class="btn btn-ghost btn-sm" title="テーマ設定">🎨</button>
         <button id="btn-toggle-sidebar" class="btn btn-ghost btn-sm" title="ツール">☰</button>
       </div>
+
+    <!-- Node Editor Fullscreen Modal -->
+    <div id="node-editor-modal" class="node-editor-modal" hidden>
+      <div class="node-editor-modal-header">
+        <h3>ノードエディタ（フルスクリーン）</h3>
+        <button id="node-editor-modal-close" class="btn btn-ghost btn-sm" title="閉じる">✕</button>
+      </div>
+      <div class="node-editor-modal-content" id="node-editor-modal-content"></div>
+    </div>
     </header>
 
     <aside id="sidebar" class="sidebar" hidden>
@@ -136,6 +145,9 @@
                 <button id="ne-validate" class="btn btn-ghost">検証</button>
                 <button id="ne-save" class="btn btn-primary">保存</button>
                 <button id="ne-export" class="btn btn-ghost">出力</button>
+              </div>
+              <div class="btn-group" style="margin: 6px 0 0;">
+                <button id="ne-open-modal" class="btn btn-ghost">フルスクリーンで編集</button>
               </div>
               <div class="ne-banner" id="ne-dirty-banner" hidden>未保存の変更があります（Ctrl+S で保存）</div>
               <div class="field">
