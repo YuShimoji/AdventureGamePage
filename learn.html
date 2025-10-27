@@ -99,9 +99,9 @@
         media: {
           title: '画像とサウンド', start: 'start',
           nodes: {
-            start: { title:'森の入口', image:'images/forest-entrance.jpg', text: '音楽が始まる。', choices: [ { text:'進む', to:'deep' } ], actions:[ { type:'play_bgm', url:'audio/forest-bgm.mp3', volume:0.6, loop:true } ] },
-            deep:  { title:'森の奥', image:'images/forest-deep.jpg', text: 'ガサガサ…', choices: [ { text:'音', to:'sfx' }, { text:'やめる', to:'stop' } ] },
-            sfx:   { text: '効果音！', choices: [ { text:'戻る', to:'deep' } ], actions:[ { type:'play_sfx', url:'audio/monster-growl.mp3', volume:0.9 } ] },
+            start: { title:'森の入口', image:'https://placehold.co/1200x700?text=Forest+Entrance', text: '音楽が始まる。', choices: [ { text:'進む', to:'deep' } ], actions:[ { type:'play_bgm', url:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3', volume:0.6, loop:true } ] },
+            deep:  { title:'森の奥', image:'https://placehold.co/1200x700?text=Forest+Deep', text: 'ガサガサ…', choices: [ { text:'音', to:'sfx' }, { text:'やめる', to:'stop' } ] },
+            sfx:   { text: '効果音！', choices: [ { text:'戻る', to:'deep' } ], actions:[ { type:'play_sfx', url:'https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3', volume:0.9 } ] },
             stop:  { text: '音楽を止める。', choices: [ { text:'最初へ', to:'start' } ], actions:[ { type:'stop_bgm', fadeOut:true } ] }
           }
         }
