@@ -13,8 +13,8 @@
     "test:ci": "node scripts/dev-check.js && node scripts/run-tests.js --ci",
     "dev": "node scripts/dev-server.js",
     "check": "node scripts/dev-check.js",
-    "lint": "echo 'No linter configured yet'",
-    "format": "echo 'No formatter configured yet'",
+    "lint": "eslint scripts/*.js",
+    "format": "prettier --write \"scripts/*.js\" \"*.js\" \"*.json\"",
     "build": "echo 'No build process configured yet'",
     "docs": "echo 'Documentation generation not configured yet'"
   },
@@ -28,5 +28,12 @@
   "bugs": {
     "url": "https://github.com/YuShimoji/AdventureGamePage/issues"
   },
-  "homepage": "https://github.com/YuShimoji/AdventureGamePage#readme"
+  "homepage": "https://github.com/YuShimoji/AdventureGamePage#readme",
+  "devDependencies": {
+    "eslint": "^9.38.0",
+    "prettier": "^3.6.2"
+  },
+  "dependencies": {
+    "jszip": "^3.10.1"
+  }
 }

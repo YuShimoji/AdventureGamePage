@@ -1,14 +1,14 @@
 // Migration utilities for extended game data schema.
 // Converts legacy data to new format with items, characters, lore, and state.
 
-const STORAGE_KEY_LEGACY = 'agp_manuscript_full';
-const STORAGE_KEY_ITEMS = 'agp_items';
-const STORAGE_KEY_CHARACTERS = 'agp_characters';
-const STORAGE_KEY_LORE = 'agp_lore';
-const STORAGE_KEY_STATE = 'agp_state';
+const STORAGE_KEY_LEGACY = "agp_manuscript_full";
+const STORAGE_KEY_ITEMS = "agp_items";
+const STORAGE_KEY_CHARACTERS = "agp_characters";
+const STORAGE_KEY_LORE = "agp_lore";
+const STORAGE_KEY_STATE = "agp_state";
 
 function migrateLegacyToExtended() {
-  if (typeof localStorage === 'undefined') return false;
+  if (typeof localStorage === "undefined") return false;
 
   // Check if migration already done
   if (localStorage.getItem(STORAGE_KEY_ITEMS)) return false;
@@ -18,18 +18,18 @@ function migrateLegacyToExtended() {
 
   try {
     const parsed = JSON.parse(legacyData);
-    if (!parsed || typeof parsed !== 'object') return false;
+    if (!parsed || typeof parsed !== "object") return false;
 
     // Migrate to items (extract any item-like content)
-    const items = extractItemsFromText(parsed.text || parsed.html || '');
+    const items = extractItemsFromText(parsed.text || parsed.html || "");
     localStorage.setItem(STORAGE_KEY_ITEMS, JSON.stringify({ items }));
 
     // Migrate to characters (extract character mentions)
-    const characters = extractCharactersFromText(parsed.text || parsed.html || '');
+    const characters = extractCharactersFromText(parsed.text || parsed.html || "");
     localStorage.setItem(STORAGE_KEY_CHARACTERS, JSON.stringify({ characters }));
 
     // Migrate to lore (extract lore-like content)
-    const lore = extractLoreFromText(parsed.text || parsed.html || '');
+    const lore = extractLoreFromText(parsed.text || parsed.html || "");
     localStorage.setItem(STORAGE_KEY_LORE, JSON.stringify({ lore }));
 
     // Migrate to state (basic state initialization)
@@ -37,14 +37,14 @@ function migrateLegacyToExtended() {
       inventory: {},
       flags: {},
       variables: { migratedFromLegacy: true },
-      history: parsed.history || []
+      history: parsed.history || [],
     };
     localStorage.setItem(STORAGE_KEY_STATE, JSON.stringify({ state }));
 
-    console.log('Migration completed successfully.');
+    console.log("Migration completed successfully.");
     return true;
   } catch (e) {
-    console.error('Migration failed:', e);
+    console.error("Migration failed:", e);
     return false;
   }
 }
@@ -53,9 +53,9 @@ function extractItemsFromText(text) {
   // Simple extraction: look for item-like patterns
   const items = [];
   const itemPatterns = [
-    { regex: /剣|刀|武器/g, type: 'weapon' },
-    { regex: /薬|ポーション/g, type: 'consumable' },
-    { regex: /鎧|盾/g, type: 'armor' }
+    { regex: /剣|刀|武器/g, type: "weapon" },
+    { regex: /薬|ポーション/g, type: "consumable" },
+    { regex: /鎧|盾/g, type: "armor" },
   ];
 
   itemPatterns.forEach(({ regex, type }) => {
@@ -67,7 +67,7 @@ function extractItemsFromText(text) {
           name: match,
           type,
           description: `${match} - 自動抽出されたアイテム。`,
-          properties: {}
+          properties: {},
         });
       });
     }
@@ -86,10 +86,10 @@ function extractCharactersFromText(text) {
     characters.push({
       id: `char${index + 1}`,
       name,
-      type: 'npc',
+      type: "npc",
       description: `${name} - 自動抽出されたキャラクター。`,
       stats: { hp: 50, attack: 5, defense: 5 },
-      relationships: []
+      relationships: [],
     });
   });
 
@@ -102,13 +102,18 @@ function extractLoreFromText(text) {
   const sections = text.split(/\n\s*\n/); // Split by double line breaks
 
   sections.forEach((section, index) => {
-    if (section.includes('歴史') || section.includes('伝説') || section.includes('王国') || section.includes('古代')) {
+    if (
+      section.includes("歴史") ||
+      section.includes("伝説") ||
+      section.includes("王国") ||
+      section.includes("古代")
+    ) {
       lore.push({
         id: `lore${index + 1}`,
         title: `抽出されたロア ${index + 1}`,
         content: section,
-        tags: ['auto-extracted'],
-        related: []
+        tags: ["auto-extracted"],
+        related: [],
       });
     }
   });
@@ -117,6 +122,6 @@ function extractLoreFromText(text) {
 }
 
 // Expose globally
-if (typeof window !== 'undefined') {
+if (typeof window !== "undefined") {
   window.DataMigration = { migrateLegacyToExtended };
 }

@@ -8,34 +8,119 @@
     <link rel="stylesheet" href="styles/play.css" />
   </head>
   <body>
-    <header class="app-header">
-      <a class="btn" href="index.html">← トップ</a>
+    <a href="#scene" class="skip-link">本文へスキップ</a>
+
+    <header class="app-header" role="banner">
+      <a class="btn" href="index.html" aria-label="トップページに戻る">← トップ</a>
       <h1 id="game-title">サンプルアドベンチャー</h1>
-      <div class="header-actions">
-        <button id="btn-back" class="btn">戻る</button>
-        <button id="btn-forward" class="btn">進む</button>
-        <button id="btn-restart" class="btn">リスタート</button>
-        <button id="btn-theme" class="icon-btn" title="テーマ設定">🎨</button>
+
+      <!-- Desktop header actions -->
+      <div class="header-actions desktop-only" role="toolbar" aria-label="ゲーム操作ツールバー">
+        <button id="btn-save" class="btn btn-accent" aria-label="ゲームを保存 (Sキー)" tabindex="0">セーブ</button>
+        <button id="btn-load" class="btn" aria-label="ゲームを読み込み (Lキー)" tabindex="0">ロード</button>
+        <button id="btn-inventory" class="btn" aria-label="インベントリを開く (Iキー)" tabindex="0">インベントリ</button>
+        <button id="btn-back" class="btn" aria-label="前の選択に戻る (←キー)" tabindex="0">戻る</button>
+        <button id="btn-forward" class="btn" aria-label="次の選択に進む (→キー)" tabindex="0">進む</button>
+        <button id="btn-restart" class="btn" aria-label="ゲームを最初から開始 (Rキー)" tabindex="0">リスタート</button>
+        <button id="btn-theme" class="icon-btn" title="テーマ設定" aria-label="テーマ設定" tabindex="0">🎨</button>
         <label class="btn file-label">
           ゲームJSON読込
-          <input id="play-file-import" type="file" accept="application/json" hidden />
+          <input id="play-file-import" type="file" accept="application/json" aria-label="ゲームJSONファイルを読み込み" tabindex="0" hidden />
         </label>
       </div>
+
+      <!-- Mobile menu button -->
+      <button id="mobile-menu-btn" class="mobile-menu-btn mobile-only" aria-label="メニューを開く" aria-expanded="false" tabindex="0">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+      </button>
     </header>
 
+    <!-- Mobile menu overlay -->
+    <div id="mobile-menu-overlay" class="mobile-menu-overlay" hidden>
+      <div class="mobile-menu-content">
+        <div class="mobile-menu-header">
+          <h2>メニュー</h2>
+          <button id="mobile-menu-close" class="mobile-menu-close" aria-label="メニューを閉じる">×</button>
+        </div>
+        <div class="mobile-menu-actions">
+          <button id="mobile-btn-save" class="btn btn-accent" aria-label="ゲームを保存">セーブ</button>
+          <button id="mobile-btn-load" class="btn" aria-label="ゲームを読み込み">ロード</button>
+          <button id="mobile-btn-inventory" class="btn" aria-label="インベントリを開く">インベントリ</button>
+          <button id="mobile-btn-back" class="btn" aria-label="前の選択に戻る">戻る</button>
+          <button id="mobile-btn-forward" class="btn" aria-label="次の選択に進む">進む</button>
+          <button id="mobile-btn-restart" class="btn" aria-label="ゲームを最初から開始">リスタート</button>
+          <button id="mobile-btn-theme" class="btn" aria-label="テーマ設定">🎨 テーマ設定</button>
+          <label class="btn file-label mobile-file-label">
+            ゲームJSON読込
+            <input id="mobile-play-file-import" type="file" accept="application/json" aria-label="ゲームJSONファイルを読み込み" hidden />
+          </label>
+        </div>
+      </div>
+    </div>
+
     <main class="container play-container">
-      <article id="scene" class="scene"></article>
-      <div id="choices" class="choices"></div>
+      <article id="scene" class="scene" role="main" aria-live="polite" aria-describedby="scene-status"></article>
+      <div id="scene-status" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+      <div id="choices" class="choices" role="navigation" aria-label="選択肢"></div>
+      <div id="game-status" class="sr-only" aria-live="assertive" aria-atomic="true"></div>
     </main>
 
-    <div id="theme-panel" class="theme-panel" hidden></div>
+    <!-- Theme Modal -->
+    <div id="theme-panel" class="modal theme-modal" hidden role="dialog" aria-modal="true" aria-labelledby="theme-title">
+      <div class="modal-content theme-modal-content">
+        <div class="modal-header">
+          <h2 id="theme-title">テーマ設定</h2>
+          <button id="theme-close" class="modal-close-btn" title="閉じる" aria-label="テーマパネルを閉じる">×</button>
+        </div>
+        <div class="modal-body theme-modal-body">
+          <!-- Theme panel content will be populated by JavaScript -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Save/Load Modal -->
+    <div id="save-load-modal" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 id="modal-title">ゲームデータを保存</h2>
+          <button id="modal-close" class="modal-close-btn" title="閉じる" aria-label="モーダルを閉じる">×</button>
+        </div>
+        <div class="modal-body">
+          <div id="save-panel">
+            <label for="save-name">セーブ名</label>
+            <input id="save-name" type="text" placeholder="セーブデータを入力" maxlength="50" aria-label="セーブデータの名前" />
+            <button id="btn-save-confirm" class="btn btn-accent" aria-label="ゲームデータを保存">保存</button>
+          </div>
+          <div id="load-panel" hidden>
+            <h3>保存済みデータ</h3>
+            <div class="load-panel-actions">
+              <button id="btn-import-save" class="btn">インポート</button>
+            </div>
+            <div id="saved-games-list" class="saved-games-list" role="list" aria-label="保存済みゲームデータ一覧">
+              <p class="no-data">保存されたゲームデータがありません</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Inventory Panel -->
+    <div id="inventory-panel" class="inventory-panel" hidden role="dialog" aria-modal="true" aria-labelledby="inventory-title">
+      <div class="inventory-header">
+        <h3 id="inventory-title">所持品</h3>
+        <button id="inventory-close" class="inventory-close-btn" title="閉じる" aria-label="インベントリを閉じる">×</button>
+      </div>
+      <div class="inventory-content">
+        <div id="inventory-list" class="inventory-list" role="list" aria-label="所持品一覧">
+          <p class="no-items">所持品がありません</p>
+        </div>
+      </div>
+    </div>
 
     <script src="scripts/storage.js"></script>
-    <script src="scripts/storageProviders.js"></script>
-    <script src="scripts/storageBridge.js"></script>
     <script src="scripts/theme.js"></script>
-    <script src="scripts/config.js"></script>
-    <script src="scripts/errorHandler.js"></script>
     <script src="scripts/sampleData.js"></script>
     <script src="scripts/gameEngine.js"></script>
     <script src="scripts/play.js"></script>
