@@ -1,21 +1,69 @@
 # OS/Editor
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
 .vscode/
 .idea/
+*.swp
+*.swo
+*~
 
-# Logs
+# Node.js
+node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+.npm
+.eslintcache
+.nyc_output
+
+# Logs
+*.log
+logs/
 server.out.txt
 server.err.txt
 
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+
 # Cache/Artifacts
-*.log
 *.tmp
 *.cache
+.parcel-cache
+.cache/
 
 # Build (not used currently, reserved)
 dist/
 build/
+
+# Browser screenshots and temp files
+screenshots/
+temp/
+
+# Local development files
+local-*.json
+*.local
+
+# Backup files
+*.bak
+*.backup
+*.tmp
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Temporary folders
+tmp/
+temp/

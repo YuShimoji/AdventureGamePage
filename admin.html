@@ -6,6 +6,8 @@
     <title>管理（Zenライク執筆エディタ）</title>
     <link rel="stylesheet" href="styles/common.css" />
     <link rel="stylesheet" href="styles/admin.css" />
+    <!-- Mermaid -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
   </head>
   <body>
     <header class="app-header">
@@ -13,9 +15,18 @@
       <h1>Zenライクエディタ</h1>
       <div class="header-actions">
         <span id="char-count" class="muted">0 文字</span>
-        <button id="btn-theme" class="icon-btn" title="テーマ設定">🎨</button>
-        <button id="btn-toggle-sidebar" class="icon-btn" title="ツール">☰</button>
+        <button id="btn-theme" class="btn btn-ghost btn-sm" title="テーマ設定">🎨</button>
+        <button id="btn-toggle-sidebar" class="btn btn-ghost btn-sm" title="ツール">☰</button>
       </div>
+
+    <!-- Node Editor Fullscreen Modal -->
+    <div id="node-editor-modal" class="node-editor-modal" hidden>
+      <div class="node-editor-modal-header">
+        <h3>ノードエディタ（フルスクリーン）</h3>
+        <button id="node-editor-modal-close" class="btn btn-ghost btn-sm" title="閉じる">✕</button>
+      </div>
+      <div class="node-editor-modal-content" id="node-editor-modal-content"></div>
+    </div>
     </header>
 
     <aside id="sidebar" class="sidebar" hidden>
@@ -29,10 +40,12 @@
         </div>
 
         <details class="agp-accordion" id="acc-tools" data-accordion-id="tools">
-          <summary data-has-hint>
-            <span class="summary-label">ツール / 保存</span>
+          <div class="summary-wrapper">
+            <summary data-has-hint>
+              <span class="summary-label">ツール / 保存</span>
+            </summary>
             <button class="accordion-hint-toggle" type="button" aria-expanded="false" aria-label="ツール / 保存のヒント" data-accordion-hint="tools">?</button>
-          </summary>
+          </div>
           <div class="accordion-content">
             <div class="accordion-hint" data-hint-for="tools" hidden></div>
             <label class="field">
@@ -40,20 +53,27 @@
               <input id="title-input" type="text" placeholder="無題" />
             </label>
 
+            <label class="field">
+              <span>保存先（ストレージ）</span>
+              <select id="storage-provider-select">
+                <option value="idb">IndexedDB（推奨）</option>
+                <option value="local">LocalStorage</option>
+              </select>
+            </label>
 
             <!-- 書式ツールはフローティングバーに分離 -->
 
             <div class="actions">
-              <button id="btn-save-simple" class="btn">シンプル保存</button>
-              <button id="btn-load-simple" class="btn">シンプル読込</button>
+              <button id="btn-save-simple" class="btn btn-primary">クイック保存</button>
+              <button id="btn-load-simple" class="btn btn-ghost">クイック読込</button>
               <button id="btn-save-full" class="btn btn-accent">完全保存</button>
-              <button id="btn-load-full" class="btn">完全読込</button>
-              <button id="btn-export" class="btn">拡張エクスポート</button>
-              <label class="btn file-label">
-                拡張インポート
-                <input id="file-import" type="file" accept=".json,.zip" multiple hidden />
+              <button id="btn-load-full" class="btn btn-ghost">完全読込</button>
+              <button id="btn-export" class="btn btn-ghost">エクスポート</button>
+              <label class="btn btn-ghost file-label">
+                インポート
+                <input id="file-import" type="file" accept="application/json" hidden />
               </label>
-              <button id="btn-saves-list" class="btn">保存一覧</button>
+              <button id="btn-saves-list" class="btn btn-ghost">保存一覧</button>
             </div>
           </div>
         </details>
@@ -62,17 +82,19 @@
     <section id="saves-panel" class="saves-panel" hidden>
       <header class="memos-header">
         <h3>保存一覧</h3>
-        <button id="saves-refresh" class="btn">更新</button>
-        <button id="saves-close" class="icon-btn" title="閉じる">✕</button>
+        <button id="saves-refresh" class="btn btn-ghost btn-sm" title="更新">↻</button>
+        <button id="saves-close" class="btn btn-ghost btn-sm" title="閉じる">✕</button>
       </header>
       <div id="saves-list" class="memos-list"></div>
     </section>
 
         <details class="agp-accordion" id="acc-editor-settings" data-accordion-id="editor-settings">
-          <summary data-has-hint>
-            <span class="summary-label">エディタ設定</span>
+          <div class="summary-wrapper">
+            <summary data-has-hint>
+              <span class="summary-label">エディタ設定</span>
+            </summary>
             <button class="accordion-hint-toggle" type="button" aria-expanded="false" aria-label="エディタ設定のヒント" data-accordion-hint="editor-settings">?</button>
-          </summary>
+          </div>
           <div class="accordion-content">
             <div class="accordion-hint" data-hint-for="editor-settings" hidden></div>
             <section id="editor-settings" class="card">
@@ -104,10 +126,12 @@
         </details>
 
         <details class="agp-accordion" id="acc-node-editor" data-accordion-id="node-editor" open>
-          <summary data-has-hint>
-            <span class="summary-label">ノード編集（MVP）</span>
+          <div class="summary-wrapper">
+            <summary data-has-hint>
+              <span class="summary-label">ノード編集（MVP）</span>
+            </summary>
             <button class="accordion-hint-toggle" type="button" aria-expanded="false" aria-label="ノード編集（MVP）のヒント" data-accordion-hint="node-editor">?</button>
-          </summary>
+          </div>
           <div class="accordion-content">
             <div class="accordion-hint" data-hint-for="node-editor" hidden></div>
             <section id="validation-panel" class="card" hidden>
@@ -117,10 +141,13 @@
             <section id="node-editor" class="card">
               <h3>ノード編集（MVP）</h3>
               <div class="ne-actions">
-                <button id="ne-load" class="btn">取込（agp_game_data）</button>
-                <button id="ne-validate" class="btn">検証</button>
-                <button id="ne-save" class="btn btn-accent">適用保存</button>
-                <button id="ne-export" class="btn">JSON出力</button>
+                <button id="ne-load" class="btn btn-ghost">取込</button>
+                <button id="ne-validate" class="btn btn-ghost">検証</button>
+                <button id="ne-save" class="btn btn-primary">保存</button>
+                <button id="ne-export" class="btn btn-ghost">出力</button>
+              </div>
+              <div class="btn-group" style="margin: 6px 0 0;">
+                <button id="ne-open-modal" class="btn btn-ghost">フルスクリーンで編集</button>
               </div>
               <div class="ne-banner" id="ne-dirty-banner" hidden>未保存の変更があります（Ctrl+S で保存）</div>
               <div class="field">
@@ -152,28 +179,29 @@
                 <textarea id="ne-node-text" rows="4" placeholder="テキスト"></textarea>
               </div>
               <div class="field">
+                <span>画像URL（任意）</span>
+                <input id="ne-node-image" type="url" placeholder="https://example.com/image.jpg" />
+              </div>
+              <div class="field">
                 <span>選択肢</span>
                 <div id="ne-choices" class="ne-choices"></div>
                 <button id="ne-add-choice" class="btn">選択肢を追加</button>
+              </div>
+              <div class="field">
+                <span>アクション</span>
+                <div id="ne-actions" class="ne-actions-list"></div>
+                <button id="ne-add-action" class="btn">アクションを追加</button>
               </div>
               <datalist id="ne-node-id-list"></datalist>
               <div class="field">
                 <span>部分エクスポート（到達可能サブグラフ）</span>
                 <div class="ne-row">
-                  <select id="ne-export-multiselect" multiple size="6" class="ne-export-multiselect"></select>
-                  <div class="ne-subactions">
+                  <select id="ne-export-multiselect" multiple size="6" style="flex:1"></select>
+                  <div class="ne-subactions" style="display:grid; gap:6px;">
                     <button id="ne-export-select-all" class="btn">全選択</button>
                     <button id="ne-export-select-none" class="btn">全解除</button>
                     <button id="ne-export-partial" class="btn">選択からエクスポート</button>
                   </div>
-                </div>
-              </div>
-              <div class="field" id="ne-diff-panel" hidden>
-                <span>変更差分</span>
-                <pre id="ne-diff-content" class="ne-diff-content"></pre>
-                <div class="ne-row">
-                  <button id="ne-diff-apply" class="btn btn-accent">適用</button>
-                  <button id="ne-diff-cancel" class="btn">キャンセル</button>
                 </div>
               </div>
             </section>
@@ -181,21 +209,20 @@
         </details>
 
         <details class="agp-accordion" id="acc-mermaid" data-accordion-id="mermaid">
-          <summary data-has-hint>
-            <span class="summary-label">分岐プレビュー（Mermaid）</span>
+          <div class="summary-wrapper">
+            <summary data-has-hint>
+              <span class="summary-label">分岐プレビュー（Mermaid）</span>
+            </summary>
             <button class="accordion-hint-toggle" type="button" aria-expanded="false" aria-label="分岐プレビュー（Mermaid）のヒント" data-accordion-hint="mermaid">?</button>
-          </summary>
+          </div>
           <div class="accordion-content">
             <div class="accordion-hint" data-hint-for="mermaid" hidden></div>
             <section id="mermaid-panel" class="card">
               <h3>分岐プレビュー（Mermaid）</h3>
-              <div class="actions actions-grid-2">
-                <button id="ne-mermaid-gen" class="btn">生成</button>
-                <button id="ne-mermaid-render" class="btn">描画</button>
-              </div>
-              <div class="ne-row ne-row-margin">
-                <button id="ne-mermaid-open" class="btn">別ウィンドウで開く</button>
-                <div class="spacer"></div>
+              <div class="btn-group" style="margin-bottom: 12px;">
+                <button id="ne-mermaid-gen" class="btn btn-primary">生成・描画</button>
+                <button id="ne-mermaid-fullscreen" class="btn btn-ghost">フルスクリーン</button>
+                <button id="ne-mermaid-open" class="btn btn-ghost">別ウィンドウ</button>
               </div>
               <div class="field">
                 <span>対象</span>
@@ -205,18 +232,39 @@
                     <option value="from_start">開始から到達</option>
                     <option value="from_selected">選択ノードをseed</option>
                   </select>
-                  <select id="ne-mermaid-seed" multiple size="5" class="ne-mermaid-seed" disabled></select>
+                  <select id="ne-mermaid-seed" multiple size="5" style="flex:1" disabled></select>
                 </div>
                 <label class="muted"><input id="ne-mermaid-show-labels" type="checkbox" checked /> エッジに選択肢ラベルを表示</label>
               </div>
               <label class="field">
                 <span>Mermaid ソース</span>
-                <textarea id="ne-mermaid-src" rows="6" placeholder="flowchart TD..." class="ne-mermaid-src"></textarea>
+                <textarea id="ne-mermaid-src" rows="6" placeholder="flowchart TD..." style="width:100%;"></textarea>
               </label>
               <div class="mermaid-view" id="ne-mermaid-view"></div>
-              <p class="muted muted-margin">
+              <p class="muted" style="margin-top:6px;">
                 注: オフライン環境では描画が行われない場合があります。その場合でもソースはコピー可能です。
               </p>
+            </section>
+          </div>
+        </details>
+
+        <details class="agp-accordion" id="acc-playtest" data-accordion-id="playtest">
+          <div class="summary-wrapper">
+            <summary data-has-hint>
+              <span class="summary-label">プレイテスト</span>
+            </summary>
+            <button class="accordion-hint-toggle" type="button" aria-expanded="false" aria-label="プレイテストのヒント" data-accordion-hint="playtest">?</button>
+          </div>
+          <div class="accordion-content">
+            <div class="accordion-hint" data-hint-for="playtest" hidden></div>
+            <section id="playtest-panel" class="card">
+              <h3>プレイテスト</h3>
+              <p class="muted">現在のエディタ内容をプレイモードで確認できます。</p>
+              <div class="btn-group" style="margin-bottom: 12px;">
+                <button id="playtest-inline" class="btn btn-primary">インラインプレビュー</button>
+                <button id="playtest-window" class="btn btn-ghost">別ウィンドウで開く</button>
+              </div>
+              <div id="playtest-status" class="muted" style="margin-top: 8px;"></div>
             </section>
           </div>
         </details>
@@ -240,22 +288,22 @@
 
     <!-- フローティング：書式ツールバー -->
     <div id="formatbar" class="formatbar-floating">
-      <button data-cmd="bold" title="太字"><b>B</b></button>
-      <button data-cmd="italic" title="斜体"><i>I</i></button>
-      <button data-cmd="underline" title="下線"><u>U</u></button>
+      <button data-cmd="bold" class="btn btn-ghost btn-sm" title="太字"><b>B</b></button>
+      <button data-cmd="italic" class="btn btn-ghost btn-sm" title="斜体"><i>I</i></button>
+      <button data-cmd="underline" class="btn btn-ghost btn-sm" title="下線"><u>U</u></button>
       <span class="spacer"></span>
-      <button data-cmd="justifyLeft" title="左揃え">⟸</button>
-      <button data-cmd="justifyCenter" title="中央">⇔</button>
-      <button data-cmd="justifyRight" title="右揃え">⟹</button>
+      <button data-cmd="justifyLeft" class="btn btn-ghost btn-sm" title="左揃え">⟸</button>
+      <button data-cmd="justifyCenter" class="btn btn-ghost btn-sm" title="中央">⇔</button>
+      <button data-cmd="justifyRight" class="btn btn-ghost btn-sm" title="右揃え">⟹</button>
     </div>
 
     <!-- フローティング：操作（Zen/サイドバー/テーマ） -->
     <div class="floating-controls">
-      <button id="btn-quick-zen" class="icon-btn" title="Zen切替">🧘</button>
-      <button id="btn-quick-sidebar" class="icon-btn" title="ツール切替">☰</button>
-      <button id="btn-quick-theme" class="icon-btn" title="テーマ設定">🎨</button>
-      <button id="btn-quick-preview" class="icon-btn" title="保存プレビュー">🗂</button>
-      <button id="btn-quick-memos" class="icon-btn" title="メモ">📝</button>
+      <button id="btn-quick-zen" class="btn btn-ghost btn-sm" title="Zen切替">🧘</button>
+      <button id="btn-quick-sidebar" class="btn btn-ghost btn-sm" title="ツール切替">☰</button>
+      <button id="btn-quick-theme" class="btn btn-ghost btn-sm" title="テーマ設定">🎨</button>
+      <button id="btn-quick-preview" class="btn btn-ghost btn-sm" title="保存プレビュー">🗂</button>
+      <button id="btn-quick-memos" class="btn btn-ghost btn-sm" title="メモ">📝</button>
     </div>
 
     <!-- メモパネル -->
@@ -268,54 +316,115 @@
           <option value="rank_desc">順位(高→低)</option>
           <option value="rank_asc">順位(低→高)</option>
         </select>
-        <button id="memos-close" class="icon-btn" title="閉じる">✕</button>
+        <button id="memos-close" class="btn btn-ghost btn-sm" title="閉じる">✕</button>
       </header>
       <div class="memos-new">
         <input id="memo-label" type="text" placeholder="ラベル" />
         <textarea id="memo-text" rows="3" placeholder="メモ本文"></textarea>
-        <button id="memo-quote" class="btn" title="エディタの選択範囲を引用">選択を引用</button>
-        <button id="memo-add" class="btn btn-accent">追加</button>
+        <button id="memo-quote" class="btn btn-ghost" title="エディタの選択範囲を引用">💬 選択を引用</button>
+        <button id="memo-add" class="btn btn-primary" title="追加">➕ 追加</button>
       </div>
       <div id="memos-list" class="memos-list"></div>
     </section>
 
-    <!-- 保存プレビューパネル（モック） -->
-    <section id="preview-panel" class="preview-panel" hidden>
-      <header class="preview-header">
-        <h3>保存プレビュー</h3>
-        <label class="muted">種類
-          <select id="preview-filter-type">
-            <option value="all">すべて</option>
-            <option value="simple">シンプル</option>
-            <option value="full">完全</option>
-            <option value="snapshot">スナップショット</option>
-          </select>
-        </label>
-        <label class="muted">並び
-          <select id="preview-sort">
-            <option value="date_desc">保存日時(新→旧)</option>
-            <option value="date_asc">保存日時(旧→新)</option>
-            <option value="size_desc">サイズ(大→小)</option>
-            <option value="size_asc">サイズ(小→大)</option>
-          </select>
-        </label>
-        <div class="spacer"></div>
-        <button id="preview-delete-selected" class="btn" disabled>選択削除</button>
-        <button id="preview-refresh" class="btn">更新</button>
-        <button id="preview-close" class="icon-btn" title="閉じる">✕</button>
+    <!-- 保存プレビューパネル -->
+    <section id="preview-panel" class="preview-panel overlay-panel" hidden>
+      <header class="preview-header" style="flex-direction: column; align-items: stretch; gap: 12px;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <h3 style="margin: 0;">保存プレビュー</h3>
+          <div class="spacer"></div>
+          <button id="snapshot-compare-btn" class="btn" disabled>比較 (0/2)</button>
+          <button id="preview-delete-selected" class="btn" disabled>選択削除</button>
+          <button id="preview-refresh" class="btn">再読込</button>
+          <button id="preview-close" class="icon-btn" title="閉じる">✕</button>
+        </div>
+        
+        <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center; font-size: 13px;">
+          <label class="muted">検索
+            <input id="preview-search" type="text" placeholder="タイトル・内容・ラベル" style="width: 150px;" />
+          </label>
+          <label class="muted">タグ
+            <select id="preview-filter-tag">
+              <option value="all">全て</option>
+              <option value="draft">下書き</option>
+              <option value="final">最終版</option>
+              <option value="backup">バックアップ</option>
+            </select>
+          </label>
+          <label class="muted">種類
+            <select id="preview-filter-type">
+              <option value="all">全て</option>
+              <option value="simple">シンプル保存</option>
+              <option value="full">完全保存</option>
+              <option value="snapshot">スナップショット</option>
+            </select>
+          </label>
+          <label class="muted">開始日
+            <input id="preview-date-from" type="date" style="width: 130px;" />
+          </label>
+          <label class="muted">終了日
+            <input id="preview-date-to" type="date" style="width: 130px;" />
+          </label>
+          <label class="muted">並び替え
+            <select id="preview-sort">
+              <option value="date_desc">保存日時（新しい順）</option>
+              <option value="date_asc">保存日時（古い順）</option>
+              <option value="size_desc">サイズ（大→小）</option>
+              <option value="size_asc">サイズ（小→大）</option>
+              <option value="title_asc">タイトル（A→Z）</option>
+              <option value="title_desc">タイトル（Z→A）</option>
+            </select>
+          </label>
+        </div>
       </header>
       <div class="snapshot-bar">
-        <input id="snapshot-label" type="text" placeholder="スナップショットのラベル (任意)" />
+        <input id="snapshot-label" type="text" placeholder="スナップショット名（任意）" />
         <button id="snapshot-create" class="btn btn-accent">スナップショット作成</button>
       </div>
       <div id="preview-list" class="preview-list"></div>
     </section>
 
+    <!-- Mermaid Fullscreen Modal -->
+    <div id="mermaid-fullscreen-modal" class="mermaid-fullscreen-modal" hidden>
+      <div class="mermaid-fullscreen-header">
+        <h3>分岐プレビュー（フルスクリーン）</h3>
+        <button id="mermaid-fullscreen-close" class="btn btn-ghost btn-sm" title="閉じる">✕</button>
+      </div>
+      <div class="mermaid-fullscreen-content">
+        <div id="mermaid-fullscreen-view" class="mermaid-view"></div>
+      </div>
+    </div>
+
+    <!-- Playtest Modal -->
+    <div id="playtest-modal" class="playtest-modal" hidden>
+      <div class="playtest-modal-header">
+        <h3>プレイテスト</h3>
+        <button id="playtest-modal-close" class="btn btn-ghost btn-sm" title="閉じる">✕</button>
+      </div>
+      <div class="playtest-modal-content">
+        <iframe id="playtest-iframe" style="width: 100%; height: 100%; border: none;"></iframe>
+      </div>
+    </div>
+
     <script src="scripts/storage.js"></script>
     <script src="scripts/theme.js"></script>
     <script src="scripts/config.js"></script>
     <script src="scripts/memos.js"></script>
+    <script src="scripts/previewUtils.js"></script>
+    <script src="scripts/errorHandler.js"></script>
     <script src="scripts/storageProviders.js"></script>
     <script src="scripts/storageBridge.js"></script>
-    <script src="scripts/lazyLoader.js"></script>
+    <script src="scripts/converters.js"></script>
+    <script src="scripts/validator.js"></script>
+    <script src="scripts/dataValidator.js"></script>
+    <script src="scripts/audioManager.js"></script>
+    <script src="scripts/nodeEditor.js"></script>
+    <script src="scripts/dataMigration.js"></script>
+    <script src="scripts/migrationWizard.js"></script>
+    <script src="scripts/snapshotCompare.js"></script>
+    <script src="scripts/savePreview.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script src="scripts/mermaidPreview.js"></script>
+    <script src="scripts/playtest.js"></script>
+    <script src="scripts/admin-boot.js"></script>
     <script src="scripts/admin.js"></script>

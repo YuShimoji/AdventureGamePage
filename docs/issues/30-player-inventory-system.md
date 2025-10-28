@@ -1,58 +1,106 @@
-# 30: プレイヤーインベントリシステム
+# Issue: インベントリシステム実装
 
-- 番号: 30
-- 種別: Feature
-- Tier: 2（中リスク・データ/UI拡張）
-- 目的: プレイヤーのアイテム管理機能を追加し、ゲームの没入感を向上させる。
+- 種別: feature
+- 優先度: high
+- フェーズ: 2
+- 画面: `play.html`, `scripts/gameEngine.js`
 
-## 背景 / 文脈
+## 概要
+プレイヤーが所持アイテムを管理できるインベントリシステムを実装します。アイテムの取得、使用、表示、永続化を行います。
 
-アドベンチャーゲームにおいて、アイテム収集・使用は重要なメカニクス。既存のノードベースシステムに統合して、アイテムをゲーム進行に活用できるようにする。
+## 背景
+現在のゲームエンジンには状態管理の基本機能はありますが、アイテムインベントリの専用機能がありません。プレイヤー体験を向上させるため、アイテム管理機能が必要です。
 
-## 要件（仕様）
+## 要件
 
-- **データモデル**:
-  - `gameData.items`: アイテム定義（id, name, description, type, icon, etc.）。
-  - `progress.inventory`: プレイヤー所持アイテム（itemId, quantity, acquiredAt）。
+### 基本機能
+- アイテムの取得・追加
+- アイテムの使用・削除
+- アイテム一覧の表示
+- アイテム数の管理（スタック可能）
 
-- **UI**: プレイ画面にインベントリパネル（トグル表示）。アイテム一覧、説明、使用ボタン。
+### データ構造
+```javascript
+{
+  inventory: {
+    items: [
+      {
+        id: 'item_key_001',
+        name: '鍵',
+        description: '古びた鉄の鍵',
+        quantity: 1,
+        type: 'key_item',
+        usable: false
+      },
+      {
+        id: 'item_potion_001',
+        name: '回復薬',
+        description: 'HPを回復する',
+        quantity: 3,
+        type: 'consumable',
+        usable: true
+      }
+    ],
+    maxSlots: 20
+  }
+}
+```
 
-- **ノード拡張**:
-  - `gainItem`: アイテム取得ノード。
-  - `loseItem`: アイテム消費ノード。
-  - `checkItem`: アイテム所持条件分岐。
+### API設計
+```javascript
+// GameEngine拡張
+GameEngine.prototype.addItem = function(itemId, quantity = 1) { ... }
+GameEngine.prototype.removeItem = function(itemId, quantity = 1) { ... }
+GameEngine.prototype.hasItem = function(itemId) { ... }
+GameEngine.prototype.getItemCount = function(itemId) { ... }
+GameEngine.prototype.getInventory = function() { ... }
+```
 
-- **保存/復元**: インベントリ状態を progress に含める。
+### UI要件
+- インベントリ表示パネル（トグル可能）
+- アイテムアイコン/名前/数量表示
+- アイテム詳細（説明文）
+- 使用可能なアイテムには使用ボタン
 
-- **互換性**: 既存ゲームデータに items を追加可能。
+## 実装ステップ
 
-## 受け入れ基準
+### Step 1: データ構造とAPI実装
+1. `scripts/gameEngine.js` にインベントリ管理メソッド追加
+2. アイテムデータの検証（`scripts/dataValidator.js`）
+3. ストレージへの永続化（`StorageBridge`経由）
 
-- 新規ゲームでアイテム定義を読み込み、取得/使用可能。
-- インベントリUI でアイテム一覧・使用が可能。
-- ノードでアイテム操作が機能。
-- 保存/復元でインベントリ状態が維持。
+### Step 2: UI実装
+1. `play.html` にインベントリパネルのHTML追加
+2. `styles/play.css` にスタイル追加
+3. `scripts/play.js` にUI制御ロジック追加
 
-## 影響範囲
+### Step 3: ノードエディタ統合
+1. `scripts/nodeEditor.js` でアイテム追加/削除のノードアクションをサポート
+2. 条件分岐でアイテム所持チェック機能
 
-- `play.html`（インベントリUI追加）
-- `styles/play.css`（インベントリスタイル）
-- `scripts/play.js`（インベントリロジック）
-- `scripts/gameEngine.js`（アイテム操作拡張）
-- `scripts/nodeEditor.js`（アイテムノード追加）
-- `CHANGELOG.md` / `README.md`（更新）
+### Step 4: テスト
+1. ユニットテスト（`tests/gameEngine.inventory.spec.js`）
+2. 統合テスト（実際のプレイシナリオ）
 
-## タスク
+## 受け入れ条件
+- [ ] アイテムの追加・削除が正常に動作する
+- [ ] アイテム数量が正しく管理される
+- [ ] インベントリがストレージに保存される
+- [ ] UIでアイテム一覧が表示される
+- [ ] アイテム使用機能が動作する
+- [ ] ノードエディタでアイテム関連アクションが設定できる
+- [ ] テストが全て通過する
 
-1. データモデル定義（items, inventory）。
-2. インベントリUI実装（play.html/css/js）。
-3. ゲームエンジン拡張（アイテム操作）。
-4. NodeEditor拡張（アイテムノード）。
-5. テストとドキュメント更新。
+## 技術的考慮事項
+- パフォーマンス: 大量アイテムでも高速動作
+- セキュリティ: アイテムデータの改ざん検証
+- 互換性: 既存セーブデータとの後方互換性
+- 拡張性: 将来的なアイテム属性追加に対応
 
-## 手動テスト
+## 関連イシュー
+- #31: ゲーム状態永続化
+- #32: マルチセッション保存
 
-- ゲームデータにアイテム定義を追加。
-- ノードでアイテム取得/使用を設定。
-- プレイでインベントリを開き、アイテム使用を確認。
-- 保存/復元でインベントリ維持を確認。
+## 参考資料
+- ゲームエンジン設計パターン
+- インベントリUI/UXベストプラクティス
