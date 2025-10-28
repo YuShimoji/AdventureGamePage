@@ -12,7 +12,10 @@
       forward: [],
       // Player state management
       playerState: {
-        inventory: [], // Array of item IDs
+        inventory: {
+          items: [], // Array of item objects: {id, name, description, quantity, type, usable, ...}
+          maxSlots: 20
+        },
         flags: {}, // Object of boolean/string flags
         variables: {}, // Object of numeric/string variables
         history: [] // Array of visited node IDs for wiki unlock etc.
@@ -185,8 +188,25 @@
 
         // Load player state if available
         if (p.playerState) {
+          // Migrate old inventory format if needed
+          let inventory = p.playerState.inventory;
+          if (Array.isArray(inventory) && inventory.length > 0 && typeof inventory[0] === 'string') {
+            // Old format: array of item IDs, convert to new format
+            inventory = {
+              items: inventory.map(itemId => {
+                const itemData = itemsData.find(item => item.id === itemId);
+                return itemData ? { ...itemData, quantity: 1, icon: getItemIcon(itemData) } : { id: itemId, name: `不明なアイテム (${itemId})`, description: '', quantity: 1, type: 'item', usable: false, icon: '❓' };
+              }),
+              maxSlots: 20
+            };
+          } else if (!inventory || typeof inventory !== 'object') {
+            inventory = { items: [], maxSlots: 20 };
+          } else if (!inventory.items) {
+            inventory = { items: [], maxSlots: inventory.maxSlots || 20 };
+          }
+
           state.playerState = {
-            inventory: Array.isArray(p.playerState.inventory) ? p.playerState.inventory : [],
+            inventory: inventory,
             flags: p.playerState.flags || {},
             variables: p.playerState.variables || {},
             history: Array.isArray(p.playerState.history) ? p.playerState.history : []
@@ -199,10 +219,13 @@
       state.history = [];
       state.forward = [];
       state.playerState = {
-        inventory: [], 
-        flags: {}, 
-        variables: {}, 
-        history: [] 
+        inventory: {
+          items: [],
+          maxSlots: 20
+        },
+        flags: {},
+        variables: {},
+        history: []
       };
       saveProgress();
       render();
@@ -233,8 +256,24 @@
       getPlayerState: () => JSON.parse(JSON.stringify(state.playerState)),
       setPlayerState: (newState) => {
         if (newState && typeof newState === 'object') {
+          let inventory = newState.inventory;
+          if (Array.isArray(inventory) && inventory.length > 0 && typeof inventory[0] === 'string') {
+            // Migrate old format
+            inventory = {
+              items: inventory.map(itemId => {
+                const itemData = itemsData.find(item => item.id === itemId);
+                return itemData ? { ...itemData, quantity: 1, icon: getItemIcon(itemData) } : { id: itemId, name: `不明なアイテム (${itemId})`, description: '', quantity: 1, type: 'item', usable: false, icon: '❓' };
+              }),
+              maxSlots: 20
+            };
+          } else if (!inventory || typeof inventory !== 'object') {
+            inventory = { items: [], maxSlots: 20 };
+          } else if (!inventory.items) {
+            inventory = { items: [], maxSlots: inventory.maxSlots || 20 };
+          }
+
           state.playerState = {
-            inventory: Array.isArray(newState.inventory) ? newState.inventory : state.playerState.inventory,
+            inventory: inventory,
             flags: newState.flags || state.playerState.flags,
             variables: newState.variables || state.playerState.variables,
             history: Array.isArray(newState.history) ? newState.history : state.playerState.history
@@ -259,7 +298,7 @@
             gameDuration: gameDuration,
             nodesVisited: state.history.length + 1,
             choicesMade: state.history.length,
-            inventoryCount: state.playerState.inventory.length,
+            inventoryCount: state.playerState.inventory.items.length,
             lastNodeText: getNode()?.text?.substring(0, 100) || '',
             version: '1.0'
           }
@@ -274,8 +313,25 @@
         state.forward = Array.isArray(saveData.forward) ? saveData.forward : [];
 
         if (saveData.playerState) {
+          // Migrate inventory format if needed
+          let inventory = saveData.playerState.inventory;
+          if (Array.isArray(inventory) && inventory.length > 0 && typeof inventory[0] === 'string') {
+            // Old format: array of item IDs
+            inventory = {
+              items: inventory.map(itemId => {
+                const itemData = itemsData.find(item => item.id === itemId);
+                return itemData ? { ...itemData, quantity: 1, icon: getItemIcon(itemData) } : { id: itemId, name: `不明なアイテム (${itemId})`, description: '', quantity: 1, type: 'item', usable: false, icon: '❓' };
+              }),
+              maxSlots: 20
+            };
+          } else if (!inventory || typeof inventory !== 'object') {
+            inventory = { items: [], maxSlots: 20 };
+          } else if (!inventory.items) {
+            inventory = { items: [], maxSlots: inventory.maxSlots || 20 };
+          }
+
           state.playerState = {
-            inventory: Array.isArray(saveData.playerState.inventory) ? saveData.playerState.inventory : [],
+            inventory: inventory,
             flags: saveData.playerState.flags || {},
             variables: saveData.playerState.variables || {},
             history: Array.isArray(saveData.playerState.history) ? saveData.playerState.history : []
@@ -287,28 +343,94 @@
         return true;
       },
       // Inventory management API
-      addItem: (itemId) => {
-        if (!itemId || state.playerState.inventory.includes(itemId)) return false;
-        state.playerState.inventory.push(itemId);
+      addItem: (itemId, quantity = 1) => {
+        if (!itemId || quantity <= 0) return false;
+
+        // Find item data
+        const itemData = itemsData.find(item => item.id === itemId);
+        if (!itemData) {
+          console.warn(`Item data not found for: ${itemId}`);
+          return false;
+        }
+
+        // Check if item already exists in inventory
+        const existingItem = state.playerState.inventory.items.find(item => item.id === itemId);
+
+        if (existingItem) {
+          // Increase quantity
+          existingItem.quantity += quantity;
+        } else {
+          // Check slot limit
+          if (state.playerState.inventory.items.length >= state.playerState.inventory.maxSlots) {
+            console.warn('Inventory is full');
+            return false;
+          }
+
+          // Add new item
+          const newItem = {
+            ...itemData,
+            quantity: quantity,
+            icon: getItemIcon(itemData)
+          };
+          state.playerState.inventory.items.push(newItem);
+        }
+
         saveProgress();
+        // Emit inventory change event
+        document.dispatchEvent(new CustomEvent('agp-inventory-changed', {
+          detail: { action: 'add', itemId, quantity }
+        }));
         return true;
       },
-      removeItem: (itemId) => {
-        const index = state.playerState.inventory.indexOf(itemId);
-        if (index === -1) return false;
-        state.playerState.inventory.splice(index, 1);
+
+      removeItem: (itemId, quantity = 1) => {
+        if (!itemId || quantity <= 0) return false;
+
+        const itemIndex = state.playerState.inventory.items.findIndex(item => item.id === itemId);
+        if (itemIndex === -1) return false;
+
+        const item = state.playerState.inventory.items[itemIndex];
+
+        if (item.quantity <= quantity) {
+          // Remove item completely
+          state.playerState.inventory.items.splice(itemIndex, 1);
+        } else {
+          // Decrease quantity
+          item.quantity -= quantity;
+        }
+
         saveProgress();
+        // Emit inventory change event
+        document.dispatchEvent(new CustomEvent('agp-inventory-changed', {
+          detail: { action: 'remove', itemId, quantity }
+        }));
         return true;
       },
-      hasItem: (itemId) => {
-        return state.playerState.inventory.includes(itemId);
+
+      hasItem: (itemId, minQuantity = 1) => {
+        if (!itemId) return false;
+        const item = state.playerState.inventory.items.find(item => item.id === itemId);
+        return item && item.quantity >= minQuantity;
       },
+
+      getItemCount: (itemId) => {
+        if (!itemId) return 0;
+        const item = state.playerState.inventory.items.find(item => item.id === itemId);
+        return item ? item.quantity : 0;
+      },
+
+      getInventory: () => {
+        return {
+          items: state.playerState.inventory.items.slice(), // Return copy
+          maxSlots: state.playerState.inventory.maxSlots,
+          currentSlots: state.playerState.inventory.items.length
+        };
+      },
+
       getInventoryItems: () => {
-        return state.playerState.inventory.map(itemId => {
-          const itemData = itemsData.find(item => item.id === itemId);
-          return itemData ? { ...itemData, icon: getItemIcon(itemData) } : { id: itemId, name: `不明なアイテム (${itemId})`, description: '', icon: '❓' };
-        });
+        return state.playerState.inventory.items.slice(); // Return copy with full item data
       },
+
       getItemsData: () => itemsData
     };
   }

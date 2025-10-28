@@ -419,15 +419,15 @@
     function updateInventoryList() {
       if (!inventoryList) return;
 
-      const items = engine.getInventoryItems();
+      const inventory = engine.getInventory();
       inventoryList.innerHTML = '';
 
-      if (items.length === 0) {
+      if (inventory.items.length === 0) {
         inventoryList.innerHTML = '<p class="no-items">所持品がありません</p>';
         return;
       }
 
-      items.forEach(item => {
+      inventory.items.forEach(item => {
         const itemEl = document.createElement('div');
         itemEl.className = 'inventory-item';
 
@@ -452,33 +452,59 @@
         const actionsEl = document.createElement('div');
         actionsEl.className = 'inventory-item-actions';
 
-        const useBtn = document.createElement('button');
-        useBtn.className = 'btn';
-        useBtn.textContent = '使用';
-        useBtn.addEventListener('click', () => {
-          alert(`"${item.name}" を使用しました`);
-          // TODO: Implement item usage logic based on item effects
-        });
+        // Quantity display
+        const quantityEl = document.createElement('div');
+        quantityEl.className = 'inventory-item-quantity';
+        quantityEl.textContent = `×${item.quantity}`;
 
+        // Use button (only for usable items)
+        if (item.usable) {
+          const useBtn = document.createElement('button');
+          useBtn.className = 'btn btn-use';
+          useBtn.textContent = '使用';
+          useBtn.addEventListener('click', () => {
+            if (confirm(`"${item.name}" を使用しますか？`)) {
+              // TODO: Implement item usage logic based on item effects
+              alert(`"${item.name}" を使用しました`);
+              // For now, just remove one from inventory
+              engine.removeItem(item.id, 1);
+              updateInventoryList();
+            }
+          });
+          actionsEl.appendChild(useBtn);
+        }
+
+        // Drop button
         const dropBtn = document.createElement('button');
-        dropBtn.className = 'btn';
+        dropBtn.className = 'btn btn-drop';
         dropBtn.textContent = '捨てる';
         dropBtn.addEventListener('click', () => {
-          if (confirm(`"${item.name}" を捨てますか？`)) {
-            engine.removeItem(item.id);
-            updateInventoryList();
+          const maxDroppable = item.quantity;
+          const quantityToDrop = maxDroppable === 1 ? 1 : parseInt(prompt(`捨てる個数を入力してください (1-${maxDroppable}):`, '1')) || 0;
+
+          if (quantityToDrop > 0 && quantityToDrop <= maxDroppable) {
+            if (confirm(`${quantityToDrop}個の "${item.name}" を捨てますか？`)) {
+              engine.removeItem(item.id, quantityToDrop);
+              updateInventoryList();
+            }
           }
         });
 
-        actionsEl.appendChild(useBtn);
         actionsEl.appendChild(dropBtn);
 
         itemEl.appendChild(iconEl);
         itemEl.appendChild(infoEl);
+        itemEl.appendChild(quantityEl);
         itemEl.appendChild(actionsEl);
 
         inventoryList.appendChild(itemEl);
       });
+
+      // Update inventory count display
+      const countDisplay = document.querySelector('.inventory-count');
+      if (countDisplay) {
+        countDisplay.textContent = `${inventory.currentSlots}/${inventory.maxSlots}`;
+      }
     }
 
     // Event listeners setup
@@ -620,11 +646,19 @@
       });
     }
 
-    }
-
-if (btnImportSave) {
-  btnImportSave.addEventListener('click', importSaveData);
-}
+    // Listen for inventory changes to update UI
+    document.addEventListener('agp-inventory-changed', () => {
+      // Update inventory UI if panel is currently open
+      if (inventoryPanel && !inventoryPanel.hidden) {
+        updateInventoryList();
+      }
+      // Update inventory count in header if exists
+      const inventoryCountBtn = document.querySelector('.inventory-count-btn');
+      if (inventoryCountBtn) {
+        const inventory = engine.getInventory();
+        inventoryCountBtn.textContent = inventory.currentSlots;
+      }
+    });
 
     // Screen reader support functions
     function announceToScreenReader(message, priority = 'polite') {
@@ -659,22 +693,12 @@ if (btnImportSave) {
       announceToScreenReader(messages[action] || action, 'assertive');
     }
 
-// Mobile menu functionality
-function openMobileMenu() {
-  if (mobileMenuOverlay) {
-    mobileMenuOverlay.hidden = false;
-    mobileMenuOverlay.style.display = 'flex';
-    document.body.style.overflow = 'hidden'; // Prevent background scrolling
-  }
-}
+    let autoSaveIntervalId = null;
+    let lastAutoSaveTime = 0;
 
-function closeMobileMenu() {
-  if (mobileMenuOverlay) {
-    mobileMenuOverlay.hidden = true;
-    mobileMenuOverlay.style.display = 'none';
-    document.body.style.overflow = ''; // Restore scrolling
-  }
-}
+    function enableAutoSave(intervalMinutes) {
+      if (!intervalMinutes || intervalMinutes <= 0) return;
+
       const intervalMs = intervalMinutes * 60 * 1000;
 
       if (autoSaveIntervalId) {
@@ -719,6 +743,32 @@ function closeMobileMenu() {
       }));
 
       console.log(`Auto-saved: ${slotName}`);
+    }
+
+    const autoSaveToggle = document.getElementById('auto-save-toggle');
+    const autoSaveIntervalInput = document.getElementById('auto-save-interval');
+
+    if (autoSaveToggle && autoSaveIntervalInput) {
+      autoSaveToggle.addEventListener('change', (e) => {
+        const enabled = e.target.checked;
+        const interval = parseFloat(autoSaveIntervalInput.value) || 5;
+        if (enabled) {
+          enableAutoSave(interval);
+        } else {
+          stopAutoSave();
+        }
+      });
+
+      autoSaveIntervalInput.addEventListener('change', () => {
+        if (!autoSaveToggle.checked) return;
+        const interval = parseFloat(autoSaveIntervalInput.value);
+        if (!interval || interval <= 0) {
+          stopAutoSave();
+          autoSaveToggle.checked = false;
+          return;
+        }
+        enableAutoSave(interval);
+      });
     }
 
     // Mobile swipe gesture support
