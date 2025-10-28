@@ -33,6 +33,15 @@
       }
       // normal navigation clears forward stack
       state.forward = [];
+
+      // Execute actions before setting the new node
+      const node = gameData.nodes[id];
+      if (node && Array.isArray(node.actions)) {
+        node.actions.forEach(action => {
+          executeAction(action);
+        });
+      }
+
       state.nodeId = id;
 
       // Update player history for wiki unlock etc.
@@ -448,6 +457,146 @@
       treasure: '💎'
     };
     return icons[type] || '📦';
+  }
+
+  // Action execution utilities
+  function executeAction(action) {
+    if (!action || !action.type) return;
+
+    try {
+      switch (action.type) {
+        case 'add_item':
+          const addQuantity = action.quantity || 1;
+          const addSuccess = state.playerState.inventory.items.some(item => item.id === action.itemId);
+          if (!addSuccess) {
+            // Add new item if not exists
+            const itemData = itemsData.find(item => item.id === action.itemId);
+            if (itemData) {
+              state.playerState.inventory.items.push({
+                ...itemData,
+                quantity: addQuantity,
+                icon: getItemIcon(itemData)
+              });
+            }
+          } else {
+            // Increase quantity if exists
+            const existingItem = state.playerState.inventory.items.find(item => item.id === action.itemId);
+            if (existingItem) {
+              existingItem.quantity += addQuantity;
+            }
+          }
+          saveProgress();
+          document.dispatchEvent(new CustomEvent('agp-inventory-changed', {
+            detail: { action: 'add', itemId: action.itemId, quantity: addQuantity }
+          }));
+          break;
+
+        case 'remove_item':
+          const removeQuantity = action.quantity || 1;
+          const itemIndex = state.playerState.inventory.items.findIndex(item => item.id === action.itemId);
+          if (itemIndex !== -1) {
+            const item = state.playerState.inventory.items[itemIndex];
+            if (item.quantity <= removeQuantity) {
+              state.playerState.inventory.items.splice(itemIndex, 1);
+            } else {
+              item.quantity -= removeQuantity;
+            }
+            saveProgress();
+            document.dispatchEvent(new CustomEvent('agp-inventory-changed', {
+              detail: { action: 'remove', itemId: action.itemId, quantity: removeQuantity }
+            }));
+          }
+          break;
+
+        case 'use_item':
+          const useItem = state.playerState.inventory.items.find(item => item.id === action.itemId);
+          if (!useItem || useItem.quantity <= 0) {
+            console.warn(`Cannot use item ${action.itemId}: not found or no quantity`);
+            return;
+          }
+
+          // Consume item if specified
+          if (action.consume !== false) { // Default to true
+            if (useItem.quantity <= 1) {
+              const index = state.playerState.inventory.items.indexOf(useItem);
+              state.playerState.inventory.items.splice(index, 1);
+            } else {
+              useItem.quantity -= 1;
+            }
+          }
+
+          // Execute effect
+          if (action.effect) {
+            executeEffect(action.effect);
+          }
+
+          saveProgress();
+          document.dispatchEvent(new CustomEvent('agp-inventory-changed', {
+            detail: { action: 'use', itemId: action.itemId, quantity: 1 }
+          }));
+          break;
+
+        case 'clear_inventory':
+          state.playerState.inventory.items = [];
+          saveProgress();
+          document.dispatchEvent(new CustomEvent('agp-inventory-changed', {
+            detail: { action: 'clear' }
+          }));
+          break;
+
+        case 'set_variable':
+          if (action.key) {
+            let value = action.value;
+            if (action.operation && action.operation !== 'set') {
+              const current = state.playerState.variables[action.key] || 0;
+              switch (action.operation) {
+                case 'add':
+                  value = current + (value || 0);
+                  break;
+                case 'subtract':
+                  value = current - (value || 0);
+                  break;
+                case 'multiply':
+                  value = current * (value || 1);
+                  break;
+                case 'divide':
+                  value = value !== 0 ? current / value : current;
+                  break;
+              }
+            }
+            state.playerState.variables[action.key] = value;
+            saveProgress();
+          }
+          break;
+
+        default:
+          console.warn(`Unknown action type: ${action.type}`);
+      }
+    } catch (error) {
+      console.error(`Error executing action ${action.type}:`, error);
+    }
+  }
+
+  function executeEffect(effect) {
+    if (!effect || !effect.type) return;
+
+    switch (effect.type) {
+      case 'show_text':
+        if (effect.text) {
+          // Show text as an alert for now, could be enhanced to show in-game message
+          setTimeout(() => {
+            alert(effect.text);
+          }, 500);
+        }
+        break;
+
+      case 'set_variable':
+        // Already handled in set_variable action
+        break;
+
+      default:
+        console.warn(`Unknown effect type: ${effect.type}`);
+    }
   }
 
   window.GameEngine = { createEngine };
