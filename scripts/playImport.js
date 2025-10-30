@@ -1,4 +1,14 @@
 (function () {
+  function getJSONErrorPosition(message) {
+    const match = message.match(/position (\d+)/);
+    return match ? parseInt(match[1]) : null;
+  }
+
+  function getLineNumber(text, position) {
+    if (position === null || position < 0) return 1;
+    const lines = text.substring(0, position).split('\n');
+    return lines.length;
+  }
   function normalizeSpecToEngine(data) {
     if (!data) return null;
     if (Array.isArray(data.nodes)) {
@@ -53,7 +63,20 @@
           location.reload();
         } catch (e) {
           console.error(e);
-          alert("ゲームJSONの読み込みに失敗しました");
+          // 詳細なエラー情報を表示
+          let errorMsg = "ゲームJSONの読み込みに失敗しました";
+          if (e instanceof SyntaxError) {
+            const pos = getJSONErrorPosition(e.message);
+            if (pos !== null) {
+              const lineNum = getLineNumber(reader.result, pos);
+              errorMsg += `\nJSON構文エラー（行 ${lineNum} 付近）: ${e.message}`;
+            } else {
+              errorMsg += `\nJSON構文エラー: ${e.message}`;
+            }
+          } else {
+            errorMsg += `\nエラー: ${e.message}`;
+          }
+          alert(errorMsg);
         }
       };
       reader.readAsText(file);

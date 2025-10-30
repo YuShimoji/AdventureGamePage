@@ -35,7 +35,21 @@
 
     const loaded = StorageUtil.loadJSON("agp_game_data");
     const normalize = window.Converters?.normalizeSpecToEngine || normalizeSpecToEngine;
-    const game = normalize(loaded) || window.SAMPLE_GAME;
+    let game;
+    try {
+      game = normalize(loaded);
+      if (!game && loaded) {
+        throw new Error("保存されたゲームデータの形式が無効です。");
+      }
+      if (!game) {
+        game = window.SAMPLE_GAME;
+        console.info("サンプルゲームを使用します。");
+      }
+    } catch (e) {
+      console.error("ゲームデータの読み込みエラー:", e);
+      alert(`ゲームデータの読み込みに失敗しました: ${e.message}\nサンプルゲームを使用します。`);
+      game = window.SAMPLE_GAME;
+    }
 
     const engine = GameEngine.createEngine(game, {
       titleEl,
@@ -44,7 +58,13 @@
       backBtn,
       forwardBtn,
     });
-    engine.loadProgress();
+    try {
+      engine.loadProgress();
+    } catch (e) {
+      console.error("進行データの読み込みエラー:", e);
+      alert("進行データの読み込みに失敗しました。最初から開始します。");
+      engine.reset();
+    }
     // 進行が保存されていればそれを復元、なければ初期ノードが使用される
     // engine.reset() は初期化（リスタート）専用
     engine.render();
