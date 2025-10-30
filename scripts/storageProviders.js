@@ -147,39 +147,9 @@
     getActive() {
       return this.get("idb");
     },
-    // Migration function
-    async migrateFromLocalStorage() {
-      if (!LocalProvider.isAvailable()) return;
-      const localData = localStorage.getItem(LS_INDEX_KEY);
-      if (!localData) return;
-      try {
-        const ids = JSON.parse(localData);
-        let migrated = 0;
-        for (const id of ids) {
-          const key = LS_PREFIX + id;
-          const data = localStorage.getItem(key);
-          if (data) {
-            const rec = JSON.parse(data);
-            await IDBProvider.save(rec);
-            localStorage.removeItem(key);
-            migrated++;
-          }
-        }
-        localStorage.removeItem(LS_INDEX_KEY);
-        localStorage.removeItem("agp_storage_provider_active"); // Remove old active setting
-        console.log(`Migrated ${migrated} records from LocalStorage to IndexedDB`);
-      } catch (e) {
-        console.error("Migration failed:", e);
-      }
-    },
   };
 
   Registry.register(IDBProvider);
-
-  // Auto-migrate on first load
-  if (IDBProvider.isAvailable()) {
-    Registry.migrateFromLocalStorage().catch(console.error);
-  }
 
   window.StorageProviders = { Registry, IDBProvider };
 })();
