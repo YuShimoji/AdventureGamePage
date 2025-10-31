@@ -14,6 +14,7 @@
       <div class="header-actions">
         <button id="btn-back" class="btn" aria-label="前のノードに戻る">戻る</button>
         <button id="btn-forward" class="btn" aria-label="次のノードに進む">進む</button>
+        <button id="btn-save-slots" class="btn" title="セーブスロット" aria-label="セーブスロットを開く">💾</button>
         <button id="btn-inventory" class="btn" title="インベントリ" aria-label="インベントリを開く" aria-expanded="false">🎒</button>
         <button id="btn-restart" class="btn" aria-label="ゲームを最初からやり直す">リスタート</button>
         <button id="btn-theme" class="icon-btn" title="テーマ設定" aria-label="テーマ設定を開く">🎨</button>
@@ -43,6 +44,18 @@
     </aside>
 
     <div id="theme-panel" class="theme-panel" hidden></div>
+
+    <!-- Save Slots Panel -->
+    <aside id="save-slots-panel" class="save-slots-panel overlay-panel" hidden role="dialog" aria-modal="true" aria-labelledby="save-slots-header">
+      <header class="save-slots-header" id="save-slots-header">
+        <h3>セーブスロット</h3>
+        <button id="save-slots-close" class="btn btn-ghost btn-sm" title="閉じる" aria-label="セーブスロットを閉じる">✕</button>
+      </header>
+      <div id="save-slots-list" class="save-slots-list"></div>
+      <div class="save-slots-actions">
+        <button id="create-new-slot" class="btn btn-primary">新規スロット作成</button>
+      </div>
+    </aside>
 
     <!-- Debug UI -->
     <div id="debug-ui" class="debug-ui" hidden>

@@ -440,8 +440,109 @@
         return state.playerState.inventory.items.slice(); // Return copy with full item data
       },
 
-      getItemsData: () => itemsData
-    };
+      getItemsData: () => itemsData,
+
+      // Multi-session save slot management
+      createSlot: (slotId, name = '') => {
+        const existing = window.StorageUtil.loadJSON('agp_save_slots') || {};
+        if (existing[slotId]) {
+          console.warn(`Slot ${slotId} already exists`);
+          return false;
+        }
+
+        const saveData = engine.saveGame(name);
+        const now = new Date().toISOString();
+        existing[slotId] = {
+          id: slotId,
+          name: name || `Save ${new Date().toLocaleString()}`,
+          gameState: saveData,
+          meta: {
+            created: now,
+            modified: now,
+            playTime: saveData.metadata?.gameDuration || 0,
+            currentLocation: getNode()?.title || 'Unknown',
+            progress: Math.round((saveData.metadata?.nodesVisited || 0) / Object.keys(gameData.nodes).length * 100),
+            version: '1.0'
+          }
+        };
+        window.StorageUtil.saveJSON('agp_save_slots', existing);
+        return true;
+      },
+
+      deleteSlot: (slotId) => {
+        const existing = window.StorageUtil.loadJSON('agp_save_slots') || {};
+        if (!existing[slotId]) return false;
+        delete existing[slotId];
+        window.StorageUtil.saveJSON('agp_save_slots', existing);
+        return true;
+      },
+
+      listSlots: () => {
+        const existing = window.StorageUtil.loadJSON('agp_save_slots') || {};
+        return Object.values(existing);
+      },
+
+      saveToSlot: (slotId) => {
+        const existing = window.StorageUtil.loadJSON('agp_save_slots') || {};
+        if (!existing[slotId]) {
+          console.warn(`Slot ${slotId} does not exist`);
+          return false;
+        }
+
+        const saveData = engine.saveGame(existing[slotId].name);
+        existing[slotId].gameState = saveData;
+        existing[slotId].meta.modified = new Date().toISOString();
+        existing[slotId].meta.playTime = saveData.metadata?.gameDuration || 0;
+        existing[slotId].meta.currentLocation = getNode()?.title || 'Unknown';
+        existing[slotId].meta.progress = Math.round((saveData.metadata?.nodesVisited || 0) / Object.keys(gameData.nodes).length * 100);
+
+        window.StorageUtil.saveJSON('agp_save_slots', existing);
+        return true;
+      },
+
+      loadFromSlot: (slotId) => {
+        const existing = window.StorageUtil.loadJSON('agp_save_slots') || {};
+        if (!existing[slotId]) return false;
+
+        const saveData = existing[slotId].gameState;
+        return engine.loadGame(saveData);
+      },
+
+      renameSlot: (slotId, newName) => {
+        const existing = window.StorageUtil.loadJSON('agp_save_slots') || {};
+        if (!existing[slotId]) return false;
+        existing[slotId].name = newName;
+        existing[slotId].meta.modified = new Date().toISOString();
+        window.StorageUtil.saveJSON('agp_save_slots', existing);
+        return true;
+      },
+
+      getSlotInfo: (slotId) => {
+        const existing = window.StorageUtil.loadJSON('agp_save_slots') || {};
+        return existing[slotId] || null;
+      },
+
+      copySlot: (fromId, toId, newName = '') => {
+        const existing = window.StorageUtil.loadJSON('agp_save_slots') || {};
+        if (!existing[fromId]) return false;
+        if (existing[toId]) {
+          console.warn(`Slot ${toId} already exists`);
+          return false;
+        }
+
+        existing[toId] = {
+          ...existing[fromId],
+          id: toId,
+          name: newName || `Copy of ${existing[fromId].name}`,
+          meta: {
+            ...existing[fromId].meta,
+            created: new Date().toISOString(),
+            modified: new Date().toISOString()
+          }
+        };
+        window.StorageUtil.saveJSON('agp_save_slots', existing);
+        return true;
+      }
   }
 
   // Inventory management utilities

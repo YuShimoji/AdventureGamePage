@@ -1125,3 +1125,160 @@
         closeModalWithFocus(themePanel);
       });
     }
+
+    // Save Slots Panel Management
+    const saveSlotsPanel = document.getElementById('save-slots-panel');
+    const saveSlotsCloseBtn = document.getElementById('save-slots-close');
+    const saveSlotsList = document.getElementById('save-slots-list');
+    const createNewSlotBtn = document.getElementById('create-new-slot');
+    const btnSaveSlots = document.getElementById('btn-save-slots');
+
+    function showSaveSlotsPanel() {
+      updateSaveSlotsList();
+      if (saveSlotsPanel) {
+        saveSlotsPanel.hidden = false;
+        saveSlotsPanel.style.display = 'block';
+        // Prevent background scrolling on mobile
+        if (window.innerWidth <= 768) {
+          document.body.style.overflow = 'hidden';
+        }
+      }
+    }
+
+    function hideSaveSlotsPanel() {
+      if (saveSlotsPanel) {
+        saveSlotsPanel.hidden = true;
+        saveSlotsPanel.style.display = 'none';
+        // Restore scrolling
+        document.body.style.overflow = '';
+      }
+    }
+
+    function updateSaveSlotsList() {
+      if (!saveSlotsList) return;
+
+      const slots = engine.listSlots();
+      saveSlotsList.innerHTML = '';
+
+      if (slots.length === 0) {
+        saveSlotsList.innerHTML = '<p class="no-data">セーブスロットがありません</p>';
+        return;
+      }
+
+      slots.forEach(slot => {
+        const slotEl = document.createElement('div');
+        slotEl.className = 'save-slot-item';
+
+        const infoEl = document.createElement('div');
+        infoEl.className = 'save-slot-info';
+
+        const nameEl = document.createElement('div');
+        nameEl.className = 'save-slot-name';
+        nameEl.textContent = slot.name;
+
+        const metaEl = document.createElement('div');
+        metaEl.className = 'save-slot-meta';
+        const lastModified = new Date(slot.meta.modified).toLocaleString();
+        const progress = slot.meta.progress || 0;
+        const location = slot.meta.currentLocation || 'Unknown';
+        metaEl.textContent = `${lastModified} • ${location} (${progress}%)`;
+
+        infoEl.appendChild(nameEl);
+        infoEl.appendChild(metaEl);
+
+        const actionsEl = document.createElement('div');
+        actionsEl.className = 'save-slot-actions';
+
+        const loadBtn = document.createElement('button');
+        loadBtn.className = 'btn btn-accent';
+        loadBtn.textContent = '読み込み';
+        loadBtn.addEventListener('click', () => {
+          if (confirm(`"${slot.name}" を読み込みますか？現在の進行状況は失われます。`)) {
+            if (engine.loadFromSlot(slot.id)) {
+              hideSaveSlotsPanel();
+              alert('セーブデータを読み込みました');
+            } else {
+              alert('読み込みに失敗しました');
+            }
+          }
+        });
+
+        const saveBtn = document.createElement('button');
+        saveBtn.className = 'btn';
+        saveBtn.textContent = '上書き保存';
+        saveBtn.addEventListener('click', () => {
+          if (engine.saveToSlot(slot.id)) {
+            updateSaveSlotsList();
+            alert('上書き保存しました');
+          } else {
+            alert('保存に失敗しました');
+          }
+        });
+
+        const renameBtn = document.createElement('button');
+        renameBtn.className = 'btn';
+        renameBtn.textContent = '名前変更';
+        renameBtn.addEventListener('click', () => {
+          const newName = prompt('新しい名前を入力してください:', slot.name);
+          if (newName && newName.trim() && newName !== slot.name) {
+            if (engine.renameSlot(slot.id, newName.trim())) {
+              updateSaveSlotsList();
+            } else {
+              alert('名前変更に失敗しました');
+            }
+          }
+        });
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'btn btn-danger';
+        deleteBtn.textContent = '削除';
+        deleteBtn.addEventListener('click', () => {
+          if (confirm(`"${slot.name}" を削除しますか？この操作は取り消せません。`)) {
+            if (engine.deleteSlot(slot.id)) {
+              updateSaveSlotsList();
+            } else {
+              alert('削除に失敗しました');
+            }
+          }
+        });
+
+        actionsEl.appendChild(loadBtn);
+        actionsEl.appendChild(saveBtn);
+        actionsEl.appendChild(renameBtn);
+        actionsEl.appendChild(deleteBtn);
+
+        slotEl.appendChild(infoEl);
+        slotEl.appendChild(actionsEl);
+        saveSlotsList.appendChild(slotEl);
+      });
+    }
+
+    // Event listeners for save slots
+    if (btnSaveSlots) {
+      btnSaveSlots.addEventListener('click', showSaveSlotsPanel);
+    }
+
+    if (saveSlotsCloseBtn) {
+      saveSlotsCloseBtn.addEventListener('click', hideSaveSlotsPanel);
+    }
+
+    if (saveSlotsPanel) {
+      saveSlotsPanel.addEventListener('click', (e) => {
+        if (e.target === saveSlotsPanel) hideSaveSlotsPanel();
+      });
+    }
+
+    if (createNewSlotBtn) {
+      createNewSlotBtn.addEventListener('click', () => {
+        const slotName = prompt('新しいスロットの名前を入力してください:');
+        if (slotName && slotName.trim()) {
+          const slotId = `slot_${Date.now()}`;
+          if (engine.createSlot(slotId, slotName.trim())) {
+            updateSaveSlotsList();
+            alert(`スロット "${slotName.trim()}" を作成しました`);
+          } else {
+            alert('スロット作成に失敗しました');
+          }
+        }
+      });
+    }

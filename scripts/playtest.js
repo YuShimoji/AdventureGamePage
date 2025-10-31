@@ -9,6 +9,10 @@
 
     if (!modal || !iframe || !closeBtn || !inlineBtn || !windowBtn) return;
 
+    // Ensure modal starts hidden even if inline styles persisted
+    modal.hidden = true;
+    modal.style.display = "none";
+
     function openModal() {
       if (!modal || !iframe) return;
       // Load play.html in iframe

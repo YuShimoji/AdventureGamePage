@@ -5,12 +5,59 @@ const http = require('http');
 
 const PORT = 8080;
 const HOST = '127.0.0.1';
-let TEST_URL = `http://${HOST}:${PORT}/tests/test.html`;
+const TEST_PATH = '/tests/test.html';
+let TEST_URL = `http://${HOST}:${PORT}${TEST_PATH}`;
 const SERVER_START_TIMEOUT = 10000;
 const TEST_TIMEOUT = 30000;
 
 function log(message) {
   console.log(`[TEST] ${message}`);
+}
+
+function waitForServerFromOutput(serverProcess) {
+  return new Promise((resolve, reject) => {
+    let resolved = false;
+    let buffer = '';
+    const timeout = setTimeout(() => {
+      if (!resolved) {
+        reject(new Error('Dev server did not report ready state in time'));
+      }
+    }, SERVER_START_TIMEOUT);
+
+    const handleLine = (line) => {
+      const trimmed = line.trim();
+      if (trimmed) {
+        console.log(`[dev-server] ${trimmed}`);
+        const match = trimmed.match(/http:\/\/127\.0\.0\.1:(\d+)\//);
+        if (match && !resolved) {
+          resolved = true;
+          clearTimeout(timeout);
+          resolve(parseInt(match[1], 10));
+        }
+      }
+    };
+
+    serverProcess.stdout.on('data', (chunk) => {
+      buffer += chunk.toString();
+      const lines = buffer.split(/\r?\n/);
+      buffer = lines.pop();
+      lines.forEach(handleLine);
+    });
+
+    serverProcess.stdout.on('error', (err) => {
+      if (!resolved) {
+        clearTimeout(timeout);
+        reject(err);
+      }
+    });
+
+    serverProcess.on('exit', (code) => {
+      if (!resolved) {
+        clearTimeout(timeout);
+        reject(new Error(`Dev server exited with code ${code} before reporting ready state`));
+      }
+    });
+  });
 }
 
 function error(message) {
@@ -71,7 +118,7 @@ function waitForServer(startPort, maxRetries = 10) {
 
     function check() {
       attempts++;
-      const url = `http://${HOST}:${currentPort}/`;
+      const url = `http://${HOST}:${currentPort}${TEST_PATH}`;
 
       http.get(url, (res) => {
         if (res.statusCode === 200) {
@@ -168,9 +215,14 @@ async function main() {
 
     // Wait for server to be ready and get actual port
     log('Waiting for server to be ready...');
-    actualPort = await waitForServer(PORT);
+    try {
+      actualPort = await waitForServerFromOutput(serverProcess);
+    } catch (stdoutErr) {
+      log(`Falling back to port probing: ${stdoutErr.message}`);
+      actualPort = await waitForServer(PORT);
+    }
 
-    const actualTestUrl = `http://${HOST}:${actualPort}/tests/test.html`;
+    const actualTestUrl = `http://${HOST}:${actualPort}${TEST_PATH}`;
     log(`Server is ready on port ${actualPort}, running tests...`);
 
     // Override TEST_URL with actual port

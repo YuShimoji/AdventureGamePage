@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2025-10-30]
+
+- feat(play): マルチセッション保存システム実装 [#32]
+  - 複数セーブスロット管理（作成/削除/名前変更/コピー）
+  - スロットごとのメタデータ保存（最終更新日時/プレイ時間/現在位置/進行度）
+  - UIパネル追加（💾ボタンで開閉、読み込み/上書き/削除操作）
+  - レスポンシブデザイン対応
+- fix(admin): 管理画面モーダル表示制御強化
+  - Mermaid/ノードエディタ/プレイテスト各モーダルのhidden属性対応
+  - 初期状態での表示制御安定化
+- fix(index): トップページヒーロー文言刷新
+  - 内製エディタ向けトーンに変更（"AdventureGamePage Studio"）
+  - CTA文言更新（ドキュメント/エディタを起動/プレイテスト）
+- feat(admin): レスポンシブデザイン強化 [#23]
+  - タブレット/モバイル対応（1024px/768px/480pxブレークポイント）
+  - サイドバーオーバーレイ表示（モバイル時）
+  - タッチデバイス最適化（ボタンサイズ/iOSズーム防止）
+  - ランドスケープ対応（低高さ時）
+- test: `tests/gameEngine.slots.spec.js` と `tests/gameEngine.persistence.spec.js` を追加 [#32, #31]
+
 ## [2025-10-23]
 
 - feat(perf): パフォーマンス最適化 - 遅延ロード & Mermaidキャッシュ [#29]
