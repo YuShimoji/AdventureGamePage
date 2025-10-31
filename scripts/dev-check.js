@@ -3,7 +3,10 @@
 (async () => {
   const targets = [
     'http://127.0.0.1:8080/',
-    'http://127.0.0.1:8080/index.html'
+    'http://127.0.0.1:8080/index.html',
+    'http://127.0.0.1:8080/learn.html',
+    'http://127.0.0.1:8080/admin.html',
+    'http://127.0.0.1:8080/play.html'
   ];
   try {
     for (const url of targets) {

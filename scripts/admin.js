@@ -63,7 +63,7 @@
     URL.revokeObjectURL(a.href);
   }
 
-  document.addEventListener('DOMContentLoaded', () => {
+  const initAdmin = () => {
     const editor = document.getElementById('editor');
     const count = document.getElementById('char-count');
     const sidebar = document.getElementById('sidebar');
@@ -765,5 +765,13 @@
       } catch(e){ console.error('deleteById', e); return false; }
     }
     window.AdminAPI = { loadById, deleteById };
-  });
+  };
+
+  // admin-boot-complete イベントを待つ
+  if (document.readyState === 'loading') {
+    document.addEventListener('admin-boot-complete', initAdmin);
+  } else {
+    // DOMが既に準備済みの場合は即時実行
+    initAdmin();
+  }
 })();

@@ -39,9 +39,7 @@
       "id": "lake",
       "title": "静かな湖畔",
       "text": "湖面は鏡のように静かだ。遠くでカモが鳴く。",
-      "choices": [
-        { "id": "", "label": "スタートへ戻る", "target": "start" }
-      ]
+      "choices": [{ "id": "", "label": "スタートへ戻る", "target": "start" }]
     }
   ]
 }

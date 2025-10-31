@@ -53,10 +53,52 @@
 
 .header-actions { display: flex; gap: 8px; align-items: center; }
 
-/* Zen mode: header/controls hidden by default when zen-mode is on body */
-body.zen-mode .app-header { height: 0; padding: 0; overflow: hidden; border: 0; }
-body.zen-mode .sidebar { display: none; }
-body.zen-mode .sidebar.show { display: block; }
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+  .editor-container {
+    width: calc(100% - 16px);
+    margin: 16px auto 32px;
+  }
+
+  .sidebar {
+    width: calc(100% - 16px);
+    left: 8px;
+    right: 8px;
+    top: 72px;
+    max-height: calc(100vh - 88px);
+  }
+
+  .floating-controls {
+    right: 8px;
+    bottom: 8px;
+  }
+
+  .formatbar-floating {
+    left: 8px;
+    right: 8px;
+    bottom: 8px;
+    width: auto;
+  }
+
+  .formatbar-floating .spacer { display: block; height: 8px; }
+  .formatbar-floating button { padding: 8px 12px; }
+}
+
+@media (max-width: 480px) {
+  .editor-container {
+    margin: 8px auto 16px;
+  }
+
+  .sidebar {
+    left: 4px;
+    right: 4px;
+    top: 64px;
+    max-height: calc(100vh - 80px);
+  }
+
+  .header-actions { gap: 4px; }
+  .header-actions span { display: none; } /* Hide char count on very small screens */
+}
 
 /* Floating format bar */
 .formatbar-floating {
@@ -256,30 +298,260 @@ body.zen-mode .sidebar.show { display: block; }
 .agp-accordion .accordion-content { padding: 10px 12px 12px; }
 .agp-accordion .actions { margin-top: 8px; }
 
-/* Responsive design */
+/* Enhanced mobile responsiveness */
 @media (max-width: 768px) {
   .editor-container {
     width: 100%;
     margin: 16px 16px 48px;
+    padding: 0;
   }
+
+  .editor {
+    min-height: calc(100vh - 200px);
+    font-size: 16px; /* Prevent zoom on iOS */
+    line-height: 1.6;
+    padding: 16px 12px;
+  }
+
   .sidebar {
     position: static;
     width: 100%;
     margin: 16px 0;
     max-height: none;
+    border-radius: 0;
   }
+
+  .sidebar-inner {
+    padding: 16px 12px;
+  }
+
   .floating-controls {
     right: 8px;
     bottom: 8px;
+    gap: 6px;
   }
+
+  .floating-controls .btn {
+    width: 44px;
+    height: 44px;
+    font-size: 18px;
+  }
+
   .formatbar-floating {
     bottom: 8px;
+    padding: 8px 12px;
+    gap: 8px;
+  }
+
+  .formatbar-floating button {
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+
+  /* Touch-friendly buttons */
+  .agp-accordion summary {
+    padding: 14px 16px;
+    min-height: 48px;
+  }
+
+  .btn {
+    min-height: 44px;
+    padding: 10px 16px;
+    font-size: 16px; /* Prevent zoom on iOS */
+  }
+
+  .ne-actions .btn,
+  .ne-choices .btn {
+    min-height: 40px;
+    padding: 8px 12px;
+  }
+
+  /* Node editor mobile optimizations */
+  .ne-row {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .ne-choices {
+    gap: 12px;
+  }
+
+  .ne-choice-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+  }
+
+  .ne-choice-row input[type="text"] {
+    width: 100%;
+  }
+
+  .ne-condition-row {
+    flex-direction: column;
+    gap: 8px;
+    padding: 8px;
+    background: rgba(0,0,0,0.05);
+    border-radius: 6px;
   }
 }
 
+/* Extra small screens */
 @media (max-width: 480px) {
-  .actions { grid-template-columns: 1fr; }
-  .header-actions { flex-wrap: wrap; }
+  .editor-container {
+    margin: 12px 12px 48px;
+  }
+
+  .editor {
+    min-height: calc(100vh - 180px);
+    font-size: 15px;
+    padding: 12px 8px;
+  }
+
+  .sidebar-inner {
+    padding: 12px 8px;
+  }
+
+  .floating-controls {
+    right: 4px;
+    bottom: 4px;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    max-width: calc(100vw - 8px);
+  }
+
+  .floating-controls .btn {
+    width: 40px;
+    height: 40px;
+    font-size: 16px;
+  }
+
+  .formatbar-floating {
+    bottom: 4px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 6px 8px;
+  }
+
+  .formatbar-floating button {
+    padding: 6px 10px;
+    font-size: 13px;
+  }
+
+  /* Compact memos panel */
+  .memos-panel {
+    top: 40px;
+    right: 4px;
+    left: 4px;
+    width: auto;
+    max-height: calc(100vh - 56px);
+  }
+
+  /* Compact preview panel */
+  .preview-panel {
+    top: 40px;
+    right: 4px;
+    left: 4px;
+    width: auto;
+    padding: 8px;
+  }
+
+  .preview-header {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .preview-search {
+    width: 120px !important;
+  }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+  .editor {
+    -webkit-touch-callout: none;
+    -webkit-user-select: text;
+    user-select: text;
+  }
+
+  .btn:active,
+  .agp-accordion summary:active,
+  .floating-controls .btn:active {
+    transform: scale(0.96);
+    transition: transform 0.1s;
+  }
+
+  .ne-choice-row,
+  .ne-condition-row,
+  .inventory-item {
+    transition: background 0.2s;
+  }
+
+  .ne-choice-row:active,
+  .ne-condition-row:active,
+  .inventory-item:active {
+    background: var(--surface-active);
+  }
+
+  /* Prevent text selection on touch */
+  .sidebar,
+  .floating-controls,
+  .formatbar-floating {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+}
+
+/* Landscape orientation on mobile */
+@media (max-height: 500px) and (orientation: landscape) {
+  .editor-container {
+    margin: 8px 8px 32px;
+  }
+
+  .editor {
+    min-height: calc(100vh - 120px);
+    font-size: 14px;
+    line-height: 1.4;
+    padding: 8px;
+  }
+
+  .sidebar {
+    margin: 8px 0;
+  }
+
+  .floating-controls {
+    bottom: 2px;
+  }
+
+  .floating-controls .btn {
+    width: 36px;
+    height: 36px;
+    font-size: 14px;
+  }
+
+  .formatbar-floating {
+    bottom: 2px;
+    padding: 4px 6px;
+  }
+
+  .formatbar-floating button {
+    padding: 4px 8px;
+    font-size: 12px;
+  }
+}
+
+/* High DPI displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .editor {
+    -webkit-font-smoothing: antialiased;
+    font-smooth: always;
+    text-rendering: optimizeLegibility;
+  }
 }
 
 /* Mermaid Fullscreen Modal */
@@ -290,6 +562,10 @@ body.zen-mode .sidebar.show { display: block; }
   z-index: 200;
   display: flex;
   flex-direction: column;
+}
+
+.mermaid-fullscreen-modal[hidden] {
+  display: none !important;
 }
 
 .mermaid-fullscreen-header {
@@ -328,6 +604,10 @@ body.zen-mode .sidebar.show { display: block; }
   flex-direction: column;
 }
 
+.playtest-modal[hidden] {
+  display: none !important;
+}
+
 .playtest-modal-header {
   display: flex;
   justify-content: space-between;
@@ -341,6 +621,34 @@ body.zen-mode .sidebar.show { display: block; }
   flex: 1;
   overflow: hidden;
   background: var(--background);
+}
+
+/* Node Editor Fullscreen Modal */
+.node-editor-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.95);
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+}
+
+.node-editor-modal[hidden] {
+  display: none !important;
+}
+.node-editor-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+.node-editor-modal-content {
+  flex: 1;
+  overflow: auto;
+  padding: 16px;
+  background: var(--surface);
 }
 
 /* Improved Mermaid styles */
@@ -450,3 +758,359 @@ body.zen-mode .sidebar.show { display: block; }
   color: var(--text-color);
 }
 
+/* Responsive Design Enhancements */
+@media (max-width: 1024px) {
+  .app-header {
+    padding: 8px 12px;
+  }
+
+  .app-header h1 {
+    font-size: 20px;
+  }
+
+  .sidebar {
+    width: 320px;
+  }
+
+  .sidebar-inner {
+    padding: 12px;
+  }
+
+  .editor-container {
+    margin-left: 320px;
+  }
+}
+
+@media (max-width: 768px) {
+  .app-header {
+    flex-direction: column;
+    gap: 8px;
+    align-items: stretch;
+  }
+
+  .app-header .btn {
+    align-self: flex-start;
+  }
+
+  .app-header h1 {
+    font-size: 18px;
+    text-align: center;
+  }
+
+  .header-actions {
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+    background: var(--bg-overlay, rgba(0, 0, 0, 0.5));
+  }
+
+  .sidebar-inner {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 280px;
+    height: 100%;
+    background: var(--bg-secondary);
+    border-left: 1px solid var(--border);
+    padding: 16px;
+    overflow-y: auto;
+  }
+
+  .editor-container {
+    margin-left: 0;
+    padding: 16px;
+  }
+
+  .editor {
+    font-size: 16px; /* Prevent zoom on iOS */
+    min-height: 60vh;
+  }
+
+  .floating-controls {
+    position: fixed;
+    bottom: 16px;
+    right: 16px;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .floating-controls .btn {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    font-size: 20px;
+  }
+
+  .formatbar-floating {
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 8px 16px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    z-index: 100;
+  }
+
+  .formatbar-floating .spacer {
+    display: none;
+  }
+
+  .formatbar-floating .btn {
+    min-width: 36px;
+    height: 36px;
+  }
+
+  /* Modal responsiveness */
+  .node-editor-modal,
+  .mermaid-fullscreen-modal,
+  .playtest-modal {
+    margin: 8px;
+    width: calc(100% - 16px);
+    height: calc(100% - 16px);
+    max-width: none;
+    max-height: none;
+  }
+
+  .node-editor-modal-content,
+  .mermaid-fullscreen-content,
+  .playtest-modal-content {
+    padding: 8px;
+  }
+
+  /* Panel responsiveness */
+  .memos-panel,
+  .preview-panel {
+    margin: 8px;
+    width: calc(100% - 16px);
+    height: calc(100% - 16px);
+    max-width: none;
+    max-height: none;
+  }
+
+  /* Form field responsiveness */
+  .field {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+  }
+
+  .field span {
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .field input,
+  .field select,
+  .field textarea {
+    width: 100%;
+  }
+
+  .ne-row {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .btn-group {
+    flex-direction: column;
+  }
+
+  .btn-group .btn {
+    width: 100%;
+  }
+
+  /* Accordion responsiveness */
+  .agp-accordion {
+    margin-bottom: 8px;
+  }
+
+  .accordion-content {
+    padding: 12px;
+  }
+
+  /* Card responsiveness */
+  .card {
+    padding: 12px;
+  }
+
+  .card h3 {
+    font-size: 16px;
+    margin-bottom: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .app-header {
+    padding: 8px;
+  }
+
+  .sidebar-inner {
+    width: 100%;
+    right: 0;
+    padding: 12px;
+  }
+
+  .editor-container {
+    padding: 12px;
+  }
+
+  .editor {
+    font-size: 15px;
+    min-height: 50vh;
+  }
+
+  .floating-controls {
+    bottom: 12px;
+    right: 12px;
+  }
+
+  .floating-controls .btn {
+    width: 44px;
+    height: 44px;
+    font-size: 18px;
+  }
+
+  .formatbar-floating {
+    bottom: 72px;
+    padding: 6px 12px;
+  }
+
+  .formatbar-floating .btn {
+    min-width: 32px;
+    height: 32px;
+    font-size: 14px;
+  }
+
+  /* Extra small modal adjustments */
+  .node-editor-modal,
+  .mermaid-fullscreen-modal,
+  .playtest-modal {
+    margin: 4px;
+    width: calc(100% - 8px);
+    height: calc(100% - 8px);
+  }
+
+  /* Touch-friendly buttons */
+  .btn {
+    min-height: 44px;
+    padding: 10px 16px;
+    font-size: 16px; /* Prevent zoom on iOS */
+  }
+
+  .btn-sm {
+    min-height: 36px;
+    padding: 8px 12px;
+  }
+
+  /* Input field improvements */
+  input[type="text"],
+  input[type="url"],
+  input[type="number"],
+  select,
+  textarea {
+    min-height: 44px;
+    font-size: 16px; /* Prevent zoom on iOS */
+    padding: 10px;
+  }
+
+  textarea {
+    min-height: 88px;
+  }
+
+  /* Range inputs need special handling */
+  input[type="range"] {
+    height: 40px;
+  }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+  .btn {
+    min-height: 48px;
+    padding: 12px 18px;
+  }
+
+  .btn:active {
+    transform: scale(0.98);
+    background: var(--bg-active, #333);
+  }
+
+  .accordion-content {
+    padding: 16px;
+  }
+
+  .field {
+    margin-bottom: 16px;
+  }
+
+  .editor {
+    font-size: 18px;
+    line-height: 1.6;
+    padding: 16px;
+  }
+}
+
+/* High DPI displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .editor {
+    font-smoothing: antialiased;
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+/* Landscape orientation on mobile */
+@media (max-height: 500px) and (orientation: landscape) {
+  .app-header {
+    padding: 4px 8px;
+  }
+
+  .app-header h1 {
+    font-size: 16px;
+  }
+
+  .sidebar-inner {
+    padding: 8px;
+    width: 240px;
+  }
+
+  .editor-container {
+    padding: 8px;
+  }
+
+  .editor {
+    min-height: 30vh;
+    font-size: 14px;
+  }
+
+  .floating-controls {
+    bottom: 8px;
+    right: 8px;
+  }
+
+  .floating-controls .btn {
+    width: 40px;
+    height: 40px;
+    font-size: 16px;
+  }
+
+  .formatbar-floating {
+    bottom: 56px;
+    padding: 4px 8px;
+  }
+
+  .formatbar-floating .btn {
+    min-width: 28px;
+    height: 28px;
+    font-size: 12px;
+  }
+}
