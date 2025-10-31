@@ -1,0 +1,24 @@
+{
+  "items": [
+    {
+      "id": "sword1",
+      "name": "鉄の剣",
+      "type": "weapon",
+      "description": "標準的な鉄製の剣。攻撃力 +5。",
+      "properties": {
+        "attack": 5,
+        "durability": 100
+      }
+    },
+    {
+      "id": "potion1",
+      "name": "回復薬",
+      "type": "consumable",
+      "description": "HPを50回復する薬。",
+      "properties": {
+        "heal": 50,
+        "stackable": true
+      }
+    }
+  ]
+}

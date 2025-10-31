@@ -6,6 +6,8 @@
   --surface: color-mix(in srgb, var(--bg-color) 92%, white);
   --muted: #9aa3af;
   --radius: 12px;
+  --breakpoint-tablet: 768px;
+  --breakpoint-mobile: 480px;
 }
 
 * { box-sizing: border-box; }
@@ -67,7 +69,7 @@ body {
 .btn:hover { filter: brightness(1.1); }
 .btn:active { transform: translateY(1px); }
 .btn-accent { background: color-mix(in srgb, var(--accent-color) 28%, var(--bg-color)); }
-.icon-btn { background: transparent; border: none; font-size: 20px; cursor: pointer; color: var(--text-color); }
+.icon-btn { background: transparent; border: none; font-size: 20px; cursor: pointer; color: var(--text-color); width: 44px; height: 44px; }
 .icon-btn:hover { filter: brightness(1.2); }
 
 .muted { color: var(--muted); }
@@ -94,8 +96,18 @@ body {
 .preset-btn { padding: 6px 10px; border-radius: 999px; border: 1px solid rgba(255,255,255,.2); background: transparent; color: var(--text-color); cursor: pointer; }
 .preset-btn:hover { background: rgba(255,255,255,.06); }
 
-/* Utilities */
-.field { display: grid; gap: 6px; margin-bottom: 12px; }
-.field input[type="text"] { padding: 8px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,.2); background: rgba(0,0,0,.2); color: var(--text-color); }
-.file-label { position: relative; overflow: hidden; }
-.file-label input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+/* Modal dialogs */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+}
+.modal-content {
+  max-width: 90vw;
+  max-height: 90vh;
+  overflow: auto;
+}

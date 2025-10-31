@@ -42,6 +42,16 @@ Phase 2 ではこれらを解消し、図を使った探索・編集体験を向
 - ノードクリック時に `document.getElementById('ne-node-select').value = nodeId;` 後に `dispatchEvent(new Event('change'))`。
 - SVG 再描画ごとにイベントハンドラを再バインド。
 
+## 実装タスク
+- [ ] `admin.html` に検索UI・経路選択UI・ステータス領域を追加
+- [ ] `styles/admin.css` に検索/経路/ステータス用スタイルとハイライト/フェードクラスを追加
+- [ ] `scripts/mermaidPreview.js` に検索フィルタ・最短経路計算・ノードクリックハンドラを実装
+- [ ] `scripts/nodeEditor.js` でノード選択変更イベントを公開し、Mermaidプレビューとの連携を強化
+- [ ] `scripts/admin.js` で NodeEditor からのイベントを受け取り、プレビュー更新とNode選択同期を実装
+- [ ] `scripts/dev-check.js` を更新し、Phase2機能のスモークチェックを追加（必要に応じて）
+- [ ] ドキュメント（本Issue、`CHANGELOG.md` など）を更新し、受け入れ基準とテスト手順を確定
+- [ ] 手動テスト（受け入れ基準に準拠）と `node scripts/dev-check.js` の実行結果を記録
+
 ## 受け入れ基準 (Acceptance Criteria)
 - [x] キーワード検索で該当ノード・エッジのみ強調され、その他がフェードする。
 - [x] 最短経路を指定すると、該当ノード・エッジが強調される。経路がない場合はメッセージを表示。

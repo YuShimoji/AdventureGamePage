@@ -41,5 +41,10 @@
 6. 回帰
    - 既存の「別ウィンドウで開く」が引き続き動作すること。
 
+## 回帰テストタスク
+- [ ] `node scripts/dev-check.js` を実行し、Phase1機能のスモーク確認を行う
+- [ ] 手動テスト手順 (1〜6) を最新ビルドに対して繰り返し、結果を `docs/test_report.md` に記録
+- [ ] `scripts/mermaidPreview.js` の主要ロジックに対するユニットテスト導入を検討（可能なら `__tests__/mermaidPreview.spec.js` を追加）
+
 ## ロールアウト
 - Phase 1 完了後、Phase 2 では検索フィルタやパス強調、ノード/エッジのインタラクション等を検討。

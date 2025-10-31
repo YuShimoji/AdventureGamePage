@@ -7,9 +7,10 @@
   - ルール: `docs/Windsurf_AI_Collab_Rules_v1.1.md`
 
 ## プロジェクト概要
-- リポジトリ: AdventureGamePage（静的Web: index/admin/play）
+- リポジトリ: AdventureGamePage（static-web-app+node-tooling）
 - 目的: ゼンライク編集・保存（IndexedDB優先）・簡易プレイ
 - 言語/ツール: HTML/CSS/JS（Vanilla）
+- 検出結果: `detect-project-type.js` により `static-web-app+node-tooling` と判定（package.json, scripts/, htmlファイル, docs/ 存在）
 
 ## 最近の主要決定・状態
 - 保存アーキテクチャ抽象化（LocalStorage/IndexedDB）を導入済み
@@ -32,8 +33,47 @@
 ## 既知のリスク/ToDo
 - docs/ISSUES.md の構造は「カテゴリ＋箇条書き」。中央Syncは `##` 見出し単位でIssue化するため、必要に応じて1Issue=1見出しへ再構成を検討
 - main の保護設定（レビュー/必須チェック）を有効化する
+- **UI/UXモダン化**: 絵文字アイコンをミニマル文字ラベル（ZEN, SB, T, PV, ME）へ置き換え、アクセシビリティ向上（aria-label追加）
+- **ヘルプドキュメント整備**: `docs/help/admin-guide.md` に操作ガイドを統合。UI内説明文を段階的にヘルプリンクへ移行
 
 ## 次の一手（提案）
-- 旧 localStorage データの移行ウィザード
-- スナップショット機能の本実装と検索/タグ
-- play 側のセーブ/ロードを Provider 抽象化へ統合
+## フェーズ1完了（2025-10-22）
+### ✅ フェーズ1.1: マイグレーション機能強化
+- プログレスバー・詳細ログ表示実装
+- バックアップ/復元機能（createBackup/restoreFromBackup）
+- dataValidator.js: データバリデーションと自動修復
+
+### ✅ フェーズ1.2: スナップショット機能拡張
+- 日時範囲フィルタ（filterByDateRange）実装
+- スナップショット比較機能（snapshotCompare.js）: 差分表示
+- 高度な検索・タグフィルタ機能
+
+### ✅ フェーズ1.3: エラーハンドリング強化
+- errorHandler.js: 統合エラーハンドリング
+- 自動リトライ・ユーザーフレンドリーなメッセージ
+- 全保存操作にエラーハンドリング適用
+
+## フェーズ2進行中（2025-10-24）
+### ✅ フェーズ2.1: インベントリシステム基本実装
+- gameEngine.js: インベントリ管理API実装
+  - addItem/removeItem/hasItem/getItemCount/getInventory/clearInventory
+  - 永続化サポート（saveProgress/loadProgress統合）
+  - 最大スロット制限（デフォルト20）
+- gameEngine.inventory.spec.js: 包括的ユニットテスト
+
+### ✅ フェーズ2.2: インベントリUI実装
+- play.html: インベントリパネル追加
+- play.css: インベントリスタイル実装（レスポンシブ対応）
+- play.js: インベントリUI制御ロジック
+  - 動的アイテム表示
+  - キーボードショートカット（I）
+
+### 🚧 フェーズ2.3: ノードエディタ統合（次）
+- ノードアクションでアイテム追加/削除
+- 条件分岐でアイテム所持チェック
+
+## 次の一手（提案）
+- ~~旧 localStorage データの移行ウィザード~~ ✅ 完了（migrationWizard.js実装、データプレビュー・手動実行・フィードバック機能付き）
+- ~~スナップショット機能の本実装と検索/タグ~~ ✅ 完了（searchItems/filterByTag拡張、UI追加、ラベル/タグ編集機能）
+- ~~play 側のセーブ/ロードを Provider 抽象化へ統合~~ ✅ 完了（play.js/gameEngine.js/playImport.jsをStorageBridge統合、play.htmlに必要なスクリプト追加）
+- ~~インベントリシステム実装~~ ✅ 完了（Phase 2.1-2.2）

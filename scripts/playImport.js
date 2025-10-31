@@ -1,51 +1,86 @@
-(function(){
-  function normalizeSpecToEngine(data){
-    if(!data) return null;
-    if(Array.isArray(data.nodes)){
+(function () {
+  function getJSONErrorPosition(message) {
+    const match = message.match(/position (\d+)/);
+    return match ? parseInt(match[1]) : null;
+  }
+
+  function getLineNumber(text, position) {
+    if (position === null || position < 0) return 1;
+    const lines = text.substring(0, position).split('\n');
+    return lines.length;
+  }
+  function normalizeSpecToEngine(data) {
+    if (!data) return null;
+    if (Array.isArray(data.nodes)) {
       const nodes = {};
-      data.nodes.forEach(n => {
-        if(!n || !n.id) return;
+      data.nodes.forEach((n) => {
+        if (!n || !n.id) return;
         nodes[n.id] = {
-          title: n.title || '',
-          text: n.text || '',
-          choices: Array.isArray(n.choices) ? n.choices.map(c => ({ text: c.label ?? c.text ?? '', to: c.target ?? c.to ?? '' })) : []
+          title: n.title || "",
+          text: n.text || "",
+          choices: Array.isArray(n.choices)
+            ? n.choices.map((c) => ({ text: c.label ?? c.text ?? "", to: c.target ?? c.to ?? "" }))
+            : [],
         };
       });
       return {
-        title: data?.meta?.title || data.title || 'Adventure',
-        start: data?.meta?.start || data.start || 'start',
-        nodes
+        title: data?.meta?.title || data.title || "Adventure",
+        start: data?.meta?.start || data.start || "start",
+        nodes,
       };
     }
     // Already engine-like
-    if(data.nodes && !Array.isArray(data.nodes)) return data;
+    if (data.nodes && !Array.isArray(data.nodes)) return data;
     return null;
   }
 
-  document.addEventListener('DOMContentLoaded', () => {
-    const fileEl = document.getElementById('play-file-import');
-    if(!fileEl) return;
-    fileEl.addEventListener('change', (ev) => {
+  document.addEventListener("DOMContentLoaded", () => {
+    const fileEl = document.getElementById("play-file-import");
+    if (!fileEl) return;
+    fileEl.addEventListener("change", (ev) => {
       const file = ev.target.files && ev.target.files[0];
-      if(!file) return; const reader = new FileReader();
+      if (!file) return;
+      const reader = new FileReader();
       reader.onload = () => {
         try {
           const obj = JSON.parse(reader.result);
-          if(window.Validator?.validateGameSpec && Array.isArray(obj?.nodes)){
+          if (window.Validator?.validateGameSpec && Array.isArray(obj?.nodes)) {
             const v = window.Validator.validateGameSpec(obj);
-            if(!v.ok){ alert('ゲームJSONの検証に失敗しました:\n- ' + v.errors.join('\n- ')); return; }
+            if (!v.ok) {
+              alert("ゲームJSONの検証に失敗しました:\n- " + v.errors.join("\n- "));
+              return;
+            }
           }
-          const engine = (window.Converters?.normalizeSpecToEngine)
+          const engine = window.Converters?.normalizeSpecToEngine
             ? window.Converters.normalizeSpecToEngine(obj)
             : normalizeSpecToEngine(obj);
-          if(!engine) { alert('対応していない形式です'); return; }
-          StorageUtil.saveJSON('agp_game_data', engine);
-          alert('ゲームJSONを読み込みました。ページを再読み込みします。');
+          if (!engine) {
+            alert("対応していない形式です");
+            return;
+          }
+          StorageUtil.saveJSON("agp_game_data", engine);
+          alert("ゲームJSONを読み込みました。ページを再読み込みします。");
           location.reload();
-        } catch(e){ console.error(e); alert('ゲームJSONの読み込みに失敗しました'); }
+        } catch (e) {
+          console.error(e);
+          // 詳細なエラー情報を表示
+          let errorMsg = "ゲームJSONの読み込みに失敗しました";
+          if (e instanceof SyntaxError) {
+            const pos = getJSONErrorPosition(e.message);
+            if (pos !== null) {
+              const lineNum = getLineNumber(reader.result, pos);
+              errorMsg += `\nJSON構文エラー（行 ${lineNum} 付近）: ${e.message}`;
+            } else {
+              errorMsg += `\nJSON構文エラー: ${e.message}`;
+            }
+          } else {
+            errorMsg += `\nエラー: ${e.message}`;
+          }
+          alert(errorMsg);
+        }
       };
       reader.readAsText(file);
-      ev.target.value = '';
+      ev.target.value = "";
     });
   });
 })();

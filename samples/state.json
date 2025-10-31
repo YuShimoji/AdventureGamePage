@@ -1,0 +1,26 @@
+{
+  "state": {
+    "inventory": {
+      "sword1": 1,
+      "potion1": 5
+    },
+    "flags": {
+      "intro_completed": true,
+      "first_battle_won": false
+    },
+    "variables": {
+      "gold": 100,
+      "reputation": 50
+    },
+    "history": [
+      {
+        "nodeId": "start",
+        "timestamp": "2025-10-19T18:42:53.860Z"
+      },
+      {
+        "nodeId": "battle1",
+        "timestamp": "2025-10-19T18:42:53.862Z"
+      }
+    ]
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "name": "adventure-game-page",
+  "version": "1.0.0",
+  "description": "ブラウザベースのアドベンチャーゲーム作成・プレイプラットフォーム",
+  "main": "index.html",
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
+  },
+  "scripts": {
+    "start": "node scripts/dev-server.js",
+    "dev": "node scripts/dev-server.js",
+    "test": "node scripts/run-tests.js",
+    "test:ci": "node scripts/dev-check.js",
+    "test:manual": "node scripts/dev-server.js",
+    "check": "npm run lint && npm run test",
+    "lint": "eslint \"scripts/*.js\" --fix || echo 'ESLint not installed, run npm install'",
+    "format": "prettier --write \"scripts/*.js\" \"*.html\" \"docs/**/*.md\" || echo 'Prettier not installed, run npm install'",
+    "smoke": "node scripts/dev-check.js",
+    "docs": "echo 'Documentation generation not configured yet'",
+    "build": "echo 'No build process configured yet'"
+  },
+  "keywords": [
+    "adventure-game",
+    "browser-game",
+    "javascript",
+    "html5",
+    "game-engine",
+    "visual-novel",
+    "text-adventure"
+  ],
+  "author": "Yu Shimoji",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/YuShimoji/AdventureGamePage.git"
+  },
+  "bugs": {
+    "url": "https://github.com/YuShimoji/AdventureGamePage/issues"
+  },
+  "homepage": "https://github.com/YuShimoji/AdventureGamePage#readme",
+  "devDependencies": {
+    "eslint": "^8.57.0",
+    "prettier": "^3.2.5"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "browserslist": [
+    "Chrome >= 80",
+    "Firefox >= 75",
+    "Safari >= 13",
+    "Edge >= 80"
+  ]
+}
