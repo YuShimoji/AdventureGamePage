@@ -20,7 +20,11 @@
       showFloatingControls: true,
       showMemos: true,
       showSavePreview: true,
-      shortcutsEnabled: true
+      shortcutsEnabled: true,
+      // ヘッダー固定のON/OFF（falseで固定解除）
+      stickyHeader: false,
+      // アイコン表現: 'emoji' | 'text'
+      iconStyle: 'text'
     },
     storage: {
       backend: 'idb',

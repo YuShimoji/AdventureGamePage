@@ -43,5 +43,22 @@
     modal.addEventListener("click", (e) => {
       if (e.target === modal) closeModal();
     });
+
+    // NodeEditorの変更に追従してプレイテストを自動再読込（500msスロットル）
+    let refreshTimer = null;
+    function scheduleRefresh(){
+      if (!modal || modal.hidden || !iframe) return; // inlineプレビュー中のみ
+      if (refreshTimer) clearTimeout(refreshTimer);
+      refreshTimer = setTimeout(() => {
+        try {
+          const cur = iframe.src;
+          // Force reload while preserving URL
+          iframe.src = 'about:blank';
+          setTimeout(() => { iframe.src = cur || 'play.html'; }, 50);
+          if (statusEl) statusEl.textContent = 'プレイテストを更新しました';
+        } catch {}
+      }, 500);
+    }
+    document.addEventListener('agp-spec-updated', scheduleRefresh);
   });
 })();

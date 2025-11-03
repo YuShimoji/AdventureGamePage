@@ -330,12 +330,32 @@
     const btnQuickSidebar = document.getElementById('btn-quick-sidebar');
     const btnQuickTheme = document.getElementById('btn-quick-theme');
     const btnQuickPreview = document.getElementById('btn-quick-preview');
+    const btnQuickMore = document.getElementById('btn-quick-more');
+    const btnQuickMemos = document.getElementById('btn-quick-memos');
+    const dropdown = document.getElementById('floating-controls-dropdown');
+    const panelHandle = document.getElementById('floating-panel-handle');
+    const closeDropdown = () => { if (dropdown && !dropdown.hidden) dropdown.hidden = true; };
     if (btnQuickZen) btnQuickZen.addEventListener('click', () => document.body.classList.toggle('zen-mode'));
     if (btnQuickSidebar) btnQuickSidebar.addEventListener('click', () => {
       const hidden = sidebar.hidden;
       sidebar.hidden = !hidden; sidebar.classList.toggle('show', !sidebar.hidden);
     });
     if (btnQuickTheme) btnQuickTheme.addEventListener('click', () => { themePanel.hidden = !themePanel.hidden; });
+    if (btnQuickMore && dropdown) {
+      btnQuickMore.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const willOpen = dropdown.hidden;
+        closeDropdown();
+        if (willOpen) {
+          dropdown.hidden = false;
+        }
+      });
+      document.addEventListener('click', (e) => {
+        if (dropdown && !dropdown.hidden && !e.target.closest('.floating-controls-group')) {
+          closeDropdown();
+        }
+      });
+    }
     // プレビュー機能が無効ならボタンを隠す
     if (btnQuickPreview && !(window.APP_CONFIG?.ui?.showSavePreview)) {
       // フラグがOFFでも、従来の保存一覧（savesPanel）をフォールバックとして使用するため、ボタンは非表示にしない
@@ -343,9 +363,8 @@
     if (btnQuickPreview) {
       btnQuickPreview.addEventListener('click', () => {
         // 新しい保存プレビューを優先
-        if (window.APP_CONFIG?.ui?.showSavePreview && previewPanel) {
-          previewPanel.hidden = false;
-          try { window.SavePreview?.refresh?.(); } catch {}
+        if (window.APP_CONFIG?.ui?.showSavePreview && window.SavePreview) {
+          window.SavePreview.toggle();
           return;
         }
         // フォールバック：従来の保存一覧
@@ -356,19 +375,284 @@
       });
     }
 
-    // ---------- Storage Providers: select active provider ----------
-    try {
-      if (window.StorageProviders?.Registry && providerSelect) {
-        const reg = window.StorageProviders.Registry;
-        // 初期アクティブ設定（config優先、なければ既定）
-        const cfgBackend = window.APP_CONFIG?.storage?.backend;
-        if (cfgBackend && reg.get(cfgBackend)) { reg.setActiveName(cfgBackend); }
-        providerSelect.value = reg.getActiveName();
-        providerSelect.addEventListener('change', () => {
-          reg.setActiveName(providerSelect.value);
+    // ---------- Theme Panel Initialization ----------
+    (function initThemePanel(){
+      const themePanel = document.getElementById('theme-panel');
+      if (!themePanel) return;
+
+      // Clear existing content
+      themePanel.innerHTML = '';
+
+      // Header
+      const header = document.createElement('div');
+      header.className = 'theme-panel-header';
+      const title = document.createElement('h3');
+      title.textContent = 'テーマ設定';
+      const closeBtn = document.createElement('button');
+      closeBtn.className = 'btn btn-ghost btn-sm';
+      closeBtn.textContent = '✕';
+      closeBtn.onclick = () => { themePanel.hidden = true; };
+      header.appendChild(title);
+      header.appendChild(closeBtn);
+
+      // Content
+      const content = document.createElement('div');
+      content.className = 'theme-panel-content';
+
+      // Theme selection
+      const themeSection = document.createElement('div');
+      themeSection.className = 'theme-section';
+      const themeLabel = document.createElement('h4');
+      themeLabel.textContent = 'テーマ';
+      const themeSelect = document.createElement('select');
+      themeSelect.className = 'theme-select';
+
+      // Populate theme options
+      const themes = window.ThemeManager?.getAvailableThemes() || [];
+      themes.forEach(theme => {
+        const option = document.createElement('option');
+        option.value = theme.name;
+        option.textContent = theme.displayName;
+        if (theme.name === window.ThemeManager?.getCurrentTheme()?.name) {
+          option.selected = true;
+        }
+        themeSelect.appendChild(option);
+      });
+
+      themeSelect.onchange = () => {
+        window.ThemeManager?.setTheme(themeSelect.value);
+      };
+
+      themeSection.appendChild(themeLabel);
+      themeSection.appendChild(themeSelect);
+
+      // Dark mode toggle
+      const darkModeSection = document.createElement('div');
+      darkModeSection.className = 'theme-section';
+      const darkLabel = document.createElement('h4');
+      darkLabel.textContent = 'ダークモード';
+      const darkToggle = document.createElement('label');
+      darkToggle.className = 'dark-mode-toggle';
+      const darkInput = document.createElement('input');
+      darkInput.type = 'checkbox';
+      darkInput.checked = window.ThemeManager?.getCurrentTheme()?.isDark || false;
+      darkInput.onchange = () => {
+        window.ThemeManager?.toggleDarkMode();
+      };
+      const darkSpan = document.createElement('span');
+      darkSpan.textContent = '有効';
+      darkToggle.appendChild(darkInput);
+      darkToggle.appendChild(darkSpan);
+
+      darkModeSection.appendChild(darkLabel);
+      darkModeSection.appendChild(darkToggle);
+
+      // Custom colors section
+      const customSection = document.createElement('div');
+      customSection.className = 'theme-section';
+      const customLabel = document.createElement('h4');
+      customLabel.textContent = 'カスタムカラー';
+      const colorGrid = document.createElement('div');
+      colorGrid.className = 'color-grid';
+
+      const colorKeys = ['primary', 'secondary', 'accent', 'success', 'warning', 'error'];
+      const currentTheme = window.ThemeManager?.getCurrentTheme();
+      colorKeys.forEach(key => {
+        const colorItem = document.createElement('div');
+        colorItem.className = 'color-item';
+        const colorLabel = document.createElement('span');
+        colorLabel.textContent = key;
+        const colorInput = document.createElement('input');
+        colorInput.type = 'color';
+        colorInput.value = currentTheme?.config?.colors?.[key] || '#000000';
+        colorInput.onchange = () => {
+          const customColors = {};
+          colorKeys.forEach(k => {
+            const input = document.querySelector(`input[data-color-key="${k}"]`);
+            if (input) customColors[k] = input.value;
+          });
+          window.ThemeManager?.applyCustomColors(customColors);
+          window.ThemeManager?.applyTheme();
+        };
+        colorInput.setAttribute('data-color-key', key);
+
+        colorItem.appendChild(colorLabel);
+        colorItem.appendChild(colorInput);
+        colorGrid.appendChild(colorItem);
+      });
+
+      customSection.appendChild(customLabel);
+      customSection.appendChild(colorGrid);
+
+      // Actions
+      const actions = document.createElement('div');
+      actions.className = 'theme-actions';
+      const resetBtn = document.createElement('button');
+      resetBtn.className = 'btn';
+      resetBtn.textContent = 'リセット';
+      resetBtn.onclick = () => {
+        window.ThemeManager?.setTheme('default');
+        window.ThemeManager?.toggleDarkMode(); // Reset to light mode
+        // Reset custom colors
+        colorKeys.forEach(key => {
+          const input = document.querySelector(`input[data-color-key="${key}"]`);
+          const defaultColor = window.ThemeManager?.themes?.default?.colors?.[key] || '#000000';
+          if (input) input.value = defaultColor;
+        });
+        window.ThemeManager?.applyCustomColors({});
+        window.ThemeManager?.applyTheme();
+      };
+
+      actions.appendChild(resetBtn);
+
+      content.appendChild(themeSection);
+      content.appendChild(darkModeSection);
+      content.appendChild(customSection);
+      content.appendChild(actions);
+
+      themePanel.appendChild(header);
+      themePanel.appendChild(content);
+    })();
+
+    // ---------- Floating Panel Management ----------
+    (function initFloatingPanel(){
+      const panel = document.getElementById('floating-panel');
+      const header = panel?.querySelector('.floating-panel-header');
+      const minimizeBtn = document.getElementById('floating-panel-minimize');
+      const closeBtn = document.getElementById('floating-panel-close');
+      const content = panel?.querySelector('.floating-panel-content');
+
+      if(!panel || !header) return;
+
+      let isDragging = false;
+      let startX, startY, startLeft, startTop;
+
+      // Load saved position and state
+      const saved = localStorage.getItem('agp_floating_panel');
+      if(saved) {
+        try {
+          const state = JSON.parse(saved);
+          if(state.position) {
+            panel.style.left = state.position.left + 'px';
+            panel.style.top = state.position.top + 'px';
+            panel.style.right = 'auto'; // Override default right positioning
+          }
+          if(state.minimized) {
+            panel.classList.add('minimized');
+          }
+          if(state.hidden) {
+            panel.classList.add('hidden');
+            if(panelHandle) panelHandle.hidden = false;
+          } else if(panelHandle) {
+            panelHandle.hidden = true;
+          }
+        } catch(e) { console.warn('Failed to load floating panel state', e); }
+      }
+
+      // Drag functionality
+      header.addEventListener('mousedown', (e) => {
+        if(e.target.closest('.floating-panel-controls')) return; // Don't drag when clicking controls
+
+        isDragging = true;
+        startX = e.clientX;
+        startY = e.clientY;
+        const rect = panel.getBoundingClientRect();
+        startLeft = rect.left;
+        startTop = rect.top;
+
+        panel.classList.add('dragging');
+        document.body.style.userSelect = 'none';
+      });
+
+      document.addEventListener('mousemove', (e) => {
+        if(!isDragging) return;
+
+        const deltaX = e.clientX - startX;
+        const deltaY = e.clientY - startY;
+
+        const newLeft = startLeft + deltaX;
+        const newTop = startTop + deltaY;
+
+        // Keep panel within viewport bounds
+        const maxLeft = window.innerWidth - panel.offsetWidth - 10;
+        const maxTop = window.innerHeight - (panel.classList.contains('minimized') ? header.offsetHeight : panel.offsetHeight) - 10;
+
+        panel.style.left = Math.max(10, Math.min(newLeft, maxLeft)) + 'px';
+        panel.style.top = Math.max(10, Math.min(newTop, maxTop)) + 'px';
+        panel.style.right = 'auto';
+      });
+
+      document.addEventListener('mouseup', () => {
+        if(isDragging) {
+          isDragging = false;
+          panel.classList.remove('dragging');
+          document.body.style.userSelect = '';
+
+          // Save position
+          savePanelState();
+        }
+      });
+
+      // Minimize/Maximize
+      if(minimizeBtn) {
+        minimizeBtn.addEventListener('click', () => {
+          panel.classList.toggle('minimized');
+          closeDropdown();
+          savePanelState();
         });
       }
-    } catch(e) { console.warn('provider select init failed', e); }
+
+      // Close/Open
+      if(closeBtn) {
+        closeBtn.addEventListener('click', () => {
+          panel.classList.add('hidden');
+          if(panelHandle) panelHandle.hidden = false;
+          closeDropdown();
+          savePanelState();
+        });
+      }
+
+      if(panelHandle) {
+        panelHandle.addEventListener('click', () => {
+          panel.classList.remove('hidden');
+          panelHandle.hidden = true;
+          closeDropdown();
+          savePanelState();
+        });
+      }
+
+      // Save panel state
+      function savePanelState() {
+        const rect = panel.getBoundingClientRect();
+        const state = {
+          position: {
+            left: rect.left,
+            top: rect.top
+          },
+          minimized: panel.classList.contains('minimized'),
+          hidden: panel.classList.contains('hidden')
+        };
+        localStorage.setItem('agp_floating_panel', JSON.stringify(state));
+      }
+
+      // Handle window resize to keep panel in bounds
+      window.addEventListener('resize', () => {
+        const rect = panel.getBoundingClientRect();
+        const maxLeft = window.innerWidth - panel.offsetWidth - 10;
+        const maxTop = window.innerHeight - panel.offsetHeight - 10;
+
+        if(rect.left > maxLeft) {
+          panel.style.left = maxLeft + 'px';
+        }
+        if(rect.top > maxTop) {
+          panel.style.top = maxTop + 'px';
+        }
+
+        savePanelState();
+      });
+    })();
+
+    // ---------- End Floating Panel Management ----------
 
     // Keyboard shortcuts (Ctrl+B/I/U)
     if (window.APP_CONFIG?.ui?.shortcutsEnabled) {
@@ -765,6 +1049,30 @@
       } catch(e){ console.error('deleteById', e); return false; }
     }
     window.AdminAPI = { loadById, deleteById };
+
+    // APP_CONFIGに基づきヘッダー固定切替とアイコンのテキスト化を追加
+    try {
+      const sticky = !!(window.APP_CONFIG?.ui?.stickyHeader);
+      document.body.classList.toggle('no-sticky', !sticky);
+    } catch {}
+
+    try {
+      if (window.APP_CONFIG?.ui?.iconStyle === 'text') {
+        const replacements = [
+          ['btn-theme', 'テーマ'],
+          ['btn-toggle-sidebar', 'ツール'],
+          ['btn-quick-zen', 'Zen'],
+          ['btn-quick-sidebar', 'ツール'],
+          ['btn-quick-theme', 'テーマ'],
+          ['btn-quick-preview', '保存'],
+          ['btn-quick-memos', 'メモ']
+        ];
+        replacements.forEach(([id, label]) => {
+          const el = document.getElementById(id);
+          if (el) el.textContent = label;
+        });
+      }
+    } catch {}
   };
 
   // admin-boot-complete イベントを待つ

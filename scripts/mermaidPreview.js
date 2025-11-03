@@ -278,33 +278,36 @@
   }
 
   function bindSvgInteractions() {
-    const { view } = getUIRefs();
-    if (!view || !lastBuildMeta) return;
-    const svg = view.querySelector("svg");
-    if (!svg) return;
-    const nodeGroups = svg.querySelectorAll("g.node");
-    nodeGroups.forEach((g) => {
-      const sid = g.id;
-      const originalId = lastBuildMeta.sanitizeMap?.get(sid);
-      if (!originalId) return;
-      g.style.cursor = "pointer";
-      g.setAttribute("tabindex", "0");
-      const handler = (ev) => {
-        ev.preventDefault();
-        focusNodeEditorNode(originalId);
-      };
-      g.addEventListener("click", handler);
-      g.addEventListener("keydown", (ev) => {
-        if (ev.key === "Enter" || ev.key === " ") {
+    const { view, mainView } = getUIRefs();
+    const views = [view, mainView].filter(Boolean);
+    views.forEach((currentView) => {
+      if (!currentView || !lastBuildMeta) return;
+      const svg = currentView.querySelector("svg");
+      if (!svg) return;
+      const nodeGroups = svg.querySelectorAll("g.node");
+      nodeGroups.forEach((g) => {
+        const sid = g.id;
+        const originalId = lastBuildMeta.sanitizeMap?.get(sid);
+        if (!originalId) return;
+        g.style.cursor = "pointer";
+        g.setAttribute("tabindex", "0");
+        const handler = (ev) => {
           ev.preventDefault();
-          handler(ev);
-        }
+          focusNodeEditorNode(originalId);
+        };
+        g.addEventListener("click", handler);
+        g.addEventListener("keydown", (ev) => {
+          if (ev.key === "Enter" || ev.key === " ") {
+            ev.preventDefault();
+            handler(ev);
+          }
+        });
       });
     });
   }
 
   function buildAndSetSource(overrides) {
-    const { src, view } = getUIRefs();
+    const { src, view, mainView } = getUIRefs();
     refreshSeedOptions();
     refreshPathSelects(true);
     const opts = collectOptions(overrides);
@@ -314,12 +317,16 @@
       view.innerHTML =
         '<div class="muted">描画（レンダリング）ボタンでプレビューを表示できます。</div>';
     }
+    if (mainView && !mainView.querySelector("svg")) {
+      mainView.innerHTML =
+        '<div class="muted">プレビューがここに表示されます。</div>';
+    }
     updateStatusFromLastBuild();
     return { opts, code };
   }
 
   async function renderDiagram() {
-    const { view } = getUIRefs();
+    const { view, mainView } = getUIRefs();
     try {
       const { code } = buildAndSetSource();
       if (!ensureMermaid()) {
@@ -338,7 +345,9 @@
             .join("")
         );
       if (renderCache.has(cacheKey)) {
-        if (view) view.innerHTML = renderCache.get(cacheKey);
+        const cachedSvg = renderCache.get(cacheKey);
+        if (view) view.innerHTML = cachedSvg;
+        if (mainView) mainView.innerHTML = cachedSvg;
         bindSvgInteractions();
         updateStatusFromLastBuild();
         return;
@@ -348,12 +357,15 @@
       // Cache the result
       renderCache.set(cacheKey, svgHtml);
       if (view) view.innerHTML = svgHtml;
+      if (mainView) mainView.innerHTML = svgHtml;
       bindSvgInteractions();
       updateStatusFromLastBuild();
     } catch (e) {
       console.error("Mermaid render error", e);
-      if (view) view.textContent = "Mermaidの描画に失敗しました";
-      setStatus("Mermaidの描画に失敗しました", "error");
+      const errorMsg = "Mermaidの描画に失敗しました";
+      if (view) view.textContent = errorMsg;
+      if (mainView) mainView.textContent = errorMsg;
+      setStatus(errorMsg, "error");
     }
   }
 
@@ -610,6 +622,7 @@
       renderBtn: document.getElementById("ne-mermaid-render"),
       src: document.getElementById("ne-mermaid-src"),
       view: document.getElementById("ne-mermaid-view"),
+      mainView: document.getElementById("main-mermaid-view"),
       openBtn: document.getElementById("ne-mermaid-open"),
       scopeSel: document.getElementById("ne-mermaid-scope"),
       seedSel: document.getElementById("ne-mermaid-seed"),
@@ -624,6 +637,7 @@
       pathGoalSel: document.getElementById("ne-mermaid-path-goal"),
       pathApplyBtn: document.getElementById("ne-mermaid-path-apply"),
       statusEl: document.getElementById("ne-mermaid-status"),
+      fullscreenBtn: document.getElementById("ne-mermaid-fullscreen"),
     };
     setUIRefs(refs);
     const {
@@ -631,6 +645,7 @@
       renderBtn,
       src,
       view,
+      mainView,
       openBtn,
       scopeSel,
       seedSel,
@@ -641,6 +656,7 @@
       pathStartSel,
       pathGoalSel,
       pathApplyBtn,
+      fullscreenBtn,
     } = refs;
     if (!genBtn || !renderBtn || !src || !view) return;
 
@@ -667,6 +683,33 @@
     renderBtn.addEventListener("click", () => {
       renderDiagram();
     });
+
+    // メインエリアの生成ボタンクリックでプレビューも更新
+    if (genBtn) {
+      genBtn.addEventListener("click", () => {
+        renderDiagram();
+      });
+    }
+
+    // フルスクリーンボタンの処理
+    if (fullscreenBtn) {
+      fullscreenBtn.addEventListener("click", () => {
+        const { mainView } = getUIRefs();
+        if (!mainView) return;
+
+        const modal = document.getElementById("mermaid-fullscreen-modal");
+        const modalView = document.getElementById("mermaid-fullscreen-view");
+        if (!modal || !modalView) return;
+
+        const svg = mainView.querySelector("svg");
+        if (svg) {
+          modalView.innerHTML = svg.outerHTML;
+        } else {
+          modalView.innerHTML = mainView.innerHTML;
+        }
+        modal.hidden = false;
+      });
+    }
 
     if (copyBtn) {
       copyBtn.addEventListener("click", async () => {
@@ -771,6 +814,20 @@ render();</script>
 
   document.addEventListener("DOMContentLoaded", () => {
     if (document.getElementById("mermaid-panel")) bind();
+    // NodeEditor からの選択変更に追従して現在ノードをハイライト
+    try {
+      document.addEventListener('agp-node-selection-changed', (e) => {
+        const nodeId = e?.detail?.nodeId;
+        if (!nodeId || !window.MermaidPreview?.focusNode) return;
+        window.MermaidPreview.focusNode(nodeId);
+      });
+    } catch {}
+    // NodeEditor からの仕様更新に追従して再描画
+    try {
+      document.addEventListener('agp-spec-updated', () => {
+        try { window.MermaidPreview?.refreshData?.(); } catch {}
+      });
+    } catch {}
   });
 
   // export for tests if needed

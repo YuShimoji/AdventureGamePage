@@ -543,6 +543,7 @@
         window.StorageUtil.saveJSON('agp_save_slots', existing);
         return true;
       }
+    };
   }
 
   // Inventory management utilities

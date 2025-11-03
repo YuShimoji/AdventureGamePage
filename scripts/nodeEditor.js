@@ -89,13 +89,25 @@
 
   function refreshNodeList(selectedId){
     const { sel } = readUIRefs(); if(!sel) return;
-    sel.innerHTML = '';
+    const currentValue = sel.value;
+    sel.innerHTML = '<option value="">-- ノードを選択 --</option>';
     (specData.nodes||[]).forEach(n => {
-      const opt = document.createElement('option'); opt.value = n.id; opt.textContent = n.id; sel.appendChild(opt);
+      const opt = document.createElement('option');
+      opt.value = n.id;
+      opt.textContent = `${n.id} - ${n.title || 'タイトルなし'}`;
+      // ドラッグ可能にする
+      opt.draggable = true;
+      opt.addEventListener('dragstart', (e) => {
+        e.dataTransfer.setData('text/plain', n.id);
+        e.dataTransfer.effectAllowed = 'copy';
+      });
+      sel.appendChild(opt);
     });
     if(selectedId && findNodeById(specData.nodes, selectedId)) sel.value = selectedId;
-    else if(sel.options.length>0) sel.value = sel.options[0].value;
-    renderNodeForm(sel.value);
+    else if(currentValue && findNodeById(specData.nodes, currentValue)) sel.value = currentValue;
+    else if(specData.nodes?.length) sel.value = specData.nodes[0].id;
+
+    if(sel.value) renderNodeForm(sel.value);
     refreshStartSelect();
     notifySpecUpdated();
   }
@@ -127,8 +139,49 @@
       });
       typeSel.value = action.type || '';
       
-      const itemId = document.createElement('input'); itemId.type='text'; itemId.placeholder='itemId'; itemId.value = action.itemId || '';
-      const quantity = document.createElement('input'); quantity.type='number'; quantity.placeholder='1'; quantity.value = action.quantity || 1; quantity.min = 1;
+      // itemId入力フィールド（ドラッグ&ドロップ対応）
+      const itemIdContainer = document.createElement('div'); itemIdContainer.className = 'ne-action-item-container';
+      const itemIdLabel = document.createElement('span'); itemIdLabel.textContent = 'アイテムID';
+      const itemId = document.createElement('input'); itemId.type='text'; itemId.placeholder='アイテムID'; itemId.value = action.itemId || '';
+      const itemIdDropZone = document.createElement('div'); itemIdDropZone.className = 'ne-action-item-drop-zone'; itemIdDropZone.textContent = '📦 アイテムをドロップ';
+      itemIdDropZone.title = 'アイテムをドラッグ&ドロップしてIDを挿入';
+
+      itemIdContainer.appendChild(itemIdLabel);
+      itemIdContainer.appendChild(itemId);
+      itemIdContainer.appendChild(itemIdDropZone);
+      row.appendChild(itemIdContainer);
+
+      const quantity = document.createElement('input'); quantity.type='number'; quantity.min='1'; quantity.placeholder='個数'; quantity.value = action.quantity || 1;
+      
+      // ドラッグ&ドロップイベントリスナー（itemIdDropZone用）
+      itemIdDropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        itemIdDropZone.classList.add('drag-over');
+      });
+      itemIdDropZone.addEventListener('dragleave', (e) => {
+        e.preventDefault();
+        itemIdDropZone.classList.remove('drag-over');
+      });
+      itemIdDropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        itemIdDropZone.classList.remove('drag-over');
+        
+        const data = e.dataTransfer.getData('text/plain');
+        if(data) {
+          itemId.value = data;
+          updateAction();
+          alert('アイテムIDを挿入しました。');
+        }
+      });
+      
+      // クリックでアイテム選択ダイアログを開く
+      itemIdDropZone.addEventListener('click', () => {
+        const itemIdValue = prompt('アイテムIDを入力してください:');
+        if(itemIdValue && itemIdValue.trim()) {
+          itemId.value = itemIdValue.trim();
+          updateAction();
+        }
+      });
       
       // オーディオ関連の設定
       const audioUrl = document.createElement('input'); audioUrl.type='url'; audioUrl.placeholder='https://example.com/audio.mp3'; audioUrl.value = action.url || '';
@@ -289,7 +342,7 @@
       audioCrossfade.style.display = (isAudioAction && action.type === 'play_bgm') ? 'block' : 'none';
       audioFadeOut.style.display = (isAudioAction && action.type === 'stop_bgm') ? 'block' : 'none';
       
-      row.append(typeSel, itemId, quantity, consumeCheck, effectTypeSel, effectInput, variableKey, variableOperation, variableValue, audioUrl, audioVolumeLabel, audioVolume, audioLoop, audioFadeIn, audioCrossfade, audioFadeOut, del);
+      row.append(typeSel, itemIdContainer, quantity, consumeCheck, effectTypeSel, effectInput, variableKey, variableOperation, variableValue, audioUrl, audioVolumeLabel, audioVolume, audioLoop, audioFadeIn, audioCrossfade, audioFadeOut, del);
       actions.appendChild(row);
     });
   }
@@ -304,6 +357,27 @@
       const label = document.createElement('input'); label.type='text'; label.placeholder='ラベル'; label.value = c.label || '';
       const target = document.createElement('input'); target.type='text'; target.placeholder='target:id'; target.value = c.target || '';
       target.setAttribute('list', 'ne-node-id-list');
+      
+      // ドラッグ&ドロップでノードIDを挿入可能にする
+      target.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        target.classList.add('drag-over');
+      });
+      target.addEventListener('dragleave', (e) => {
+        e.preventDefault();
+        target.classList.remove('drag-over');
+      });
+      target.addEventListener('drop', (e) => {
+        e.preventDefault();
+        target.classList.remove('drag-over');
+        const data = e.dataTransfer.getData('text/plain');
+        if(data) {
+          target.value = data;
+          // 入力イベントをトリガー
+          target.dispatchEvent(new Event('input'));
+          alert('ノードIDを挿入しました。');
+        }
+      });
       
       // Conditions section
       const conditionsContainer = document.createElement('div'); conditionsContainer.className = 'ne-conditions';
@@ -515,6 +589,69 @@
     } catch(e){ console.error('NodeEditor.export', e); alert('JSON出力に失敗しました'); }
   }
 
+  function setupDragAndDrop(){
+    const imageDropZone = document.getElementById('ne-image-drop-zone');
+    const imageInput = document.getElementById('ne-node-image');
+
+    if(!imageDropZone || !imageInput) return;
+
+    // ドラッグオーバー時の処理
+    imageDropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      imageDropZone.classList.add('drag-over');
+    });
+
+    // ドラッグリーブ時の処理
+    imageDropZone.addEventListener('dragleave', (e) => {
+      e.preventDefault();
+      imageDropZone.classList.remove('drag-over');
+    });
+
+    // ドロップ時の処理
+    imageDropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      imageDropZone.classList.remove('drag-over');
+
+      const files = e.dataTransfer.files;
+      if(files.length > 0) {
+        const file = files[0];
+        if(file.type.startsWith('image/')) {
+          // 画像ファイルの場合、Data URLに変換して入力
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            imageInput.value = e.target.result;
+            // 入力イベントをトリガーして保存処理を実行
+            imageInput.dispatchEvent(new Event('input'));
+            alert('画像を挿入しました。保存してください。');
+          };
+          reader.readAsDataURL(file);
+        } else {
+          alert('画像ファイルのみドロップ可能です。');
+        }
+      }
+    });
+
+    // クリックでファイル選択ダイアログを開く
+    imageDropZone.addEventListener('click', () => {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/*';
+      input.onchange = (e) => {
+        const file = e.target.files[0];
+        if(file) {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            imageInput.value = e.target.result;
+            imageInput.dispatchEvent(new Event('input'));
+            alert('画像を挿入しました。保存してください。');
+          };
+          reader.readAsDataURL(file);
+        }
+      };
+      input.click();
+    });
+  }
+
   function bindUI(){
     const btnLoad = document.getElementById('ne-load');
     const btnSave = document.getElementById('ne-save');
@@ -524,12 +661,31 @@
     const btnRemoveNode = document.getElementById('ne-remove-node');
     const btnAddChoice = document.getElementById('ne-add-choice');
 
-    const { sel, startSel, id, title, text, image } = readUIRefs();
+    const actionMenu = document.getElementById('ne-action-menu');
+    if(actionMenu) actionMenu.addEventListener('change', () => {
+      const action = actionMenu.value;
+      if(!action) return;
 
-    if(btnLoad) btnLoad.addEventListener('click', loadFromStorage);
-    if(btnValidate) btnValidate.addEventListener('click', validateSpec);
-    if(btnSave) btnSave.addEventListener('click', saveToStorage);
-    if(btnExport) btnExport.addEventListener('click', exportJson);
+      switch(action) {
+        case 'load':
+          loadFromStorage();
+          break;
+        case 'save':
+          saveToStorage();
+          break;
+        case 'export':
+          exportJson();
+          break;
+        case 'validate':
+          validateSpec();
+          break;
+      }
+
+      // リセット
+      actionMenu.value = '';
+    });
+
+    const { sel, startSel, id, title, text, image } = readUIRefs();
 
     if(sel) sel.addEventListener('change', () => renderNodeForm(sel.value));
     if(startSel) startSel.addEventListener('change', () => { if(!specData.meta) specData.meta = {}; specData.meta.start = startSel.value; setDirty(true); notifySpecUpdated(); });
@@ -602,6 +758,9 @@
       notifySpecUpdated();
     });
 
+    // ドラッグ&ドロップ処理
+    setupDragAndDrop();
+
     if(btnAddChoice) btnAddChoice.addEventListener('click', () => {
       const { sel } = readUIRefs(); const node = findNodeById(specData.nodes, sel.value); if(!node) return;
       addChoice(node, { label:'', target:'' });
@@ -610,14 +769,55 @@
       notifySpecUpdated();
     });
 
-    const btnAddAction = document.getElementById('ne-add-action');
-    if(btnAddAction) btnAddAction.addEventListener('click', () => {
+    const actionTypeDropdown = document.getElementById('ne-action-type-dropdown');
+    if(actionTypeDropdown) actionTypeDropdown.addEventListener('change', () => {
+      const actionType = actionTypeDropdown.value;
+      if(!actionType) return;
+      
       const { sel } = readUIRefs(); const node = findNodeById(specData.nodes, sel.value); if(!node) return;
       if(!Array.isArray(node.actions)) node.actions = [];
-      node.actions.push({ type: 'add_item', itemId: '', quantity: 1 });
+      
+      // アクションタイプに応じたデフォルト値を設定
+      let newAction = { type: actionType };
+      switch(actionType) {
+        case 'add_item':
+        case 'remove_item':
+          newAction.itemId = '';
+          newAction.quantity = 1;
+          break;
+        case 'use_item':
+          newAction.itemId = '';
+          newAction.quantity = 1;
+          newAction.consume = true;
+          newAction.effect = { type: 'show_text', text: '' };
+          break;
+        case 'set_variable':
+          newAction.key = '';
+          newAction.operation = 'set';
+          newAction.value = 0;
+          break;
+        case 'play_bgm':
+        case 'play_se':
+          newAction.url = '';
+          newAction.volume = 1.0;
+          newAction.loop = actionType.includes('bgm');
+          break;
+        case 'stop_bgm':
+        case 'stop_se':
+          newAction.url = '';
+          break;
+        case 'show_text':
+          newAction.effect = { type: 'show_text', text: '' };
+          break;
+      }
+      
+      node.actions.push(newAction);
       renderActions(node);
       setDirty(true);
       notifySpecUpdated();
+      
+      // ドロップダウンをリセット
+      actionTypeDropdown.value = '';
     });
 
     // Partial export UI bindings
