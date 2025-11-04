@@ -8,6 +8,8 @@ All notable changes to this project will be documented in this file.
   - `docs/issues/42-blind-spot-proposals.md`: セキュリティ/パフォーマンス/アクセシビリティ/機能拡張の盲点提案
   - `docs/issues/43-future-tasks-summary.md`: 高優先度タスクの一覧表
   - プロジェクトの今後の方向性整理
+- docs: エディターのストーリー作成支援機能検討を追加 [#44]
+  - `docs/issues/44-editor-story-creation-support.md`: テンプレート/自動生成/AI支援機能の提案
 
 ## [2025-10-30]
 
