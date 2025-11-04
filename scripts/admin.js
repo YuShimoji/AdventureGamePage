@@ -1059,30 +1059,54 @@
           if (el) el.textContent = label;
         });
       }
-    } catch {}
-  };
 
   // admin-boot-complete イベントを待つ
   if (document.readyState === 'loading') {
-    document.addEventListener('admin-boot-complete', initAdmin);
+    document.addEventListener('admin-boot-complete', (event) => {
+      // SavePreview初期化失敗時は一部機能を制限
+      const bootDetail = event?.detail || {};
+      const savePreviewFailed = bootDetail.savePreviewFailed;
+
+      if (savePreviewFailed) {
+        console.warn('[DEBUG] SavePreview initialization failed, limiting functionality');
+        // SavePreview関連の機能を無効化
+        const btnQuickPreview = document.getElementById('btn-quick-preview');
+        if (btnQuickPreview) {
+          btnQuickPreview.disabled = true;
+          btnQuickPreview.title = '保存プレビュー機能が利用できません';
+          btnQuickPreview.style.opacity = '0.5';
+        }
+      }
+      initAdmin(event);
+    });
   } else {
     // DOMが既に準備済みの場合は即時実行
     initAdmin();
   }
-
-  function initAdmin(event) {
-    // SavePreview初期化失敗時は一部機能を制限
-    const bootDetail = event?.detail || {};
-    const savePreviewFailed = bootDetail.savePreviewFailed;
-
-    if (savePreviewFailed) {
-      console.warn('[DEBUG] SavePreview initialization failed, limiting functionality');
-      // SavePreview関連の機能を無効化
-      const btnQuickPreview = document.getElementById('btn-quick-preview');
-      if (btnQuickPreview) {
-        btnQuickPreview.disabled = true;
-        btnQuickPreview.title = '保存プレビュー機能が利用できません';
-        btnQuickPreview.style.opacity = '0.5';
-      }
-    }
 })();
+
+// ...
+
+// APP_CONFIGに基づきヘッダー固定切替とアイコンのテキスト化を追加
+try {
+  const sticky = !!(window.APP_CONFIG?.ui?.stickyHeader);
+  document.body.classList.toggle('no-sticky', !sticky);
+} catch {}
+
+try {
+  if (window.APP_CONFIG?.ui?.iconStyle === 'text') {
+    const replacements = [
+      ['btn-theme', 'テーマ'],
+      ['btn-toggle-sidebar', 'ツール'],
+      ['btn-quick-zen', 'Zen'],
+      ['btn-quick-sidebar', 'ツール'],
+      ['btn-quick-theme', 'テーマ'],
+      ['btn-quick-preview', '保存'],
+      ['btn-quick-memos', 'メモ']
+    ];
+    replacements.forEach(([id, label]) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = label;
+    });
+  }
+} catch {}

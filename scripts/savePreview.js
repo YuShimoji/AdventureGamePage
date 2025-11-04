@@ -111,33 +111,60 @@
         listenersAttached: false,
         open: (options = {}) => {
           if (this.isOpen()) return false;
-          this.overlay.lastFocused = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-          this.panel.removeAttribute("hidden");
-          this.panel.setAttribute("aria-hidden", "false");
+
+          // 現在のfocus要素を保存（閉じる時に戻すため）
+          this.overlay.lastFocused = document.activeElement;
+
           this.panel.dataset.state = "open";
           this.panel.classList.add("is-open");
+          this.panel.removeAttribute("aria-hidden");
+          this.panel.removeAttribute("hidden");
           this.attachOverlayListeners();
           this.state.isOpen = true;
           if (options.focus !== false) {
             setTimeout(() => {
-              try { this.panel.focus({ preventScroll: true }); } catch (_) {}
+              try {
+                // パネル内の最初のfocusable要素にfocus
+                const focusableElements = this.panel.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+                const firstFocusable = focusableElements.length > 0 ? focusableElements[0] : this.panel;
+                firstFocusable.focus({ preventScroll: true });
+              } catch (_) {}
             }, 0);
           }
           return true;
         },
         close: (options = {}) => {
           if (!this.isOpen()) return false;
-          this.panel.dataset.state = "closed";
-          this.panel.classList.remove("is-open");
-          this.panel.setAttribute("aria-hidden", "true");
-          this.panel.setAttribute("hidden", "");
-          this.detachOverlayListeners();
-          this.state.isOpen = false;
+
+          // まずfocusをパネル外に移動させる（aria-hidden警告対策）
           if (options.restoreFocus !== false && this.overlay.lastFocused && typeof this.overlay.lastFocused.focus === "function") {
-            setTimeout(() => {
-              try { this.overlay.lastFocused.focus(); } catch (_) {}
-            }, 0);
+            try {
+              this.overlay.lastFocused.focus({ preventScroll: true });
+            } catch (_) {
+              // fallback: 開くボタンにfocus
+              const openBtn = document.getElementById("btn-quick-preview");
+              if (openBtn && typeof openBtn.focus === "function") {
+                openBtn.focus({ preventScroll: true });
+              }
+            }
+          } else {
+            // lastFocusedがない場合も開くボタンにfocus
+            const openBtn = document.getElementById("btn-quick-preview");
+            if (openBtn && typeof openBtn.focus === "function") {
+              openBtn.focus({ preventScroll: true });
+            }
           }
+
+          // 少し遅延してパネルを閉じる（focus移動が完了してから）
+          setTimeout(() => {
+            this.panel.dataset.state = "closed";
+            this.panel.classList.remove("is-open");
+            this.panel.setAttribute("aria-hidden", "true");
+            this.panel.setAttribute("hidden", "");
+            this.detachOverlayListeners();
+            this.state.isOpen = false;
+          }, 10);
+
           return true;
         },
         isOpen: () => this.state.isOpen && this.panel.dataset.state === "open" && !this.panel.hasAttribute("hidden")
