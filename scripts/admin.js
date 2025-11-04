@@ -1069,4 +1069,20 @@
     // DOMが既に準備済みの場合は即時実行
     initAdmin();
   }
+
+  function initAdmin(event) {
+    // SavePreview初期化失敗時は一部機能を制限
+    const bootDetail = event?.detail || {};
+    const savePreviewFailed = bootDetail.savePreviewFailed;
+
+    if (savePreviewFailed) {
+      console.warn('[DEBUG] SavePreview initialization failed, limiting functionality');
+      // SavePreview関連の機能を無効化
+      const btnQuickPreview = document.getElementById('btn-quick-preview');
+      if (btnQuickPreview) {
+        btnQuickPreview.disabled = true;
+        btnQuickPreview.title = '保存プレビュー機能が利用できません';
+        btnQuickPreview.style.opacity = '0.5';
+      }
+    }
 })();

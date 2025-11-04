@@ -203,8 +203,45 @@
 
       // 4.6 SavePreviewPanelManagerの初期化（admin.jsより先に実行）
       if (window.SavePreviewPanelManager && window.APP_CONFIG?.ui?.showSavePreview) {
-        await window.SavePreviewPanelManager.initialize();
-        log('info', 'SavePreviewPanelManager initialized');
+        console.log('[DEBUG] SavePreviewPanelManager found, initializing...');
+        console.log('[DEBUG] APP_CONFIG.ui.showSavePreview:', window.APP_CONFIG?.ui?.showSavePreview);
+        try {
+          await window.SavePreviewPanelManager.initialize();
+          console.log('[DEBUG] SavePreviewPanelManager initialized successfully');
+          console.log('[DEBUG] SavePreviewPanelManager.isOpen():', window.SavePreviewPanelManager.isOpen());
+
+          // パネルの初期状態を確認
+          const panel = document.getElementById('preview-panel');
+          console.log('[DEBUG] After initialization - panel.hidden:', panel?.hidden);
+          console.log('[DEBUG] After initialization - panel.dataset.state:', panel?.dataset?.state);
+          console.log('[DEBUG] After initialization - panel.classList:', panel?.classList?.toString());
+
+        } catch (e) {
+          console.error('[DEBUG] SavePreviewPanelManager initialization failed:', e);
+          log('error', 'SavePreviewPanelManager initialization failed', { error: e.message });
+
+          // 初期化失敗時はadmin.jsの実行をブロック
+          const errorMsg = `保存プレビューパネルの初期化に失敗しました: ${e.message}\\n管理画面の機能が制限される可能性があります。`;
+          console.error(errorMsg);
+
+          // エラーモーダルを表示し、admin-boot-completeイベントを発火
+          showBootError(new Error(errorMsg));
+
+          // admin-boot-completeを発火するが、admin.jsの実行は許可しない
+          setTimeout(() => {
+            document.dispatchEvent(new CustomEvent('admin-boot-complete', {
+              detail: { error: e, config: window.APP_CONFIG, savePreviewFailed: true }
+            }));
+            console.log('[DEBUG] admin-boot-complete fired with SavePreview failure');
+          }, 100);
+
+          return; // 初期化を中止
+        }
+      } else {
+        console.log('[DEBUG] SavePreviewPanelManager not found or disabled:', {
+          manager: !!window.SavePreviewPanelManager,
+          config: window.APP_CONFIG?.ui?.showSavePreview
+        });
       }
 
       // 5. 初期フォーカス設定（Zenモード以外）

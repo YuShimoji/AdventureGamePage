@@ -20,15 +20,59 @@
 
     // 初期化 - DOM準備後に一度だけ呼ばれる
     async initialize() {
-      if (this.initialized) return;
-      if (!this.getElements()) {
-        console.warn('[SavePreviewPanelManager] Required elements not found');
-        return;
+      try {
+        if (this.initialized) {
+          console.log('[DEBUG] SavePreviewPanelManager already initialized');
+          return;
+        }
+
+        console.log('[DEBUG] SavePreviewPanelManager.initialize() called');
+
+        // 必須要素の確認
+        if (!this.getElements()) {
+          console.error('[DEBUG] SavePreviewPanelManager] Required elements not found');
+          throw new Error('Required DOM elements not found');
+        }
+
+        console.log('[DEBUG] Elements found, ensuring overlay...');
+        this.ensureOverlay();
+
+        console.log('[DEBUG] Attaching listeners...');
+        this.attachListeners();
+
+        this.initialized = true;
+        console.log('[DEBUG] SavePreviewPanelManager initialization complete');
+
+        // 初期化後の状態確認
+        console.log('[DEBUG] Final panel state after initialization:');
+        console.log('[DEBUG] panel.hidden:', this.panel?.hidden);
+        console.log('[DEBUG] panel.dataset.state:', this.panel?.dataset?.state);
+        console.log('[DEBUG] panel.classList:', this.panel?.classList?.toString());
+        console.log('[DEBUG] overlay.isOpen():', this.overlay?.isOpen());
+
+        // 初期状態を強制的に設定
+        this.forceInitialState();
+
+      } catch (error) {
+        console.error('[DEBUG] SavePreviewPanelManager initialization failed:', error);
+        this.initialized = false;
+        throw error;
       }
-      this.ensureOverlay();
-      this.attachListeners();
-      this.initialized = true;
-      console.debug('[SavePreviewPanelManager] Initialized');
+    }
+
+    // 初期状態を強制的に設定（安全策）
+    forceInitialState() {
+      if (!this.panel) return;
+
+      // パネルを必ず非表示に
+      this.panel.setAttribute('hidden', '');
+      this.panel.dataset.state = 'closed';
+      this.panel.classList.remove('is-open');
+      this.panel.setAttribute('aria-hidden', 'true');
+
+      console.log('[DEBUG] Force initial state applied');
+      console.log('[DEBUG] panel.hidden:', this.panel.hidden);
+      console.log('[DEBUG] panel.dataset.state:', this.panel.dataset.state);
     }
 
     // DOM要素の取得
