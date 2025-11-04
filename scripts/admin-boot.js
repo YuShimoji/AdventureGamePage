@@ -178,7 +178,7 @@
   }
 
   // 初期化のメイン関数
-  function boot() {
+  async function boot() {
     try {
       log('info', '管理画面ブート開始');
 
@@ -200,6 +200,12 @@
 
       // 4.5 ノードエディタモーダルの初期化
       initNodeEditorModal();
+
+      // 4.6 SavePreviewPanelManagerの初期化（admin.jsより先に実行）
+      if (window.SavePreviewPanelManager && window.APP_CONFIG?.ui?.showSavePreview) {
+        await window.SavePreviewPanelManager.initialize();
+        log('info', 'SavePreviewPanelManager initialized');
+      }
 
       // 5. 初期フォーカス設定（Zenモード以外）
       if (!window.APP_CONFIG?.editor?.startZen) {

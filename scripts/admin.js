@@ -360,20 +360,7 @@
     if (btnQuickPreview && !(window.APP_CONFIG?.ui?.showSavePreview)) {
       // フラグがOFFでも、従来の保存一覧（savesPanel）をフォールバックとして使用するため、ボタンは非表示にしない
     }
-    if (btnQuickPreview) {
-      btnQuickPreview.addEventListener('click', () => {
-        // 新しい保存プレビューを優先
-        if (window.APP_CONFIG?.ui?.showSavePreview && window.SavePreview) {
-          window.SavePreview.toggle();
-          return;
-        }
-        // フォールバック：従来の保存一覧
-        if (!savesPanel) return;
-        const willOpen = savesPanel.hidden === true;
-        savesPanel.hidden = !willOpen;
-        if (willOpen && typeof renderSaves === 'function') { renderSaves(); }
-      });
-    }
+    // btn-quick-previewのイベントリスナーはPanelManagerで設定されるため、ここでは設定しない
 
     // ---------- Theme Panel Initialization ----------
     (function initThemePanel(){
