@@ -913,7 +913,64 @@
 
   // Expose utils for tests
   window.NodeEditorUtils = { ensureUniqueId, findNodeById, upsertNode, removeNode, addChoice, removeChoice, moveChoice, renameReferences, computeUnresolvedTargets, collectSubgraph, normalizeSpec };
-  // Lightweight public API for other panels (e.g., Mermaid preview)
-  window.NodeEditorAPI = { getSpec: () => normalizeSpec(specData) };
+  window.NodeEditorAPI = {
+    getSpec: () => normalizeSpec(specData),
+    getSelectedNodeId: () => {
+      const { sel } = readUIRefs();
+      return (sel && sel.value) || '';
+    },
+    selectNode: (id) => {
+      const { sel } = readUIRefs();
+      if (!sel || !findNodeById(specData.nodes, id)) return false;
+      sel.value = id;
+      renderNodeForm(id);
+      return true;
+    },
+    createNode: (baseId = 'node:new') => {
+      const ids = (specData.nodes || []).map(n => n.id);
+      const nid = ensureUniqueId(baseId, ids);
+      const node = { id: nid, title: '', text: '', choices: [] };
+      upsertNode(specData.nodes, node);
+      refreshNodeList(nid);
+      refreshExportList();
+      refreshNodeIdDatalist();
+      setDirty(true);
+      refreshUnresolvedPanel();
+      notifySpecUpdated();
+      return nid;
+    },
+    updateNodeText: (id, textVal) => {
+      const n = findNodeById(specData.nodes, id);
+      if (!n) return false;
+      n.text = textVal || '';
+      const { sel, text } = readUIRefs();
+      if (text && sel && sel.value === id) {
+        text.value = n.text;
+      }
+      setDirty(true);
+      notifySpecUpdated();
+      return true;
+    },
+    addChoiceToNode: (id, choice) => {
+      const n = findNodeById(specData.nodes, id);
+      if (!n) return false;
+      addChoice(n, choice || { label: '', target: '' });
+      renderChoices(n);
+      setDirty(true);
+      refreshUnresolvedPanel();
+      notifySpecUpdated();
+      return true;
+    },
+    addActionToNode: (id, action) => {
+      const n = findNodeById(specData.nodes, id);
+      if (!n) return false;
+      if (!Array.isArray(n.actions)) n.actions = [];
+      n.actions.push(action);
+      renderActions(n);
+      setDirty(true);
+      notifySpecUpdated();
+      return true;
+    }
+  };
 
 })();

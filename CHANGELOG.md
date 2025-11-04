@@ -10,13 +10,18 @@ All notable changes to this project will be documented in this file.
   - プロジェクトの今後の方向性整理
 - docs: エディターのストーリー作成支援機能検討を追加 [#44]
   - `docs/issues/44-editor-story-creation-support.md`: テンプレート/自動生成/AI支援機能の提案
+- feat(editor): ストーリービルダー（根幹ブロックUI）を追加 [#45]
+  - `admin.html`: ストーリービルダーパレット（ボタンクリック/ドラッグ&ドロップ）
+  - `scripts/storyBuilder.js`: ノード選択と本文ワンクリック編集の同期、DnDで選択肢/アクション追加
+  - `scripts/nodeEditor.js`: NodeEditorAPI拡張（create/select/update/addChoice/addAction）
+  - `tests/nodeEditor.api.spec.js`: APIのユニットテストを追加
 
 ## [2025-10-30]
 
 - feat(play): マルチセッション保存システム実装 [#32]
   - 複数セーブスロット管理（作成/削除/名前変更/コピー）
   - スロットごとのメタデータ保存（最終更新日時/プレイ時間/現在位置/進行度）
-  - UIパネル追加（💾ボタンで開閉、読み込み/上書き/削除操作）
+  - UIパネル追加（ボタンで開閉、読み込み/上書き/削除操作）
   - レスポンシブデザイン対応
 - fix(admin): 管理画面モーダル表示制御強化
   - Mermaid/ノードエディタ/プレイテスト各モーダルのhidden属性対応

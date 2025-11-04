@@ -234,6 +234,34 @@
           </div>
         </details>
 
+        <!-- Story Builder -->
+        <details class="agp-accordion" id="acc-story-builder" data-accordion-id="story-builder">
+          <summary data-has-hint>
+            <span class="summary-label">ストーリービルダー</span>
+            <button class="accordion-hint-toggle" type="button" aria-expanded="false" aria-label="ストーリービルダーのヒント" data-accordion-hint="story-builder">?</button>
+          </summary>
+          <div class="accordion-content">
+            <div class="accordion-hint" data-hint-for="story-builder" hidden>
+              <!-- Filled by admin.js hint system if configured -->
+            </div>
+            <section id="story-builder" class="card">
+              <h3>ストーリービルダー（ドラッグ＆ドロップ／クリック挿入）</h3>
+              <div id="sb-palette" class="sb-palette" style="display:flex; gap:8px; flex-wrap:wrap;">
+                <button class="btn" data-sb-block="new_node" title="新規ノードを作成">+ ノード</button>
+                <button class="btn" data-sb-block="choice" title="選択肢を追加（ne-choicesにドロップ可）">+ 選択肢</button>
+                <button class="btn" data-sb-block="add_item" title="アイテム追加（ne-actionsにドロップ）">+ アイテム追加</button>
+                <button class="btn" data-sb-block="use_item" title="アイテム使用（ne-actionsにドロップ）">+ アイテム使用</button>
+                <button class="btn" data-sb-block="set_variable" title="変数操作（ne-actionsにドロップ）">+ 変数設定</button>
+                <button class="btn" data-sb-block="clear_inventory" title="インベントリクリア（ne-actionsにドロップ）">インベントリクリア</button>
+              </div>
+              <p class="muted" style="margin-top:8px;">
+                ・パレットのボタンはクリックで挿入、または「アクション」「選択肢」の領域へドラッグ＆ドロップでも追加できます。<br/>
+                ・ノード選択時、本文はメインのエディター（左側）で直接編集できます（ワンクリック編集）。
+              </p>
+            </section>
+          </div>
+        </details>
+
         <details class="agp-accordion" id="acc-mermaid" data-accordion-id="mermaid">
           <summary data-has-hint>
             <span class="summary-label">Mermaid設定</span>
@@ -466,4 +494,5 @@
     <script src="scripts/mermaidPreview.js"></script>
     <script src="scripts/playtest.js"></script>
     <script src="scripts/admin-boot.js"></script>
+    <script src="scripts/storyBuilder.js"></script>
     <script src="scripts/admin.js"></script>
