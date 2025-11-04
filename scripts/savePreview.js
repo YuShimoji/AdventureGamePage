@@ -136,9 +136,12 @@
         close: (options = {}) => {
           if (!this.isOpen()) return false;
 
-          // 即座に状態を更新（再呼び出し防止）
+          // 即座に状態とDOM属性を更新（再呼び出し防止）
           this.state.isOpen = false;
           this.panel.dataset.state = "closed";
+          this.panel.classList.remove("is-open");
+          this.panel.setAttribute("aria-hidden", "true");
+          this.panel.setAttribute("hidden", "");
           this.detachOverlayListeners();
 
           // focusを外部に移動
@@ -160,14 +163,9 @@
             }
           };
 
-          // focus移動後にDOM属性を更新
+          // focus移動
           requestAnimationFrame(() => {
             restoreFocus();
-            requestAnimationFrame(() => {
-              this.panel.classList.remove("is-open");
-              this.panel.setAttribute("aria-hidden", "true");
-              this.panel.setAttribute("hidden", "");
-            });
           });
 
           return true;

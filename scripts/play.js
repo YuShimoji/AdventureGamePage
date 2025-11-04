@@ -10,6 +10,9 @@
       window.PlayInventory.init(engine);
       window.PlayInput.init(engine);
 
+      // Ensure modal is hidden on initialization
+      const saveLoadModal = window.PlaySave.getModalElement?.() || document.getElementById('save-load-modal');
+
       // Setup basic UI interactions
       if (elements.btnRestart) {
         elements.btnRestart.addEventListener("click", () => engine.reset());
@@ -177,22 +180,14 @@
 
     // Override existing modal functions to include focus management
     const originalShowModal = window.showModal || (() => {});
-    window.showModal = function(type) {
-      showSaveLoadModal(type);
-      const modal = document.getElementById('save-load-modal');
-      if (modal) {
-        openModalWithFocus(modal);
-      }
+    window.showModal = function(type = 'save') {
+      window.PlaySave.showModal?.(type);
+      originalShowModal(type);
     };
 
-    // Update existing modal close handlers to use focus management
-    if (modalCloseBtn) {
-      const originalClick = modalCloseBtn.onclick || (() => {});
-      modalCloseBtn.addEventListener('click', () => {
-        originalClick();
-        const modal = document.getElementById('save-load-modal');
-        closeModalWithFocus(modal);
-      });
+    if (saveLoadModal) {
+      saveLoadModal.addEventListener('agp-play-save-shown', () => openModalWithFocus(saveLoadModal));
+      saveLoadModal.addEventListener('agp-play-save-hidden', () => closeModalWithFocus(saveLoadModal));
     }
 
     // Theme panel focus management

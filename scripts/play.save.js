@@ -9,6 +9,7 @@
     },
 
     setupModal: function() {
+      const playSave = this;
       const modal = document.getElementById('save-load-modal');
       const modalTitle = document.getElementById('modal-title');
       const savePanel = document.getElementById('save-panel');
@@ -27,44 +28,97 @@
         modal.style.display = 'none';
       }
 
-      const showModal = (isSaveMode) => {
+      const applyMode = (mode) => {
         if (!modal) return;
-        modalTitle.textContent = isSaveMode ? 'ゲームデータを保存' : 'ゲームデータを読み込み';
-        savePanel.hidden = !isSaveMode;
-        loadPanel.hidden = isSaveMode;
-        if (isSaveMode) {
-          saveNameInput.value = '';
-          saveNameInput.focus();
-        } else {
-          this.loadSavedGames(savedGamesList);
+        const normalizedMode = mode === 'load' ? 'load' : 'save';
+        playSave.currentMode = normalizedMode;
+        const isSaveMode = normalizedMode !== 'load';
+        if (modalTitle) {
+          modalTitle.textContent = isSaveMode ? 'ゲームデータを保存' : 'ゲームデータを読み込み';
         }
+        if (savePanel) {
+          savePanel.hidden = !isSaveMode;
+        }
+        if (loadPanel) {
+          loadPanel.hidden = isSaveMode;
+        }
+        if (isSaveMode) {
+          if (saveNameInput) {
+            saveNameInput.value = '';
+            setTimeout(() => {
+              if (document.activeElement && document.activeElement.closest('#save-load-modal') === modal) {
+                return;
+              }
+              saveNameInput.focus();
+            }, 150);
+          }
+        } else if (savedGamesList) {
+          playSave.loadSavedGames(savedGamesList);
+        }
+      };
+
+      const showModal = (mode = 'save') => {
+        if (!modal) return;
+        applyMode(mode);
         modal.hidden = false;
         modal.style.display = 'flex';
+        modal.dispatchEvent(new CustomEvent('agp-play-save-shown', {
+          bubbles: true,
+          detail: { mode: playSave.currentMode }
+        }));
       };
 
       const hideModal = () => {
-        if (modal) {
-          modal.hidden = true;
-          modal.style.display = 'none';
-        }
+        if (!modal) return;
+        modal.hidden = true;
+        modal.style.display = 'none';
+        modal.dispatchEvent(new CustomEvent('agp-play-save-hidden', { bubbles: true }));
+      };
+
+      playSave.getModalElement = () => modal;
+      playSave.showModal = (mode = 'save') => {
+        showModal(mode);
+      };
+      playSave.hideModal = () => {
+        hideModal();
+      };
+
+      // Legacy compatibility for existing callers
+      window.showSaveLoadModal = (type) => {
+        playSave.showModal(type);
+      };
+      window.hideSaveLoadModal = () => {
+        playSave.hideModal();
       };
 
       // Event listeners
       if (btnSave) {
-        btnSave.addEventListener('click', () => showModal(true));
+        btnSave.addEventListener('click', () => {
+          if (typeof window.showModal === 'function') {
+            window.showModal('save');
+          } else {
+            playSave.showModal('save');
+          }
+        });
       }
       if (btnLoad) {
-        btnLoad.addEventListener('click', () => showModal(false));
+        btnLoad.addEventListener('click', () => {
+          if (typeof window.showModal === 'function') {
+            window.showModal('load');
+          } else {
+            playSave.showModal('load');
+          }
+        });
       }
       if (modalCloseBtn) {
-        modalCloseBtn.addEventListener('click', hideModal);
+        modalCloseBtn.addEventListener('click', playSave.hideModal);
       }
       if (saveConfirmBtn) {
         saveConfirmBtn.addEventListener('click', () => {
           const slotName = saveNameInput.value.trim();
           if (slotName) {
             this.saveGameToStorage(this.engine.saveGame(slotName));
-            hideModal();
+            playSave.hideModal();
             alert('ゲームデータを保存しました');
           }
         });
@@ -76,7 +130,7 @@
       // Close on backdrop click
       if (modal) {
         modal.addEventListener('click', (e) => {
-          if (e.target === modal) hideModal();
+          if (e.target === modal) playSave.hideModal();
         });
       }
     },
@@ -139,8 +193,7 @@
         loadBtn.textContent = '読み込み';
         loadBtn.addEventListener('click', () => {
           if (this.engine.loadGame(save)) {
-            document.getElementById('save-load-modal').hidden = true;
-            document.getElementById('save-load-modal').style.display = 'none';
+            playSave.hideModal();
             alert('ゲームデータを読み込みました');
           } else {
             alert('ゲームデータの読み込みに失敗しました');
