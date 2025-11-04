@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2025-11-04]
+
+- docs: OpenSpecに盲点提案と今後のタスクまとめを追加 [#42, #43]
+  - `docs/issues/42-blind-spot-proposals.md`: セキュリティ/パフォーマンス/アクセシビリティ/機能拡張の盲点提案
+  - `docs/issues/43-future-tasks-summary.md`: 高優先度タスクの一覧表
+  - プロジェクトの今後の方向性整理
+
 ## [2025-10-30]
 
 - feat(play): マルチセッション保存システム実装 [#32]
