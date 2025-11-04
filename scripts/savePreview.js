@@ -136,34 +136,39 @@
         close: (options = {}) => {
           if (!this.isOpen()) return false;
 
-          // まずfocusをパネル外に移動させる（aria-hidden警告対策）
-          if (options.restoreFocus !== false && this.overlay.lastFocused && typeof this.overlay.lastFocused.focus === "function") {
-            try {
-              this.overlay.lastFocused.focus({ preventScroll: true });
-            } catch (_) {
-              // fallback: 開くボタンにfocus
+          // 即座に状態を更新（再呼び出し防止）
+          this.state.isOpen = false;
+          this.panel.dataset.state = "closed";
+          this.detachOverlayListeners();
+
+          // focusを外部に移動
+          const restoreFocus = () => {
+            if (options.restoreFocus !== false && this.overlay.lastFocused && typeof this.overlay.lastFocused.focus === "function") {
+              try {
+                this.overlay.lastFocused.focus({ preventScroll: true });
+              } catch (_) {
+                const openBtn = document.getElementById("btn-quick-preview");
+                if (openBtn && typeof openBtn.focus === "function") {
+                  openBtn.focus({ preventScroll: true });
+                }
+              }
+            } else {
               const openBtn = document.getElementById("btn-quick-preview");
               if (openBtn && typeof openBtn.focus === "function") {
                 openBtn.focus({ preventScroll: true });
               }
             }
-          } else {
-            // lastFocusedがない場合も開くボタンにfocus
-            const openBtn = document.getElementById("btn-quick-preview");
-            if (openBtn && typeof openBtn.focus === "function") {
-              openBtn.focus({ preventScroll: true });
-            }
-          }
+          };
 
-          // 少し遅延してパネルを閉じる（focus移動が完了してから）
-          setTimeout(() => {
-            this.panel.dataset.state = "closed";
-            this.panel.classList.remove("is-open");
-            this.panel.setAttribute("aria-hidden", "true");
-            this.panel.setAttribute("hidden", "");
-            this.detachOverlayListeners();
-            this.state.isOpen = false;
-          }, 10);
+          // focus移動後にDOM属性を更新
+          requestAnimationFrame(() => {
+            restoreFocus();
+            requestAnimationFrame(() => {
+              this.panel.classList.remove("is-open");
+              this.panel.setAttribute("aria-hidden", "true");
+              this.panel.setAttribute("hidden", "");
+            });
+          });
 
           return true;
         },

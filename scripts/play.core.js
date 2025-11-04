@@ -2,27 +2,23 @@
   // Play Core Module - Game initialization and engine setup
   window.PlayCore = {
     init: function() {
-      return new Promise((resolve) => {
-        document.addEventListener("DOMContentLoaded", () => {
-          const elements = this.getUIElements();
-          const game = this.loadGameData();
-          const engine = this.createEngine(elements, game);
+      const elements = this.getUIElements();
+      const game = this.loadGameData();
+      const engine = this.createEngine(elements, game);
 
-          // Load progress
-          try {
-            engine.loadProgress();
-          } catch (e) {
-            console.error("進行データの読み込みエラー:", e);
-            alert("進行データの読み込みに失敗しました。最初から開始します。");
-            engine.reset();
-          }
+      // Load progress
+      try {
+        engine.loadProgress();
+      } catch (e) {
+        console.error("進行データの読み込みエラー:", e);
+        alert("進行データの読み込みに失敗しました。最初から開始します。");
+        engine.reset();
+      }
 
-          // Initial render
-          engine.render();
+      // Initial render
+      engine.render();
 
-          resolve({ elements, engine, game });
-        });
-      });
+      return { elements, engine, game };
     },
 
     getUIElements: function() {

@@ -1,9 +1,9 @@
 (function () {
   // Main play.js - UI rendering and coordination after modularization
-  document.addEventListener("DOMContentLoaded", async () => {
+  document.addEventListener("DOMContentLoaded", () => {
     try {
       // Initialize core modules
-      const { elements, engine, game } = await window.PlayCore.init();
+      const { elements, engine, game } = window.PlayCore.init();
 
       // Initialize feature modules
       window.PlaySave.init(engine, game.title);

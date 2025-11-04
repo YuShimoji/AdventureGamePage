@@ -1059,6 +1059,8 @@
           if (el) el.textContent = label;
         });
       }
+    } catch {}
+  };
 
   // admin-boot-complete イベントを待つ
   if (document.readyState === 'loading') {
@@ -1084,8 +1086,6 @@
     initAdmin();
   }
 })();
-
-// ...
 
 // APP_CONFIGに基づきヘッダー固定切替とアイコンのテキスト化を追加
 try {

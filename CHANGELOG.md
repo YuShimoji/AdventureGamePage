@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 ## [2025-11-04]
 
+- fix: 3つの重大なバグを緊急修正
+  - `admin.js`: try-catch構文エラー修正（管理画面読み込み失敗の原因）
+  - `savePreview.js`: パネルclose処理改善（状態の即座更新、requestAnimationFrame使用）
+  - `play.core.js`: 二重DOMContentLoadedリスナー削除（プレイモード初期化フリーズの原因）
+  - プレイモード真っ黒問題、保存プレビュー閉じない問題を解決
 - docs: OpenSpecに盲点提案と今後のタスクまとめを追加 [#42, #43]
   - `docs/issues/42-blind-spot-proposals.md`: セキュリティ/パフォーマンス/アクセシビリティ/機能拡張の盲点提案
   - `docs/issues/43-future-tasks-summary.md`: 高優先度タスクの一覧表
