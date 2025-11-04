@@ -204,6 +204,40 @@
       });
     }
 
+    // Inventory Panel Management
+    const inventoryPanel = document.getElementById('inventory-panel');
+    const inventoryCloseBtn = document.getElementById('inventory-close');
+    const inventoryList = document.getElementById('inventory-list');
+    const btnInventory = document.getElementById('btn-inventory');
+
+    // Set ARIA attributes for inventory panel
+    if (inventoryPanel) {
+      inventoryPanel.setAttribute('role', 'dialog');
+      inventoryPanel.setAttribute('aria-modal', 'true');
+      inventoryPanel.setAttribute('aria-labelledby', 'inventory-title');
+    }
+
+    function showInventoryPanel() {
+      window.PlayInventory.updateInventoryList(inventoryList);
+      if (inventoryPanel) {
+        openModalWithFocus(inventoryPanel);
+        // Update aria-expanded
+        if (btnInventory) {
+          btnInventory.setAttribute('aria-expanded', 'true');
+        }
+      }
+    }
+
+    function hideInventoryPanel() {
+      if (inventoryPanel) {
+        closeModalWithFocus(inventoryPanel);
+        // Update aria-expanded
+        if (btnInventory) {
+          btnInventory.setAttribute('aria-expanded', 'false');
+        }
+      }
+    }
+
     // Save Slots Panel Management
     const saveSlotsPanel = document.getElementById('save-slots-panel');
     const saveSlotsCloseBtn = document.getElementById('save-slots-close');
@@ -211,24 +245,31 @@
     const createNewSlotBtn = document.getElementById('create-new-slot');
     const btnSaveSlots = document.getElementById('btn-save-slots');
 
+    // Set ARIA attributes for save slots panel
+    if (saveSlotsPanel) {
+      saveSlotsPanel.setAttribute('role', 'dialog');
+      saveSlotsPanel.setAttribute('aria-modal', 'true');
+      saveSlotsPanel.setAttribute('aria-labelledby', 'save-slots-title');
+    }
+
     function showSaveSlotsPanel() {
       updateSaveSlotsList();
       if (saveSlotsPanel) {
-        saveSlotsPanel.hidden = false;
-        saveSlotsPanel.style.display = 'block';
-        // Prevent background scrolling on mobile
-        if (window.innerWidth <= 768) {
-          document.body.style.overflow = 'hidden';
+        openModalWithFocus(saveSlotsPanel);
+        // Update aria-expanded
+        if (btnSaveSlots) {
+          btnSaveSlots.setAttribute('aria-expanded', 'true');
         }
       }
     }
 
     function hideSaveSlotsPanel() {
       if (saveSlotsPanel) {
-        saveSlotsPanel.hidden = true;
-        saveSlotsPanel.style.display = 'none';
-        // Restore scrolling
-        document.body.style.overflow = '';
+        closeModalWithFocus(saveSlotsPanel);
+        // Update aria-expanded
+        if (btnSaveSlots) {
+          btnSaveSlots.setAttribute('aria-expanded', 'false');
+        }
       }
     }
 
@@ -333,6 +374,7 @@
 
     // Event listeners for save slots
     if (btnSaveSlots) {
+      btnSaveSlots.setAttribute('aria-expanded', 'false');
       btnSaveSlots.addEventListener('click', showSaveSlotsPanel);
     }
 
@@ -363,7 +405,18 @@
 
     // Inventory event listeners
     if (btnInventory) {
+      btnInventory.setAttribute('aria-expanded', 'false');
       btnInventory.addEventListener('click', showInventoryPanel);
+    }
+
+    if (inventoryCloseBtn) {
+      inventoryCloseBtn.addEventListener('click', hideInventoryPanel);
+    }
+
+    if (inventoryPanel) {
+      inventoryPanel.addEventListener('click', (e) => {
+        if (e.target === inventoryPanel) hideInventoryPanel();
+      });
     }
   } catch (error) {
     console.error('Play initialization failed:', error);
