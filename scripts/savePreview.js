@@ -66,6 +66,7 @@
 
       // パネルを必ず非表示に
       this.panel.setAttribute('hidden', '');
+      this.panel.setAttribute('inert', ''); // 完全に非対話化
       this.panel.dataset.state = 'closed';
       this.panel.classList.remove('is-open');
       this.panel.setAttribute('aria-hidden', 'true');
@@ -109,64 +110,93 @@
       this.overlay = {
         lastFocused: null,
         listenersAttached: false,
-        open: (options = {}) => {
+        open: () => {
           if (this.isOpen()) return false;
 
-          // 現在のfocus要素を保存（閉じる時に戻すため）
+          // 現在のフォーカス要素を保存
           this.overlay.lastFocused = document.activeElement;
 
+          // 1. DOM表示とアクセシビリティ属性を設定
+          this.panel.removeAttribute("hidden");
+          this.panel.removeAttribute("inert"); // inertを解除
+          this.panel.setAttribute("aria-hidden", "false");
+
+          // 2. 状態を更新
+          this.state.isOpen = true;
           this.panel.dataset.state = "open";
           this.panel.classList.add("is-open");
-          this.panel.removeAttribute("aria-hidden");
-          this.panel.removeAttribute("hidden");
+
+          // 3. イベントリスナーを設定
           this.attachOverlayListeners();
-          this.state.isOpen = true;
-          if (options.focus !== false) {
-            setTimeout(() => {
+
+          // 4. パネル内の最初のフォーカス可能要素にフォーカス
+          // requestAnimationFrameで遅延して、DOM更新後にフォーカス
+          requestAnimationFrame(() => {
+            const focusable = this.panel.querySelectorAll(
+              'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+            );
+            const firstFocusable = Array.from(focusable).find(
+              (el) => el.offsetParent !== null
+            );
+            if (firstFocusable) {
               try {
-                // パネル内の最初のfocusable要素にfocus
-                const focusableElements = this.panel.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
-                const firstFocusable = focusableElements.length > 0 ? focusableElements[0] : this.panel;
                 firstFocusable.focus({ preventScroll: true });
-              } catch (_) {}
-            }, 0);
-          }
+              } catch (_) {
+                // フォーカス失敗時はパネル自体にフォーカス
+                try {
+                  this.panel.focus({ preventScroll: true });
+                } catch (_) {}
+              }
+            }
+          });
+
           return true;
         },
         close: (options = {}) => {
           if (!this.isOpen()) return false;
 
-          // 即座に状態とDOM属性を更新（再呼び出し防止）
-          this.state.isOpen = false;
-          this.panel.dataset.state = "closed";
-          this.panel.classList.remove("is-open");
-          this.panel.setAttribute("aria-hidden", "true");
-          this.panel.setAttribute("hidden", "");
-          this.detachOverlayListeners();
-
-          // focusを外部に移動
-          const restoreFocus = () => {
+          // CRITICAL: フォーカスを先に移動してから aria-hidden を設定
+          // ブラウザが aria-hidden のブロックエラーを出さないようにする
+          const restoreFocusTarget = () => {
             if (options.restoreFocus !== false && this.overlay.lastFocused && typeof this.overlay.lastFocused.focus === "function") {
               try {
                 this.overlay.lastFocused.focus({ preventScroll: true });
+                return true;
               } catch (_) {
-                const openBtn = document.getElementById("btn-quick-preview");
-                if (openBtn && typeof openBtn.focus === "function") {
-                  openBtn.focus({ preventScroll: true });
-                }
-              }
-            } else {
-              const openBtn = document.getElementById("btn-quick-preview");
-              if (openBtn && typeof openBtn.focus === "function") {
-                openBtn.focus({ preventScroll: true });
+                // fallthrough
               }
             }
+            // フォールバック: openボタンにフォーカス
+            const openBtn = document.getElementById("btn-quick-preview");
+            if (openBtn && typeof openBtn.focus === "function") {
+              try {
+                openBtn.focus({ preventScroll: true });
+                return true;
+              } catch (_) {
+                // フォーカス移動失敗時は body にフォーカス
+                document.body.focus();
+                return false;
+              }
+            }
+            return false;
           };
 
-          // focus移動
-          requestAnimationFrame(() => {
-            restoreFocus();
-          });
+          // 1. 状態を更新（再呼び出し防止）
+          this.state.isOpen = false;
+          this.panel.dataset.state = "closed";
+          this.panel.classList.remove("is-open");
+
+          // 2. フォーカスを即座に移動（aria-hiddenの前に実行）
+          restoreFocusTarget();
+
+          // 3. イベントリスナーを解除
+          this.detachOverlayListeners();
+
+          // 4. アクセシビリティ属性とDOM非表示を設定
+          // フォーカスが既に移動しているため、ブロックされない
+          this.panel.setAttribute("aria-hidden", "true");
+          this.panel.setAttribute("inert", ""); // 最新標準: 要素を完全に非対話化
+          this.panel.setAttribute("hidden", "");
 
           return true;
         },
