@@ -53,6 +53,16 @@
 
   function exec(cmd) { document.execCommand(cmd, false, undefined); }
 
+  function bridgeEnabled(){
+    const be = window.APP_CONFIG?.storage?.backend;
+    return (be && be !== 'localStorage') || !!window.APP_CONFIG?.storage?.useBridge;
+  }
+
+  function closeDropdown() {
+    const dropdown = document.getElementById('floating-controls-dropdown');
+    if (dropdown && !dropdown.hidden) dropdown.hidden = true;
+  }
+
   window.AdminCore = {
     init: function() {
       this.setupCore();
@@ -376,9 +386,29 @@
         });
       }
 
-      // Preview functionality check
-      if (btnQuickPreview && !(window.APP_CONFIG?.ui?.showSavePreview)) {
-        // Keep button visible as fallback for savesPanel
+      // Preview functionality - integrate with SavePreviewPanelManager
+      if (btnQuickPreview) {
+        if (window.SavePreviewPanelManager && window.APP_CONFIG?.ui?.showSavePreview) {
+          // Use SavePreviewPanelManager if available
+          btnQuickPreview.addEventListener('click', () => {
+            if (window.SavePreviewPanelManager.isOpen && window.SavePreviewPanelManager.isOpen()) {
+              window.SavePreviewPanelManager.close();
+            } else {
+              window.SavePreviewPanelManager.open();
+            }
+          });
+        } else {
+          // Fallback to savesPanel
+          btnQuickPreview.addEventListener('click', () => {
+            const savesPanel = document.getElementById('saves-panel');
+            if (savesPanel) {
+              savesPanel.hidden = false;
+              if (this.initSaveLoad && typeof renderSaves === 'function') {
+                renderSaves();
+              }
+            }
+          });
+        }
       }
     },
 
@@ -1116,4 +1146,49 @@
       } catch {}
     }
   };
+
+  // Initialize AdminCore when boot completes
+  // Support both EventBus and legacy DOM events
+  function initializeAdminCore(event) {
+    try {
+      const detail = event?.detail || {};
+      if (detail.savePreviewFailed) {
+        console.warn('[AdminCore] SavePreview initialization failed, limiting functionality');
+        const btnQuickPreview = document.getElementById('btn-quick-preview');
+        if (btnQuickPreview) {
+          btnQuickPreview.disabled = true;
+          btnQuickPreview.title = '保存プレビュー機能が利用できません';
+          btnQuickPreview.style.opacity = '0.5';
+        }
+      }
+      
+      window.AdminCore.init();
+      
+      // Emit completion event
+      if (window.EventBus) {
+        window.EventBus.emit(window.EventBus.Events.ADMIN_INIT_COMPLETE, {
+          timestamp: Date.now()
+        });
+      }
+    } catch (error) {
+      console.error('[AdminCore] Initialization failed:', error);
+    }
+  }
+
+  // Subscribe to boot complete event
+  if (window.EventBus) {
+    window.EventBus.on(window.EventBus.Events.ADMIN_BOOT_COMPLETE, initializeAdminCore);
+  }
+
+  // Legacy DOM event fallback
+  if (document.readyState === 'loading') {
+    document.addEventListener('admin-boot-complete', initializeAdminCore);
+  } else {
+    // DOM already loaded, check if boot already completed
+    if (window.AdminBoot && document.getElementById('editor')) {
+      setTimeout(initializeAdminCore, 0);
+    } else {
+      document.addEventListener('admin-boot-complete', initializeAdminCore);
+    }
+  }
 })();

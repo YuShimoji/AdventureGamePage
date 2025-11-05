@@ -252,11 +252,18 @@
         }, 200);
       }
 
-      // 6. 初期化完了イベントの発火
+      // 6. 初期化完了イベントの発火（DOM + EventBus）
       setTimeout(() => {
-        document.dispatchEvent(new CustomEvent('admin-boot-complete', {
-          detail: { elements, config: window.APP_CONFIG }
-        }));
+        const detail = { elements, config: window.APP_CONFIG };
+        
+        // Legacy DOM event
+        document.dispatchEvent(new CustomEvent('admin-boot-complete', { detail }));
+        
+        // EventBus event
+        if (window.EventBus) {
+          window.EventBus.emit(window.EventBus.Events.ADMIN_BOOT_COMPLETE, detail);
+        }
+        
         log('info', '管理画面ブート完了');
       }, 100);
 
