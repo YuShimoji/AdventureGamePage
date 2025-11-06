@@ -316,6 +316,60 @@ flowchart LR
 - 「保存一覧」で保存内容を確認・開く・エクスポート・削除が可能です。
 - 詳細: `docs/architecture-storage.md`
 
+## アーキテクチャ（モジュラー設計）
+
+### 概要
+プロジェクトは保守性と拡張性を高めるため、大規模JavaScriptファイルをモジュラーなコンポーネントにリファクタリングしました。各ファイルは以下の3つのマネージャーに分割されています：
+
+- **Utils**: 純粋なユーティリティ関数（計算、変換、ストレージ操作）
+- **UIManager**: UIレンダリング、DOM操作、イベントハンドリング、アクセシビリティ対応
+- **LogicManager**: コアビジネスロジック、状態管理、データ処理
+
+### リファクタリングされたコンポーネント
+
+#### 🎮 GameEngine (ゲームエンジン)
+- **gameEngineUtils.js**: アイテムアイコン生成、アクション実行、エフェクト処理
+- **gameEngineUIManager.js**: UIレンダリング、キーボードナビゲーション、アクセシビリティ
+- **gameEngineLogicManager.js**: ゲーム状態管理、ナビゲーション、インベントリ管理
+- **gameEngine.js**: マネージャー統合とAPI提供
+
+#### ✏️ NodeEditor (ノードエディタ)
+- **nodeEditorUtils.js**: ノード操作ユーティリティ、検証関数
+- **nodeEditorUIManager.js**: UI状態管理、レンダリング、イベントバインディング
+- **nodeEditorLogicManager.js**: ロード/保存/検証/エクスポートロジック
+- **nodeEditor.js**: マネージャー統合とAPI提供
+
+#### 📊 MermaidPreview (Mermaidプレビュー)
+- **mermaidPreviewUtils.js**: グラフ処理、Mermaid生成ユーティリティ
+- **mermaidPreviewUIManager.js**: UI状態管理、インタラクション処理
+- **mermaidPreviewLogicManager.js**: グラフ構築、レンダリングロジック
+- **mermaidPreview.js**: マネージャー統合とAPI提供
+
+#### 🎨 Theme (テーマ管理)
+- **themeUtils.js**: テーマ適用、プリセット管理、ストレージ操作
+- **themeUIManager.js**: パネル構築、プレビュー更新、イベントハンドリング
+- **themeLogicManager.js**: 初期化、テーマ適用、設定管理
+- **theme.js**: マネージャー統合とAPI提供
+
+#### ⚙️ AdminCore (管理コア)
+- 複数のマネージャーモジュール（UI調整、API管理、ストレージ操作など）に分割済み
+- **admin.core.js**: マネージャー統合と初期化
+
+#### 💾 SavePreview (保存プレビュー)
+- すでにクラスベースのモジュラー設計を実装済み
+
+### 利点
+- **保守性向上**: 各コンポーネントの責任が明確化
+- **テスト容易性**: 個別コンポーネントのユニットテストが可能
+- **拡張性**: 新機能追加時の影響範囲が局所化
+- **再利用性**: ユーティリティ関数の共有化
+- **開発効率**: 並行開発時の競合減少
+
+### 開発時の注意点
+- スクリプト読み込み順序を `admin.html` で確認してください
+- 新規マネージャー追加時は、対応するUtils/UIManager/LogicManagerの3ファイルを検討
+- イベント駆動型初期化（DOMContentLoaded）を維持してください
+
 ## Troubleshooting（ブラウザが開かない時）
 環境により GUI アプリの自動起動が制限される場合があります。以下のいずれかの方法でご確認ください。
 1. IDE のブラウザプレビューを使用する（推奨）
