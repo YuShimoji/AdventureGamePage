@@ -1,4 +1,17 @@
 /* Admin (Zen editor) */
+.app-header {
+  color: var(--text-color, #e9e9e9) !important;
+}
+
+.app-header h1,
+.app-header .btn {
+  color: var(--text-color, #e9e9e9) !important;
+}
+
+.floating-controls .btn {
+  color: var(--text-color, #e9e9e9) !important;
+}
+
 .editor-container {
   width: min(1200px, calc(100% - 320px - 48px)); /* サイドバー幅を考慮して中央コンテンツを広げる */
   margin: 24px auto 48px;
@@ -214,6 +227,10 @@
 .preview-actions { display: flex; gap: 8px; margin-top: 8px; }
 .snapshot-bar { display: flex; gap: 8px; margin: 8px 0 12px; }
 .snapshot-bar input { flex: 1; padding: 8px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,.2); background: rgba(0,0,0,.15); color: var(--text-color); }
+
+.preview-panel[hidden] {
+  display: none !important;
+}
 
 /* Validation panel */
 #validation-panel { margin-top: 8px; }
