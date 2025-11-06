@@ -109,5 +109,16 @@
     }
   }
 
-  window.StorageBridge = { saveSimple, loadSimple, saveFull, loadFull, get, remove };
+  async function list() {
+    try {
+      const p = getProvider();
+      if (!p || !p.isAvailable()) return [];
+      return await p.list();
+    } catch (e) {
+      console.error("StorageBridge.list error:", e);
+      return [];
+    }
+  }
+
+  window.StorageBridge = { saveSimple, loadSimple, saveFull, loadFull, get, remove, list };
 })();
