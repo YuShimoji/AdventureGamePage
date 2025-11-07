@@ -926,3 +926,5 @@ render();</script>
   });
 
   // export for tests if needed
+
+})();
