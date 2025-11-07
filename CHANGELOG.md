@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2025-11-07]
+
+- feat(merge): merge conflicts resolved and latest changes integrated [closes #12]
+  - Resolved conflicts in admin.html and scripts/mermaidPreview.js
+  - Integrated modularized script updates from remote branch
+  - Updated script loading order in admin.html
+
 ## [2025-11-04]
 
 - fix: 3つの重大なバグを緊急修正
