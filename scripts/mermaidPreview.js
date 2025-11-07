@@ -1,7 +1,7 @@
 (function () {
-  let lastBuildMeta = null;
-  const renderCache = new Map(); // Cache for rendered SVG
+  // Mermaid Preview - Main initialization coordinator for mermaid preview interface (Refactored for modularity)
 
+<<<<<<< HEAD
   function sanitizeId(id) {
     return String(id || "").replace(/[^A-Za-z0-9_]/g, "_");
   }
@@ -926,30 +926,3 @@ render();</script>
   });
 
   // export for tests if needed
-  window.MermaidPreview = {
-    buildMermaid: () => buildMermaidWithOptions(collectOptions()),
-    buildMermaidWithOptions,
-    refreshData: () => {
-      refreshSeedOptions();
-      refreshPathSelects(true);
-      buildAndSetSource();
-    },
-    focusNode: (nodeId) => {
-      if (!nodeId) return;
-      const { pathStartSel, pathGoalSel, searchInput } = getUIRefs();
-      if (searchInput) {
-        searchInput.value = nodeId;
-      }
-      if (pathStartSel && !pathStartSel.disabled) {
-        pathStartSel.value = nodeId;
-      }
-      if (pathGoalSel) {
-        pathGoalSel.value = nodeId;
-      }
-      renderDiagram();
-    },
-    render: renderDiagram,
-    collectOptions,
-    buildAndSetSource,
-  };
-})();
