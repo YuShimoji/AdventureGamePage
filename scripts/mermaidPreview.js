@@ -665,16 +665,30 @@
         const v = getScope();
         seedSel.disabled = v !== "from_selected";
       };
+      // Save initial scope value to prevent auto-render on initialization
+      const initialScope = scopeSel.value;
       scopeSel.addEventListener("change", () => {
-        applySeedEnabled();
-        if (getScope() === "from_selected") refreshSeedOptions();
-        renderDiagram();
+        const newValue = scopeSel.value;
+        if (newValue !== initialScope) {
+          applySeedEnabled();
+          if (getScope() === "from_selected") refreshSeedOptions();
+          renderDiagram();
+        } else {
+          applySeedEnabled();
+        }
       });
       applySeedEnabled();
     }
     if (seedSel) {
+      // Save initial seed value to prevent auto-render on initialization
+      const initialSeeds = Array.from(seedSel.selectedOptions).map(o => o.value).sort().join(',');
       seedSel.addEventListener("focus", refreshSeedOptions);
-      seedSel.addEventListener("change", renderDiagram);
+      seedSel.addEventListener("change", () => {
+        const currentSeeds = Array.from(seedSel.selectedOptions).map(o => o.value).sort().join(',');
+        if (currentSeeds !== initialSeeds) {
+          renderDiagram();
+        }
+      });
     }
 
     genBtn.addEventListener("click", () => {
@@ -793,14 +807,26 @@ render();</script>
       });
     }
 
-    if (pathStartSel)
+    if (pathStartSel) {
+      // Save initial path start value to prevent auto-render on initialization
+      const initialPathStart = pathStartSel.value;
       pathStartSel.addEventListener("change", () => {
-        renderDiagram();
+        const newValue = pathStartSel.value;
+        if (newValue !== initialPathStart) {
+          renderDiagram();
+        }
       });
-    if (pathGoalSel)
+    }
+    if (pathGoalSel) {
+      // Save initial path goal value to prevent auto-render on initialization
+      const initialPathGoal = pathGoalSel.value;
       pathGoalSel.addEventListener("change", () => {
-        renderDiagram();
+        const newValue = pathGoalSel.value;
+        if (newValue !== initialPathGoal) {
+          renderDiagram();
+        }
       });
+    }
     if (pathApplyBtn)
       pathApplyBtn.addEventListener("click", () => {
         renderDiagram();
@@ -809,6 +835,11 @@ render();</script>
     refreshSeedOptions();
     refreshPathSelects(false);
     setStatus("生成ボタンでプレビューを表示できます");
+
+    // Set initial message for main view without triggering render
+    if (mainView && !mainView.querySelector("svg")) {
+      mainView.innerHTML = '<div class="muted">プレビューがここに表示されます。</div>';
+    }
   }
 
   document.addEventListener("DOMContentLoaded", () => {
