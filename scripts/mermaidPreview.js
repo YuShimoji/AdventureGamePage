@@ -92,6 +92,30 @@
     return uiRefs || {};
   }
 
+  function ensureInlinePanelExpanded() {
+    const { inlinePanel, inlineContent, toggleBtn } = getUIRefs();
+    if (!inlinePanel || !inlineContent || !toggleBtn) return;
+    if (inlinePanel.dataset.state !== "expanded") {
+      inlinePanel.classList.remove("collapsed");
+      inlinePanel.dataset.state = "expanded";
+      inlineContent.hidden = false;
+      toggleBtn.textContent = "閉じる";
+      toggleBtn.setAttribute("aria-expanded", "true");
+      toggleBtn.setAttribute("aria-label", "分岐プレビューを閉じる");
+    }
+  }
+
+  function collapseInlinePanel() {
+    const { inlinePanel, inlineContent, toggleBtn } = getUIRefs();
+    if (!inlinePanel || !inlineContent || !toggleBtn) return;
+    inlinePanel.classList.add("collapsed");
+    inlinePanel.dataset.state = "collapsed";
+    inlineContent.hidden = true;
+    toggleBtn.textContent = "開く";
+    toggleBtn.setAttribute("aria-expanded", "false");
+    toggleBtn.setAttribute("aria-label", "分岐プレビューを開く");
+  }
+
   function setStatus(message, kind = "info") {
     const { statusEl } = getUIRefs();
     if (!statusEl) return;
@@ -328,6 +352,7 @@
   async function renderDiagram() {
     const { view, mainView } = getUIRefs();
     try {
+      ensureInlinePanelExpanded();
       const { code } = buildAndSetSource();
       if (!ensureMermaid()) {
         setStatus(
@@ -638,6 +663,9 @@
       pathApplyBtn: document.getElementById("ne-mermaid-path-apply"),
       statusEl: document.getElementById("ne-mermaid-status"),
       fullscreenBtn: document.getElementById("ne-mermaid-fullscreen"),
+      inlinePanel: document.getElementById("mermaid-inline-panel"),
+      inlineContent: document.getElementById("mermaid-inline-content"),
+      toggleBtn: document.getElementById("ne-mermaid-toggle"),
     };
     setUIRefs(refs);
     const {
@@ -657,37 +685,63 @@
       pathGoalSel,
       pathApplyBtn,
       fullscreenBtn,
+      inlinePanel,
+      inlineContent,
+      toggleBtn,
     } = refs;
     if (!genBtn || !renderBtn || !src || !view) return;
+
+    // Ensure inline panel starts collapsed unless explicitly expanded by persisted state
+    if (inlinePanel) {
+      // Assume collapsed state by default when dataset state not explicitly set
+      if (!inlinePanel.dataset.state || inlinePanel.dataset.state !== "expanded") {
+        collapseInlinePanel();
+      } else {
+        ensureInlinePanelExpanded();
+      }
+    }
+
+    if (toggleBtn && inlinePanel && inlineContent) {
+      toggleBtn.addEventListener("click", () => {
+        const expanded = inlinePanel.dataset.state === "expanded";
+        if (expanded) {
+          collapseInlinePanel();
+        } else {
+          ensureInlinePanelExpanded();
+        }
+      });
+    }
 
     if (scopeSel && seedSel) {
       const applySeedEnabled = () => {
         const v = getScope();
         seedSel.disabled = v !== "from_selected";
       };
-      // Save initial scope value to prevent auto-render on initialization
-      const initialScope = scopeSel.value;
+      // Track last applied scope to avoid redundant renders
+      let lastScope = scopeSel.value;
       scopeSel.addEventListener("change", () => {
         const newValue = scopeSel.value;
-        if (newValue !== initialScope) {
-          applySeedEnabled();
-          if (getScope() === "from_selected") refreshSeedOptions();
-          renderDiagram();
-        } else {
-          applySeedEnabled();
+        applySeedEnabled();
+        if (newValue === lastScope) {
+          return;
         }
+        lastScope = newValue;
+        if (getScope() === "from_selected") refreshSeedOptions();
+        renderDiagram();
       });
       applySeedEnabled();
     }
     if (seedSel) {
-      // Save initial seed value to prevent auto-render on initialization
-      const initialSeeds = Array.from(seedSel.selectedOptions).map(o => o.value).sort().join(',');
+      // Track last applied seeds to avoid redundant renders
+      let lastSeeds = Array.from(seedSel.selectedOptions).map(o => o.value).sort().join(',');
       seedSel.addEventListener("focus", refreshSeedOptions);
       seedSel.addEventListener("change", () => {
         const currentSeeds = Array.from(seedSel.selectedOptions).map(o => o.value).sort().join(',');
-        if (currentSeeds !== initialSeeds) {
-          renderDiagram();
+        if (currentSeeds === lastSeeds) {
+          return;
         }
+        lastSeeds = currentSeeds;
+        renderDiagram();
       });
     }
 
@@ -808,23 +862,21 @@ render();</script>
     }
 
     if (pathStartSel) {
-      // Save initial path start value to prevent auto-render on initialization
-      const initialPathStart = pathStartSel.value;
+      let lastPathStart = pathStartSel.value;
       pathStartSel.addEventListener("change", () => {
         const newValue = pathStartSel.value;
-        if (newValue !== initialPathStart) {
-          renderDiagram();
-        }
+        if (newValue === lastPathStart) return;
+        lastPathStart = newValue;
+        renderDiagram();
       });
     }
     if (pathGoalSel) {
-      // Save initial path goal value to prevent auto-render on initialization
-      const initialPathGoal = pathGoalSel.value;
+      let lastPathGoal = pathGoalSel.value;
       pathGoalSel.addEventListener("change", () => {
         const newValue = pathGoalSel.value;
-        if (newValue !== initialPathGoal) {
-          renderDiagram();
-        }
+        if (newValue === lastPathGoal) return;
+        lastPathGoal = newValue;
+        renderDiagram();
       });
     }
     if (pathApplyBtn)

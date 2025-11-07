@@ -1802,6 +1802,16 @@ textarea {
   border: 1px solid var(--border);
   border-radius: var(--radius);
   overflow: hidden;
+  transition: max-height 0.2s ease;
+}
+
+.preview-panel.collapsed {
+  max-height: 64px;
+  border-radius: var(--radius);
+}
+
+.preview-panel.collapsed .preview-content {
+  display: none;
 }
 
 .preview-header {
@@ -1813,6 +1823,26 @@ textarea {
   border-bottom: 1px solid var(--border);
   font-size: 14px;
   font-weight: 600;
+}
+
+.preview-controls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.preview-content {
+  flex: 1;
+  padding: 16px;
+  overflow: auto;
+}
+
+.preview-content .mermaid-view {
+  min-height: 220px;
+}
+
+#ne-mermaid-toggle {
+  min-width: 64px;
 }
 
 .preview-header h4 {
