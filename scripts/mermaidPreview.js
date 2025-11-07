@@ -808,26 +808,38 @@ render();</script>
 
     refreshSeedOptions();
     refreshPathSelects(false);
-    setStatus("組み立て前：生成または描画してください");
-    buildAndSetSource();
+    setStatus("生成ボタンでプレビューを表示できます");
   }
 
   document.addEventListener("DOMContentLoaded", () => {
-    if (document.getElementById("mermaid-panel")) bind();
-    // NodeEditor からの選択変更に追従して現在ノードをハイライト
-    try {
-      document.addEventListener('agp-node-selection-changed', (e) => {
-        const nodeId = e?.detail?.nodeId;
-        if (!nodeId || !window.MermaidPreview?.focusNode) return;
-        window.MermaidPreview.focusNode(nodeId);
-      });
-    } catch {}
-    // NodeEditor からの仕様更新に追従して再描画
-    try {
-      document.addEventListener('agp-spec-updated', () => {
-        try { window.MermaidPreview?.refreshData?.(); } catch {}
-      });
-    } catch {}
+    if (document.getElementById("mermaid-panel")) {
+      // Wait for admin-boot-complete event instead of initializing immediately
+      const initializeMermaidPreview = () => {
+        bind();
+        // NodeEditor からの選択変更に追従して現在ノードをハイライト
+        try {
+          document.addEventListener('agp-node-selection-changed', (e) => {
+            const nodeId = e?.detail?.nodeId;
+            if (!nodeId || !window.MermaidPreview?.focusNode) return;
+            window.MermaidPreview.focusNode(nodeId);
+          });
+        } catch {}
+        // NodeEditor からの仕様更新に追従して再描画
+        try {
+          document.addEventListener('agp-spec-updated', () => {
+            try { window.MermaidPreview?.refreshData?.(); } catch {}
+          });
+        } catch {}
+      };
+
+      // Check if admin-boot already completed
+      if (window.AdminBoot && document.getElementById('editor')) {
+        initializeMermaidPreview();
+      } else {
+        // Wait for admin-boot-complete event
+        document.addEventListener('admin-boot-complete', initializeMermaidPreview, { once: true });
+      }
+    }
   });
 
   // export for tests if needed
