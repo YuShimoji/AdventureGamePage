@@ -42,6 +42,84 @@
         return;
       }
 
+      // Initialize WYSIWYG editor
+      const wysiwygOpenBtn = document.getElementById('wysiwyg-open');
+      const wysiwygLoadBtn = document.getElementById('wysiwyg-load');
+      const wysiwygStatus = document.getElementById('wysiwyg-status');
+
+      if (wysiwygOpenBtn) {
+        wysiwygOpenBtn.addEventListener('click', () => {
+          const container = document.getElementById('editor-container');
+          const wysiwygView = document.getElementById('wysiwyg-editor-view');
+
+          // Hide other views
+          document.getElementById('editor-main').style.display = 'none';
+          document.getElementById('node-editor-parallel-view').hidden = true;
+
+          // Show WYSIWYG view
+          wysiwygView.hidden = false;
+          container.classList.add('wysiwyg-active');
+
+          // Initialize editor
+          if (window.WYSIWYGStoryEditor && window.WYSIWYGStoryEditor.init) {
+            const success = window.WYSIWYGStoryEditor.init('wysiwyg-editor-container');
+            if (success) {
+              if (wysiwygStatus) wysiwygStatus.textContent = 'WYSIWYGエディタが起動しました';
+            } else {
+              if (wysiwygStatus) wysiwygStatus.textContent = 'エディタの初期化に失敗しました';
+            }
+          }
+        });
+      }
+
+      if (wysiwygLoadBtn) {
+        wysiwygLoadBtn.addEventListener('click', () => {
+          // Load current story from Node Editor
+          if (window.NodeEditorAPI && window.WYSIWYGStoryEditor) {
+            const spec = window.NodeEditorAPI.getSpec();
+            if (spec) {
+              window.WYSIWYGStoryEditor.loadStory(spec);
+              if (wysiwygStatus) wysiwygStatus.textContent = '現在のストーリーを読み込みました';
+            } else {
+              if (wysiwygStatus) wysiwygStatus.textContent = '読み込むストーリーがありません';
+            }
+          }
+        });
+      }
+
+      // AI Story Improvement
+      const aiAnalyzeBtn = document.getElementById('ai-analyze');
+      const aiAutoFixBtn = document.getElementById('ai-auto-fix');
+      const aiStatus = document.getElementById('ai-status');
+
+      if (aiAnalyzeBtn) {
+        aiAnalyzeBtn.addEventListener('click', () => {
+          if (window.AIStoryImprover && window.NodeEditorAPI) {
+            const spec = window.NodeEditorAPI.getSpec();
+            if (spec) {
+              window.AIStoryImprover.showImprovementSuggestions(spec);
+              if (aiStatus) aiStatus.textContent = '改善提案を表示しました';
+            } else {
+              if (aiStatus) aiStatus.textContent = '分析するストーリーがありません';
+            }
+          }
+        });
+      }
+
+      if (aiAutoFixBtn) {
+        aiAutoFixBtn.addEventListener('click', () => {
+          if (window.AIStoryImprover && window.NodeEditorAPI) {
+            const spec = window.NodeEditorAPI.getSpec();
+            if (spec) {
+              window.AIStoryImprover.applyAutomaticImprovements(spec);
+              if (aiStatus) aiStatus.textContent = '自動改善を適用しました';
+            } else {
+              if (aiStatus) aiStatus.textContent = '改善するストーリーがありません';
+            }
+          }
+        });
+      }
+
       // Initialize character count
       this.updateCharCount(editor, count);
 

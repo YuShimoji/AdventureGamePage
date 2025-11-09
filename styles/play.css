@@ -427,12 +427,12 @@
   }
 }
 
-/* High DPI displays */
-@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
-  .scene-image img {
-    image-rendering: -webkit-optimize-contrast;
-    image-rendering: crisp-edges;
-  }
+/* play-page でのみ保存ウィンドウを表示 */
+body:not(.play-page) .save-slots-panel,
+body:not(.play-page) .inventory-panel,
+body:not(.play-page) .theme-panel,
+body:not(.play-page) .modal-overlay {
+  display: none !important;
 }
 
 /* Landscape orientation on mobile */

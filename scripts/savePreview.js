@@ -16,13 +16,24 @@
       };
       this.initialized = false;
       this.listenersAttached = false;
+      // ページコンテキスト: admin.htmlでのみ有効
+      this.isAdminPage = this.checkIfAdminPage();
     }
 
-    // 初期化 - DOM準備後に一度だけ呼ばれる
+    // ページコンテキストチェック: admin.htmlでのみ有効
+    checkIfAdminPage() {
+      return window.location.pathname.endsWith('admin.html') || window.location.pathname === '/admin.html';
+    }
     async initialize() {
       try {
         if (this.initialized) {
           console.log('[DEBUG] SavePreviewPanelManager already initialized');
+          return;
+        }
+
+        // ページコンテキストチェック: adminページでのみ初期化
+        if (!this.isAdminPage) {
+          console.log('[DEBUG] SavePreviewPanelManager skipped: not admin page');
           return;
         }
 
@@ -367,14 +378,14 @@
 
     // パネルを開く
     open(options) {
-      if (!this.initialized) return;
+      if (!this.initialized || !this.isAdminPage) return;
       if (!this.overlay.open(options)) return;
       this.refresh();
     }
 
     // パネルを閉じる
     close(options) {
-      if (!this.initialized) return;
+      if (!this.initialized || !this.isAdminPage) return;
       this.overlay.close(options);
       this.state.selected.clear();
       this.updateDeleteSelectedBtn();
@@ -382,7 +393,7 @@
 
     // パネルをトグル
     toggle(options) {
-      if (!this.initialized) return;
+      if (!this.initialized || !this.isAdminPage) return;
       if (this.overlay.isOpen()) {
         this.close(options);
       } else {
@@ -392,7 +403,7 @@
 
     // 開いているかどうか
     isOpen() {
-      return this.initialized && this.overlay.isOpen();
+      return this.initialized && this.isAdminPage && this.overlay.isOpen();
     }
 
     // ユーティリティ関数
@@ -600,15 +611,19 @@
   // シングルトンインスタンス
   const panelManager = new SavePreviewPanelManager();
 
-  // admin-boot.js で初期化されるよう公開
-  window.SavePreviewPanelManager = panelManager;
+  // admin-boot.js で初期化されるよう公開（adminページでのみ）
+  if (window.location.pathname.endsWith('admin.html') || window.location.pathname === '/admin.html') {
+    window.SavePreviewPanelManager = panelManager;
+  }
 
   // レガシーAPIとの互換性維持
-  window.SavePreview = {
-    refresh: () => panelManager.refresh(),
-    open: (options) => panelManager.open(options),
-    close: (options) => panelManager.close(options),
-    toggle: (options) => panelManager.toggle(options),
-    getState: () => ({ ...panelManager.state, selected: Array.from(panelManager.state.selected) })
-  };
+  if (window.location.pathname.endsWith('admin.html') || window.location.pathname === '/admin.html') {
+    window.SavePreview = {
+      refresh: () => panelManager.refresh(),
+      open: (options) => panelManager.open(options),
+      close: (options) => panelManager.close(options),
+      toggle: (options) => panelManager.toggle(options),
+      getState: () => ({ ...panelManager.state, selected: Array.from(panelManager.state.selected) })
+    };
+  }
 })();

@@ -60,10 +60,13 @@
       }
 
       const loaded = StorageUtil.loadJSON("agp_game_data");
+      console.log("Loaded game data from storage:", loaded);
       const normalize = window.Converters?.normalizeSpecToEngine || normalizeSpecToEngine;
+      console.log("Using normalize function:", normalize);
       let game;
       try {
         game = normalize(loaded);
+        console.log("Normalized game data:", game);
         if (!game && loaded) {
           throw new Error("保存されたゲームデータの形式が無効です。");
         }
@@ -76,10 +79,13 @@
         alert(`ゲームデータの読み込みに失敗しました: ${e.message}\nサンプルゲームを使用します。`);
         game = window.SAMPLE_GAME;
       }
+      console.log("Final game data:", game);
       return game;
     },
 
     createEngine: function(elements, game) {
+      console.log("Creating engine with game data:", game);
+      console.log("Game data start property:", game?.start);
       return GameEngine.createEngine(game, {
         titleEl: elements.titleEl,
         textEl: elements.textEl,

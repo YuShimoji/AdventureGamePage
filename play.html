@@ -4,10 +4,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>プレイ</title>
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E📚%3C/text%3E%3C/svg%3E">
     <link rel="stylesheet" href="styles/common.css?v=4">
     <link rel="stylesheet" href="styles/play.css?v=4">
   </head>
-  <body>
+  <body class="play-page">
     <header class="app-header">
       <a class="btn" href="index.html">← トップ</a>
       <h1 id="game-title">サンプルアドベンチャー</h1>
@@ -16,10 +17,10 @@
         <button id="btn-forward" class="btn" aria-label="次のノードに進む">進む</button>
         <button id="btn-save" class="btn" aria-label="保存モーダルを開く">保存</button>
         <button id="btn-load" class="btn" aria-label="読込モーダルを開く">読込</button>
-        <button id="btn-save-slots" class="btn" title="セーブスロット" aria-label="セーブスロットを開く">💾</button>
-        <button id="btn-inventory" class="btn" title="インベントリ" aria-label="インベントリを開く" aria-expanded="false">🎒</button>
+        <button id="btn-save-slots" class="btn" title="セーブスロット" aria-label="セーブスロットを開く">スロット</button>
+        <button id="btn-inventory" class="btn" title="インベントリ" aria-label="インベントリを開く" aria-expanded="false">インベントリ</button>
         <button id="btn-restart" class="btn" aria-label="ゲームを最初からやり直す">リスタート</button>
-        <button id="btn-theme" class="icon-btn" title="テーマ設定" aria-label="テーマ設定を開く">🎨</button>
+        <button id="btn-theme" class="icon-btn" title="テーマ設定" aria-label="テーマ設定を開く">テーマ</button>
         <label class="btn file-label" aria-label="ゲームデータを読み込む">
           ゲームJSON読込
           <input id="play-file-import" type="file" accept="application/json" hidden />
@@ -40,7 +41,7 @@
       <header class="inventory-header">
         <h3 id="inventory-title">インベントリ</h3>
         <span id="inventory-count" class="inventory-count" aria-live="polite"></span>
-        <button id="inventory-close" class="btn btn-ghost btn-sm" title="閉じる" aria-label="インベントリを閉じる">✕</button>
+        <button id="inventory-close" class="btn btn-ghost btn-sm" title="閉じる" aria-label="インベントリを閉じる">閉じる</button>
       </header>
       <div id="inventory-list" class="inventory-list" role="list" aria-label="所持アイテム"></div>
     </aside>
@@ -51,7 +52,7 @@
     <aside id="save-slots-panel" class="save-slots-panel overlay-panel" hidden role="dialog" aria-modal="true" aria-labelledby="save-slots-header">
       <header class="save-slots-header" id="save-slots-header">
         <h3>セーブスロット</h3>
-        <button id="save-slots-close" class="btn btn-ghost btn-sm" title="閉じる" aria-label="セーブスロットを閉じる">✕</button>
+        <button id="save-slots-close" class="btn btn-ghost btn-sm" title="閉じる" aria-label="セーブスロットを閉じる">閉じる</button>
       </header>
       <div id="save-slots-list" class="save-slots-list"></div>
       <div class="save-slots-actions">
@@ -64,7 +65,7 @@
       <div class="modal" role="document">
         <header class="modal-header">
           <h2 id="modal-title">ゲームデータを保存</h2>
-          <button id="modal-close" class="modal-close" aria-label="閉じる">✕</button>
+          <button id="modal-close" class="modal-close" aria-label="閉じる">閉じる</button>
         </header>
         <section class="modal-body">
           <div id="save-panel">
@@ -86,12 +87,12 @@
     </div>
 
     <!-- Mobile Menu -->
-    <button id="mobile-menu-btn" class="mobile-menu-btn" aria-label="メニューを開く">☰</button>
+    <button id="mobile-menu-btn" class="mobile-menu-btn" aria-label="メニューを開く">メニュー</button>
     <div id="mobile-menu-overlay" class="mobile-menu-overlay" hidden>
       <div class="mobile-menu" role="dialog" aria-modal="true">
         <header class="mobile-menu-header">
           <h3>メニュー</h3>
-          <button id="mobile-menu-close" class="mobile-menu-close" aria-label="閉じる">✕</button>
+          <button id="mobile-menu-close" class="mobile-menu-close" aria-label="閉じる">閉じる</button>
         </header>
         <div class="mobile-menu-body">
           <button id="mobile-btn-save" class="btn">保存</button>
@@ -112,20 +113,46 @@
     <script src="scripts/storage.js"></script>
     <script src="scripts/storageProviders.js"></script>
     <script src="scripts/storageBridge.js"></script>
-    <script src="scripts/theme-manager.js"></script>
     <script src="scripts/config.js"></script>
     <script src="scripts/errorHandler.js"></script>
     <script src="scripts/audioManager.js"></script>
     <script src="scripts/sampleData.js"></script>
+    <script src="scripts/themeUtils.js"></script>
+    <script src="scripts/themeUIManager.js"></script>
+    <script src="scripts/themeLogicManager.js"></script>
+    <script src="scripts/theme.js"></script>
+    <script src="scripts/gameEngineLogicManager.js"></script>
+    <script src="scripts/gameEngineUIManager.js"></script>
+    <script src="scripts/gameEngineUtils.js"></script>
     <script src="scripts/gameEngine.js"></script>
+    <script src="scripts/converters.js"></script>
     <!-- Modularized play scripts -->
     <script src="scripts/play.core.js"></script>
-    <script src="scripts/play.save.js"></script>
-    <script src="scripts/play.inventory.js"></script>
-    <script src="scripts/play.input.js"></script>
-    <script src="scripts/play.js"></script>
-    <script src="scripts/converters.js"></script>
     <script src="scripts/validator.js"></script>
     <script src="scripts/playImport.js"></script>
+
+    <!-- ページ固有の初期化 -->
+    <script>
+      // プレイページ用の初期化
+      document.addEventListener('DOMContentLoaded', function() {
+        // 他のページの要素が残っている可能性があるため、強制的に非表示
+        const adminElements = [
+          'preview-panel', 'memos-panel', 'mermaid-fullscreen-modal',
+          'playtest-modal', 'node-editor-modal'
+        ];
+
+        adminElements.forEach(id => {
+          const el = document.getElementById(id);
+          if (el) {
+            el.style.display = 'none !important';
+            el.hidden = true;
+            el.setAttribute('aria-hidden', 'true');
+            el.setAttribute('inert', '');
+          }
+        });
+
+        console.log('[PLAY] Page-specific elements hidden for play.html');
+      });
+    </script>
   </body>
 </html>

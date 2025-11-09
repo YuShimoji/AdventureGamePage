@@ -72,8 +72,69 @@
 - ノードアクションでアイテム追加/削除
 - 条件分岐でアイテム所持チェック
 
+### ✅ フェーズ3: モジュラリティ改善（完了）
+- ✅ NodeEditor UI モジュール完全分割
+  - `scripts/nodeEditor/ui/readUIRefs.js` - DOM参照の一元管理（41行）
+  - `scripts/nodeEditor/ui/forms.js` - renderActions/renderChoices を分離（453行）
+  - `scripts/nodeEditor/ui/preview.js` - プレビュー機能を分離（283行）
+  - `nodeEditorUIManager.js` - 738行→172行に削減（77%減）
+  - `admin.html` - 依存順スクリプト読み込み整理、Mermaid重複削除
+  - `docs/REFACTORING_TEST.md` - テスト手順書作成
+- 絵文字完全削除
+  - すべてのUIボタンから絵文字を削除し、テキストベースのラベルに統一
+  - プロフェッショナルな外観を維持しつつ、視覚的なわかりやすさを確保
+- 主な改善点
+  - 単一責任原則の徹底: 各モジュールが明確な責務を持つ
+  - 依存関係の明確化: readUIRefs → forms/preview → UIManager の階層構造
+  - テスタビリティ向上: 各モジュールを独立してテスト可能
+  - プレビュー表示継続問題の根本対策: MutationObserver の適切な管理
+- 次のステップ
+  - 開発サーバーでの動作テスト実施中（http://127.0.0.1:8080）
+  - nodeEditorLogicManager.js の分割検討
+
 ## 次の一手（提案）
-- ~~旧 localStorage データの移行ウィザード~~ ✅ 完了（migrationWizard.js実装、データプレビュー・手動実行・フィードバック機能付き）
-- ~~スナップショット機能の本実装と検索/タグ~~ ✅ 完了（searchItems/filterByTag拡張、UI追加、ラベル/タグ編集機能）
-- ~~play 側のセーブ/ロードを Provider 抽象化へ統合~~ ✅ 完了（play.js/gameEngine.js/playImport.jsをStorageBridge統合、play.htmlに必要なスクリプト追加）
+- ~~旧 localStorage データの移行ウィザード~~ 完了（migrationWizard.js実装、データプレビュー・手動実行・フィードバック機能付き）
+- ~~スナップショット機能の本実装と検索/タグ~~ 完了（searchItems/filterByTag拡張、UI追加、ラベル/タグ編集機能）
+- ~~play 側のセーブ/ロードを Provider 抽象化へ統合~~ 完了（play.js/gameEngine.js/playImport.jsをStorageBridge統合、play.htmlに必要なスクリプト追加）
+- ~~インベントリシステム実装~~ 完了（Phase 2.1-2.2）
+- プレビュー機能のリファクタリングと安定化（進行中）
 - ~~インベントリシステム実装~~ ✅ 完了（Phase 2.1-2.2）
+- 🚧 プレビュー機能のリファクタリングと安定化（進行中）
+
+## 2025-11-10 状況更新（UI安定化・統一方針）
+
+### 実施済み（本セッション）
+- **モーダル/オーバーレイの非表示を保証**: CSS に `[hidden] { display: none !important; }` をグローバル追加。` .modal-overlay[hidden]`/`.overlay-panel[hidden]` も明示。
+- **hover の白飛び軽減**: `.btn:hover` / `.icon-btn:hover` の `filter: brightness()` を廃止し、段階トーンでの背景色強調に変更。
+- **テーマトークン拡充**: `--border` / `--surface-hover` / `--surface-active` / `--muted-text` / `--text-secondary` を追加し、既存CSSから参照可能に。
+- **ドキュメント表記の日本語統一**: `learn.html` のタイトル/見出しを「学ぶ」に統一。
+
+### 現状の観測
+- プレイ: JSON未ロード時は意図通り「何も表示されない」状態。
+- 管理（エディタ）: SavePreview オーバーレイは初期 `hidden`/`closed` でログ上も非表示。表示が続く要素は「インラインの分岐プレビューパネル（collapsedヘッダ部）」である可能性が高い。
+
+### 次のステップ（短期）
+- 管理画面の「不要時の見た目最小化」
+  - インラインの分岐プレビューは collapsed 時のヘッダのトーン/コントラストを調整（白地×白字を回避）。
+  - 仕様確認：初期表示を「ヘッダも最小化（非表示）にする」か「ヘッダは残す（現行）」かを決定。
+- 可視性トレース（必要時）
+  - `#preview-panel` / `#mermaid-fullscreen-modal` / `#mermaid-inline-panel` の `hidden`/`dataset.state`/computed `display` を計測し、予期せぬ再表示元を特定。
+
+### ヘッダー統一（多ページ構成でも一貫性を担保）
+- `scripts/header.js` を追加し、各ページで同一スクリプトを読み込み → ランタイム生成でヘッダーを共通化。
+- `APP_CONFIG.nav` にページ配列を定義（ラベル/URL/active判定）。HTML直書きのヘッダーを段階的に削除。
+
+### 単一ページ（SPA）統合方針（段階導入）
+1. Phase A: 共通ヘッダー/フッター/テーマの完全共通化（既存複数HTMLを温存）。
+2. Phase B: ルーター導入（hashベース `/#!/{page}`）。各ページのメインセクションをコンポーネント化し遅延読込。
+3. Phase C: 既存ページを `index.html` に統合（`<section data-route>`）。URL互換のため `meta refresh` or 軽量リダイレクトを提供。
+4. Phase D: 旧ページの整理（リンク置換・404対策・ドキュメント更新）。
+
+### テスト計画
+- ハードリロードで index/admin/play/learn を個別確認。
+- 管理: SavePreview/分岐プレビューの表示条件（クリック起点でのみ開く）を確認、`[hidden]` と `computed display` を検証。
+- ボタンhoverの視認性、テーマ切替下でのコントラスト確認。
+
+### 備考
+- 既存の `APP_CONFIG.ui.showSavePreview` が true でも、初期表示でオーバーレイは開かない仕様を維持。
+- SPA への移行はドキュメントの更新・テスト負荷が大きい。Phase A を先に完遂してから着手推奨。

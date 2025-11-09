@@ -5,6 +5,13 @@
   --accent-color: #6aa0ff;
   --surface: color-mix(in srgb, var(--bg-color) 92%, white);
   --muted: #9aa3af;
+  /* Aliases and extended tokens for consistent theming */
+  --background: var(--bg-color);
+  --border: color-mix(in srgb, var(--surface) 80%, white);
+  --surface-hover: color-mix(in srgb, var(--surface) 88%, white);
+  --surface-active: color-mix(in srgb, var(--surface) 82%, white);
+  --muted-text: var(--muted);
+  --text-secondary: color-mix(in srgb, var(--text-color) 75%, var(--bg-color) 25%);
   /* Radius tokens: reduce excessive roundness */
   --radius: 8px;
   --radius-btn: 8px;
@@ -25,6 +32,9 @@ body {
   color: var(--text-color);
   line-height: 1.8;
 }
+
+/* Ensure hidden attribute always hides elements regardless of component CSS */
+[hidden] { display: none !important; }
 
 .app-header {
   position: sticky;
@@ -77,11 +87,11 @@ body {
   align-items: center;
   gap: 6px;
 }
-.btn:hover { filter: brightness(1.1); }
+.btn:hover { background: color-mix(in srgb, var(--accent-color) 26%, var(--bg-color)); }
 .btn:active { transform: translateY(1px); }
 .btn-accent { background: color-mix(in srgb, var(--accent-color) 28%, var(--bg-color)); }
 .icon-btn { background: transparent; border: none; font-size: 20px; cursor: pointer; color: var(--text-color); width: 44px; height: 44px; }
-.icon-btn:hover { filter: brightness(1.2); }
+.icon-btn:hover { background: color-mix(in srgb, var(--accent-color) 14%, var(--bg-color)); }
 
 .muted { color: var(--muted); }
 
@@ -117,6 +127,8 @@ body {
   justify-content: center;
   z-index: 10000;
 }
+.modal-overlay[hidden] { display: none !important; }
+.overlay-panel[hidden] { display: none !important; }
 .modal-content {
   max-width: 90vw;
   max-height: 90vh;

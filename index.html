@@ -4,9 +4,10 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Adventure Game Page</title>
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E📚%3C/text%3E%3C/svg%3E">
     <link rel="stylesheet" href="styles/common.css" />
   </head>
-  <body>
+  <body class="index-page">
     <header class="app-header">
       <h1>Adventure Game Page</h1>
       <nav class="nav">
@@ -14,7 +15,7 @@
         <a class="btn" href="admin.html">管理</a>
         <a class="btn btn-accent" href="play.html">プレイ</a>
       </nav>
-      <button id="btn-theme" class="icon-btn" title="テーマ設定">🎨</button>
+      <button id="btn-theme" class="icon-btn" title="テーマ設定">テーマ</button>
     </header>
 
     <main>
@@ -53,6 +54,46 @@
     <div id="theme-panel" class="theme-panel" hidden></div>
 
     <script src="scripts/storage.js"></script>
+    <script src="scripts/themeUtils.js"></script>
+    <script src="scripts/themeUIManager.js"></script>
+    <script src="scripts/themeLogicManager.js"></script>
     <script src="scripts/theme.js"></script>
+
+    <!-- ページ固有の初期化 -->
+    <script>
+      // メインページ用の初期化
+      document.addEventListener('DOMContentLoaded', function() {
+        // 他のページの要素が残っている可能性があるため、強制的に非表示
+        const adminElements = [
+          'preview-panel', 'memos-panel', 'mermaid-fullscreen-modal',
+          'playtest-modal', 'node-editor-modal'
+        ];
+        const playElements = [
+          'save-slots-panel', 'inventory-panel', 'save-load-modal'
+        ];
+
+        adminElements.forEach(id => {
+          const el = document.getElementById(id);
+          if (el) {
+            el.style.display = 'none !important';
+            el.hidden = true;
+            el.setAttribute('aria-hidden', 'true');
+            el.setAttribute('inert', '');
+          }
+        });
+
+        playElements.forEach(id => {
+          const el = document.getElementById(id);
+          if (el) {
+            el.style.display = 'none !important';
+            el.hidden = true;
+            el.setAttribute('aria-hidden', 'true');
+            el.setAttribute('inert', '');
+          }
+        });
+
+        console.log('[INDEX] Page-specific elements hidden for index.html');
+      });
+    </script>
   </body>
   </html>

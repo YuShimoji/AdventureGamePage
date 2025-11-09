@@ -4,6 +4,7 @@
     try {
       // Initialize core modules
       const { elements, engine, game } = window.PlayCore.init();
+      console.log("PlayCore.init returned:", { elements, engine, game });
 
       // Initialize feature modules
       window.PlaySave.init(engine, game.title);
@@ -418,4 +419,27 @@
     alert(`プレイヤー初期化に失敗しました: ${error.message}`);
   }
   });
+
+  // ページ固有のクリーンアップ（どのページでも実行）
+  document.addEventListener('DOMContentLoaded', function() {
+    // play.html以外ではプレイ要素を強制的に非表示
+    if (!(window.location.pathname.endsWith('play.html') || window.location.pathname === '/play.html')) {
+      const playElements = [
+        'save-slots-panel', 'inventory-panel', 'save-load-modal'
+      ];
+
+      playElements.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.style.display = 'none !important';
+          el.hidden = true;
+          el.setAttribute('aria-hidden', 'true');
+          el.setAttribute('inert', '');
+        }
+      });
+
+      console.log('[PLAY] Play elements hidden for non-play page');
+    }
+  });
+
 })();

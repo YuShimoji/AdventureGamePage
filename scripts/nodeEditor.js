@@ -12,6 +12,15 @@
     window.NodeEditorUIManager.refreshNodeIdDatalist();
     window.NodeEditorUIManager.refreshUnresolvedPanel();
     window.NodeEditorUIManager.setDirty(false);
+
+    // Bind modal close event
+    const modalClose = document.getElementById('node-editor-modal-close');
+    if(modalClose){
+      modalClose.addEventListener('click', () => {
+        const modal = document.getElementById('node-editor-modal');
+        if(modal) modal.hidden = true;
+      });
+    }
   });
 
   // Expose API
@@ -53,6 +62,40 @@
       window.NodeEditorUIManager.setDirty(true);
       window.NodeEditorUIManager.notifySpecUpdated();
       return true;
+    },
+    openModal: () => {
+      const modal = document.getElementById('node-editor-modal');
+      const modalEditor = document.getElementById('node-editor-modal-editor');
+      const sidebarEditor = document.getElementById('node-editor');
+      const parallelView = document.getElementById('node-editor-parallel-view');
+      const parallelEditor = parallelView?.querySelector('.node-editor-parallel-editor');
+      const container = document.getElementById('editor-container');
+
+      if(!modal || !modalEditor || !sidebarEditor || !parallelView || !parallelEditor || !container) return;
+
+      // Switch to parallel view
+      container.classList.add('node-editor-active');
+      parallelView.hidden = false;
+
+      // Clone the sidebar editor content to parallel view
+      parallelEditor.innerHTML = sidebarEditor.innerHTML;
+
+      // Re-bind events for parallel view elements
+      window.NodeEditorLogicManager.bindUI();
+
+      // Initialize parallel preview
+      if(window.NodeEditorUIManager.initParallelPreview){
+        window.NodeEditorUIManager.initParallelPreview();
+      }
+
+      // Update preview for current node
+      const { sel } = window.NodeEditorUIManager.readUIRefs();
+      if(sel && sel.value){
+        const node = window.NodeEditorUtils.findNodeById(window.NodeEditorUIManager.getSpecData().nodes, sel.value);
+        if(window.NodeEditorUIManager.updateParallelPreview){
+          window.NodeEditorUIManager.updateParallelPreview(node);
+        }
+      }
     },
     addChoiceToNode: (id, choice) => {
       const n = window.NodeEditorUtils.findNodeById(window.NodeEditorUIManager.getSpecData().nodes, id);

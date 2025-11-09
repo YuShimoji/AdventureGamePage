@@ -424,6 +424,12 @@ render();</script>
   }
 
   document.addEventListener("DOMContentLoaded", () => {
+    // ページコンテキストチェック: adminページでのみ初期化
+    if (!(window.location.pathname.endsWith('admin.html') || window.location.pathname === '/admin.html')) {
+      console.log('[MermaidPreviewUIManager] Skipped: not admin page');
+      return;
+    }
+
     if (document.getElementById("mermaid-panel")) bind();
     // NodeEditor からの選択変更に追従して現在ノードをハイライト
     try {
@@ -440,6 +446,71 @@ render();</script>
       });
     } catch {}
   });
+
+  function unbind() {
+    const refs = getUIRefs();
+    const {
+      genBtn,
+      renderBtn,
+      scopeSel,
+      seedSel,
+      copyBtn,
+      dlBtn,
+      searchInput,
+      searchClear,
+      pathStartSel,
+      pathGoalSel,
+      pathApplyBtn,
+      fullscreenBtn,
+    } = refs;
+
+    // イベントリスナーの解除
+    try {
+      if (genBtn) {
+        genBtn.removeEventListener("click", genBtn._handler);
+      }
+      if (renderBtn) {
+        renderBtn.removeEventListener("click", renderBtn._handler);
+      }
+      if (scopeSel) {
+        scopeSel.removeEventListener("change", scopeSel._handler);
+      }
+      if (seedSel) {
+        seedSel.removeEventListener("focus", seedSel._focusHandler);
+        seedSel.removeEventListener("change", seedSel._changeHandler);
+      }
+      if (copyBtn) {
+        copyBtn.removeEventListener("click", copyBtn._handler);
+      }
+      if (dlBtn) {
+        dlBtn.removeEventListener("click", dlBtn._handler);
+      }
+      if (searchInput) {
+        searchInput.removeEventListener("input", searchInput._handler);
+      }
+      if (searchClear) {
+        searchClear.removeEventListener("click", searchClear._handler);
+      }
+      if (pathStartSel) {
+        pathStartSel.removeEventListener("change", pathStartSel._handler);
+      }
+      if (pathGoalSel) {
+        pathGoalSel.removeEventListener("change", pathGoalSel._handler);
+      }
+      if (pathApplyBtn) {
+        pathApplyBtn.removeEventListener("click", pathApplyBtn._handler);
+      }
+      if (fullscreenBtn) {
+        fullscreenBtn.removeEventListener("click", fullscreenBtn._handler);
+      }
+    } catch (e) {
+      console.warn('[MermaidPreviewUIManager] Error during unbind:', e);
+    }
+
+    // UI参照をクリア
+    setUIRefs({});
+    console.log('[MermaidPreviewUIManager] Unbound and cleared references');
+  }
 
   // Expose UI manager
   window.MermaidPreviewUIManager = {
@@ -460,7 +531,8 @@ render();</script>
     updateStatusFromLastBuild,
     focusNodeEditorNode,
     bindSvgInteractions,
-    bind
+    bind,
+    unbind
   };
 
 })();
