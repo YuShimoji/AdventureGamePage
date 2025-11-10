@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2025-11-10]
+
+- fix(test): テストランナーを安定化（Windows/ポート競合対応）
+  - `run-tests.js`: 外部 `curl` 依存を廃止し、Node の `fetch` に置換
+  - `dev-server.js` 起動時に `PORT=0` を付与して空きポートで起動（自動割当）
+  - `/tests/test.html` が 404 の場合は index/admin/play へのスモークチェックにフォールバック
+
 ## [2025-11-07]
 
 - feat(merge): merge conflicts resolved and latest changes integrated [closes #12]
