@@ -64,11 +64,13 @@
       // Inventory management API
       addItem: logicManager.addItem.bind(logicManager),
       removeItem: logicManager.removeItem.bind(logicManager),
+      useItem: logicManager.useItem.bind(logicManager),
       hasItem: logicManager.hasItem.bind(logicManager),
       getItemCount: logicManager.getItemCount.bind(logicManager),
       getInventory: logicManager.getInventory.bind(logicManager),
       getInventoryItems: logicManager.getInventoryItems.bind(logicManager),
       getItemsData: () => itemsData,
+      checkConditions: (conditions) => GameEngineUtils.checkConditions(conditions, logicManager.state),
       // Multi-session save slot management
       createSlot: logicManager.createSlot.bind(logicManager),
       deleteSlot: logicManager.deleteSlot.bind(logicManager),

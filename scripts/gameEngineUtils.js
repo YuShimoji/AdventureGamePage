@@ -211,5 +211,24 @@
     }
   }
 
+  static checkConditions(conditions, state) {
+    if (!conditions || !Array.isArray(conditions)) return true;
+
+    for (const cond of conditions) {
+      switch (cond.type) {
+        case 'has_item':
+          if (!state.playerState.inventory.items.some(item => item.id === cond.itemId && item.quantity >= (cond.minQuantity || 1))) return false;
+          break;
+        case 'inventory_empty':
+          if (state.playerState.inventory.items.length > 0) return false;
+          break;
+        default:
+          console.warn(`Unknown condition type: ${cond.type}`);
+          return false;
+      }
+    }
+    return true;
+  }
+
   window.GameEngineUtils = GameEngineUtils;
 })();

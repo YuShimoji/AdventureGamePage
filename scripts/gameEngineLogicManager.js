@@ -233,6 +233,20 @@
       return true;
     }
 
+    useItem(itemId) {
+      if (!this.hasItem(itemId, 1)) return false;
+
+      const itemData = this.itemsData.find(item => item.id === itemId);
+      if (!itemData || !itemData.effect) {
+        console.warn(`No effect defined for item ${itemId}`);
+        return false;
+      }
+
+      const action = { type: 'use_item', itemId, effect: itemData.effect };
+      GameEngineUtils.executeAction(action, this.state, this.itemsData, this.saveProgress.bind(this));
+      return true;
+    }
+
     hasItem(itemId, minQuantity = 1) {
       if (!itemId) return false;
       const item = this.state.playerState.inventory.items.find(item => item.id === itemId);
