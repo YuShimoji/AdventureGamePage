@@ -307,7 +307,7 @@
     if (!window.mermaid) return false;
     if (!ensureMermaid._inited) {
       try {
-        window.mermaid.initialize({ startOnLoad: false });
+        window.mermaid.initialize({ startOnLoad: false, cursor: 'pointer' });
       } catch {}
       ensureMermaid._inited = true;
     }

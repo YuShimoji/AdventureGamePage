@@ -13,6 +13,7 @@
       return;
     }
 
+    console.log('[MermaidPreview] Initializing on admin page');
     if (document.getElementById('mermaid-panel')) {
       // Wait for admin-boot-complete event instead of initializing immediately
       const initializeMermaidPreview = () => {
@@ -35,10 +36,15 @@
 
       // Check if admin-boot already completed
       if (window.AdminBoot && document.getElementById('editor')) {
+        console.log('[MermaidPreview] Admin-boot already complete, initializing now');
         initializeMermaidPreview();
       } else {
+        console.log('[MermaidPreview] Waiting for admin-boot-complete event');
         // Wait for admin-boot-complete event
-        document.addEventListener('admin-boot-complete', initializeMermaidPreview, { once: true });
+        document.addEventListener('admin-boot-complete', () => {
+          console.log('[MermaidPreview] Admin-boot-complete event received');
+          initializeMermaidPreview();
+        }, { once: true });
       }
     }
   });

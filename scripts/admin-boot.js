@@ -123,10 +123,11 @@
         log('info', 'プレースホルダを設定', { placeholder });
       }
 
-      // 初期テキストの設定（空の場合）
+      // 初期状態の設定（空の場合）
       if (!editor.textContent.trim()) {
-        editor.innerHTML = '<p>ここに本文を入力してください。</p><p><br></p>';
-        log('info', '初期テキストを設定');
+        editor.setAttribute('data-empty', 'true');
+        editor.innerHTML = '';
+        log('info', '初期状態を設定（空）');
       }
 
       // Zenモードの初期設定
