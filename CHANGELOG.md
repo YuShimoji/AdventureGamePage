@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2025-11-11]
+
+- feat(play): 画像表示機能を実装 [#37]
+  - `GameEngineUIManager.renderImage`: ノードごとの画像表示機能追加
+  - `play.html`: `#scene-image`要素による画像表示エリア
+  - `styles/play.css`: レスポンシブ対応（モバイル200px, タブレット300px, デスクトップ400px）
+  - URL形式検証とエラーハンドリング（無効URLや読み込み失敗時は自動非表示）
+  - `tests/gameEngine.imageDisplay.spec.js`: 包括的テストスイート追加
+  - http/https/相対パス/data URL形式に対応
+
 ## [2025-11-07]
 
 - feat(merge): merge conflicts resolved and latest changes integrated [closes #12]

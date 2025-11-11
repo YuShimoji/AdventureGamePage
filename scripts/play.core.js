@@ -26,6 +26,7 @@
         titleEl: document.getElementById("game-title"),
         textEl: document.getElementById("scene"),
         choicesEl: document.getElementById("choices"),
+        imageEl: document.getElementById("scene-image"),
         btnRestart: document.getElementById("btn-restart"),
         backBtn: document.getElementById("btn-back"),
         forwardBtn: document.getElementById("btn-forward")
@@ -90,6 +91,7 @@
         titleEl: elements.titleEl,
         textEl: elements.textEl,
         choicesEl: elements.choicesEl,
+        imageEl: elements.imageEl,
         backBtn: elements.backBtn,
         forwardBtn: elements.forwardBtn,
       });

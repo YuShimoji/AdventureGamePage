@@ -15,6 +15,11 @@
       const node = getNode();
       if (this.elements.textEl) this.elements.textEl.textContent = node.text || "";
 
+      // Render scene image if available
+      if (this.elements.imageEl) {
+        this.renderImage(node.image);
+      }
+
       if (this.elements.choicesEl) {
         this.elements.choicesEl.innerHTML = "";
         (node.choices || []).forEach((c, index) => {
@@ -103,6 +108,59 @@
       } catch (e) {
         // Ignore accessibility setup errors
       }
+    }
+
+    // 画像レンダリング
+    renderImage(imageUrl) {
+      const imageEl = this.elements.imageEl;
+      if (!imageEl) return;
+
+      // Clear existing content
+      imageEl.innerHTML = '';
+
+      // No image URL provided
+      if (!imageUrl || typeof imageUrl !== 'string') {
+        imageEl.hidden = true;
+        return;
+      }
+
+      // Validate URL (basic check)
+      const isValidUrl = imageUrl.startsWith('http://') || 
+                        imageUrl.startsWith('https://') || 
+                        imageUrl.startsWith('/') || 
+                        imageUrl.startsWith('./') || 
+                        imageUrl.startsWith('../') ||
+                        imageUrl.startsWith('data:');
+
+      if (!isValidUrl) {
+        console.warn(`[ImageDisplay] Invalid image URL: ${imageUrl}`);
+        imageEl.hidden = true;
+        return;
+      }
+
+      // Create image element
+      const img = document.createElement('img');
+      img.src = imageUrl;
+      img.alt = 'Scene image';
+      img.className = 'scene-image__img';
+
+      // Handle load success
+      img.addEventListener('load', () => {
+        imageEl.hidden = false;
+        if (window.APP_CONFIG?.debug?.showConsoleLogs) {
+          console.log(`[ImageDisplay] Image loaded: ${imageUrl}`);
+        }
+      });
+
+      // Handle load error
+      img.addEventListener('error', () => {
+        console.warn(`[ImageDisplay] Failed to load image: ${imageUrl}`);
+        imageEl.hidden = true;
+        imageEl.innerHTML = '';
+      });
+
+      // Append image to container
+      imageEl.appendChild(img);
     }
 
     // バック/フォワードボタンイベントリスナー設定
