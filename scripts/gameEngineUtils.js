@@ -125,28 +125,50 @@
     }
 
     static executeSetVariableAction(action, state, saveProgress) {
-      if (action.key) {
-        let value = action.value;
-        if (action.operation && action.operation !== 'set') {
-          const current = state.playerState.variables[action.key] || 0;
-          switch (action.operation) {
-            case 'add':
-              value = current + (value || 0);
-              break;
-            case 'subtract':
-              value = current - (value || 0);
-              break;
-            case 'multiply':
-              value = current * (value || 1);
-              break;
-            case 'divide':
-              value = value !== 0 ? current / value : current;
-              break;
-          }
+      if (!action.key) return;
+
+      // セキュリティ検証
+      if (window.SecurityUtils) {
+        // 変数名の検証
+        if (!window.SecurityUtils.validateVariableName(action.key)) {
+          console.warn(`[Security] Invalid variable name: ${action.key}`);
+          return;
         }
-        state.playerState.variables[action.key] = value;
-        saveProgress();
+
+        // 安全なオブジェクトキーかチェック
+        if (!window.SecurityUtils.isSafeObjectKey(action.key)) {
+          console.error(`[Security] Unsafe object key detected: ${action.key}`);
+          return;
+        }
       }
+
+      let value = action.value;
+      if (action.operation && action.operation !== 'set') {
+        const current = state.playerState.variables[action.key] || 0;
+        switch (action.operation) {
+          case 'add':
+            value = current + (value || 0);
+            break;
+          case 'subtract':
+            value = current - (value || 0);
+            break;
+          case 'multiply':
+            value = current * (value || 1);
+            break;
+          case 'divide':
+            value = value !== 0 ? current / value : current;
+            break;
+        }
+      }
+
+      // 値の検証
+      if (window.SecurityUtils && !window.SecurityUtils.validateVariableValue(value)) {
+        console.warn(`[Security] Invalid variable value for key ${action.key}:`, value);
+        return;
+      }
+
+      state.playerState.variables[action.key] = value;
+      saveProgress();
     }
 
     static executeEffect(effect) {

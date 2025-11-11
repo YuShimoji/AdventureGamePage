@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2025-11-11]
+
+- feat(security): セキュリティ強化（XSS対策・データ検証厳格化） [#46]
+  - `SecurityUtils`: 新規作成（HTMLエスケープ、テキストサニタイズ、URL検証、セーブデータ検証等）
+  - XSS対策: HTMLタグ・スクリプトのエスケープ処理実装
+  - プロトタイプ汚染防止: `__proto__`等の危険なキー拒否
+  - `GameEngineLogicManager`: セーブデータ検証追加（loadProgress/loadGame）
+  - `GameEngineUtils`: 変数名・値の検証追加（executeSetVariableAction）
+  - `tests/securityUtils.spec.js`: 包括的セキュリティテスト追加（XSS攻撃パターン・プロトタイプ汚染防止等）
+  - 不正データ検出時はエラーログ出力、デバッグモードではアラート表示
+
 ## [2025-11-07]
 
 - feat(merge): merge conflicts resolved and latest changes integrated [closes #12]
