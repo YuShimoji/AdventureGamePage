@@ -249,6 +249,9 @@
       pathApplyBtn: document.getElementById("ne-mermaid-path-apply"),
       statusEl: document.getElementById("ne-mermaid-status"),
       fullscreenBtn: document.getElementById("ne-mermaid-fullscreen"),
+      toggleBtn: document.getElementById("ne-mermaid-toggle"),
+      inlinePanel: document.getElementById("mermaid-inline-panel"),
+      inlineContent: document.getElementById("mermaid-inline-content"),
     };
     setUIRefs(refs);
     const {
@@ -268,6 +271,9 @@
       pathGoalSel,
       pathApplyBtn,
       fullscreenBtn,
+      toggleBtn,
+      inlinePanel,
+      inlineContent,
     } = refs;
     if (!genBtn || !renderBtn || !src || !view) return;
 
@@ -319,6 +325,50 @@
           modalView.innerHTML = mainView.innerHTML;
         }
         modal.hidden = false;
+      });
+    }
+
+    // フルスクリーンモーダルの閉じるボタン
+    const fullscreenCloseBtn = document.getElementById("mermaid-fullscreen-close");
+    if (fullscreenCloseBtn) {
+      fullscreenCloseBtn.addEventListener("click", () => {
+        const modal = document.getElementById("mermaid-fullscreen-modal");
+        if (modal) modal.hidden = true;
+      });
+    }
+
+    // インラインパネルのトグルボタン
+    if (toggleBtn && inlinePanel && inlineContent) {
+      toggleBtn.addEventListener("click", () => {
+        const isHidden = inlinePanel.hidden;
+        const isCollapsed = inlinePanel.classList.contains("collapsed");
+        
+        if (isHidden) {
+          // パネルを表示
+          inlinePanel.hidden = false;
+          inlinePanel.classList.remove("collapsed");
+          inlinePanel.dataset.state = "expanded";
+          inlineContent.hidden = false;
+          toggleBtn.textContent = "閉じる";
+          toggleBtn.setAttribute("aria-expanded", "true");
+          toggleBtn.setAttribute("aria-label", "分岐プレビューを閉じる");
+        } else if (isCollapsed) {
+          // collapsed → 展開
+          inlinePanel.classList.remove("collapsed");
+          inlinePanel.dataset.state = "expanded";
+          inlineContent.hidden = false;
+          toggleBtn.textContent = "閉じる";
+          toggleBtn.setAttribute("aria-expanded", "true");
+        } else {
+          // 展開 → 非表示
+          inlinePanel.hidden = true;
+          inlinePanel.classList.add("collapsed");
+          inlinePanel.dataset.state = "collapsed";
+          inlineContent.hidden = true;
+          toggleBtn.textContent = "開く";
+          toggleBtn.setAttribute("aria-expanded", "false");
+          toggleBtn.setAttribute("aria-label", "分岐プレビューを開く");
+        }
       });
     }
 
@@ -422,30 +472,6 @@ render();</script>
     setStatus("組み立て前：生成または描画してください");
     window.MermaidPreviewLogicManager.buildAndSetSource();
   }
-
-  document.addEventListener("DOMContentLoaded", () => {
-    // ページコンテキストチェック: adminページでのみ初期化
-    if (!(window.location.pathname.endsWith('admin.html') || window.location.pathname === '/admin.html')) {
-      console.log('[MermaidPreviewUIManager] Skipped: not admin page');
-      return;
-    }
-
-    if (document.getElementById("mermaid-panel")) bind();
-    // NodeEditor からの選択変更に追従して現在ノードをハイライト
-    try {
-      document.addEventListener('agp-node-selection-changed', (e) => {
-        const nodeId = e?.detail?.nodeId;
-        if (!nodeId || !window.MermaidPreview?.focusNode) return;
-        window.MermaidPreview.focusNode(nodeId);
-      });
-    } catch {}
-    // NodeEditor からの仕様更新に追従して再描画
-    try {
-      document.addEventListener('agp-spec-updated', () => {
-        try { window.MermaidPreview?.refreshData?.(); } catch {}
-      });
-    } catch {}
-  });
 
   function unbind() {
     const refs = getUIRefs();
