@@ -7,6 +7,7 @@
       this.gameData = gameData;
       this.state = state;
       this.itemsData = itemsData;
+      this.autoSaveTimeoutId = null;
     }
 
     // ノード設定
@@ -38,7 +39,28 @@
       }
 
       render();
-      saveProgress();
+      
+      // Auto-save with debounce if enabled
+      if (window.APP_CONFIG?.game?.autoSave?.enabled) {
+        const delayMs = window.APP_CONFIG.game.autoSave.delayMs || 0;
+        
+        // Clear any pending auto-save
+        if (this.autoSaveTimeoutId) {
+          clearTimeout(this.autoSaveTimeoutId);
+        }
+        
+        // Schedule auto-save with debounce
+        this.autoSaveTimeoutId = setTimeout(() => {
+          try {
+            saveProgress();
+            if (window.APP_CONFIG?.debug?.showConsoleLogs) {
+              console.log('[AutoSave] Game progress saved');
+            }
+          } catch (error) {
+            console.warn('[AutoSave] Failed to save progress:', error);
+          }
+        }, delayMs);
+      }
     }
 
     // 現在のノード取得

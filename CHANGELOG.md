@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 ## [2025-11-11]
 
+- feat(gameEngine): オートセーブ機能を実装 [#35]
+  - `GameEngineLogicManager.setNode`: ノード遷移時の自動セーブをデバウンス付きで実装
+  - `APP_CONFIG.game.autoSave`: 有効/無効切り替えと遅延時間設定が可能
+  - エラーハンドリング強化（保存失敗時も処理継続）
+  - `tests/gameEngine.autoSave.spec.js`: 包括的テストスイート追加（設定・デバウンス・エラー処理を網羅）
+  - 連続遷移時のパフォーマンス影響を最小化
 - feat(gameEngine): 変数システム条件分岐を完成 [#38]
   - `GameEngineUtils.checkConditions`: 変数関連の条件を追加（variable_exists, variable_equals, variable_not_equals, variable_greater_than, variable_less_than, variable_greater_equal, variable_less_equal）
   - `tests/gameEngine.variables.spec.js`: 包括的テストスイート追加（設定・操作・条件分岐・永続化を網羅）
