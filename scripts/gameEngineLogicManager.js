@@ -122,24 +122,38 @@
     // プログレスのロード
     loadProgress() {
       const p = StorageUtil.loadJSON('agp_progress');
-      if (p && p.title === this.gameData.title) {
-        if (p.nodeId && this.gameData.nodes[p.nodeId]) {
-          this.state.nodeId = p.nodeId;
-        }
-        const hist = Array.isArray(p.history) ? p.history.filter((id) => !!this.gameData.nodes[id]) : [];
-        const fwd = Array.isArray(p.forward) ? p.forward.filter((id) => !!this.gameData.nodes[id]) : [];
-        this.state.history = hist;
-        this.state.forward = fwd;
+      if (!p || p.title !== this.gameData.title) {
+        return;
+      }
 
-        // Load player state if available
-        if (p.playerState) {
-          this.state.playerState = {
-            inventory: GameEngineUtils.migrateInventory(p.playerState.inventory, this.itemsData),
-            flags: p.playerState.flags || {},
-            variables: p.playerState.variables || {},
-            history: Array.isArray(p.playerState.history) ? p.playerState.history : []
-          };
+      // セキュリティ検証
+      if (window.SecurityUtils) {
+        const validation = window.SecurityUtils.validateSaveData(p);
+        if (!validation.valid) {
+          console.error('[Security] Invalid save data detected:', validation.errors);
+          if (window.APP_CONFIG?.debug?.enabled) {
+            alert('セーブデータに不正な内容が含まれています。詳細はコンソールを確認してください。');
+          }
+          return;
         }
+      }
+
+      if (p.nodeId && this.gameData.nodes[p.nodeId]) {
+        this.state.nodeId = p.nodeId;
+      }
+      const hist = Array.isArray(p.history) ? p.history.filter((id) => !!this.gameData.nodes[id]) : [];
+      const fwd = Array.isArray(p.forward) ? p.forward.filter((id) => !!this.gameData.nodes[id]) : [];
+      this.state.history = hist;
+      this.state.forward = fwd;
+
+      // Load player state if available
+      if (p.playerState) {
+        this.state.playerState = {
+          inventory: GameEngineUtils.migrateInventory(p.playerState.inventory, this.itemsData),
+          flags: p.playerState.flags || {},
+          variables: p.playerState.variables || {},
+          history: Array.isArray(p.playerState.history) ? p.playerState.history : []
+        };
       }
     }
 
@@ -151,6 +165,18 @@
     // ゲームロード
     loadGame(saveData) {
       if (!saveData || saveData.title !== this.gameData.title) return false;
+
+      // セキュリティ検証
+      if (window.SecurityUtils) {
+        const validation = window.SecurityUtils.validateSaveData(saveData);
+        if (!validation.valid) {
+          console.error('[Security] Invalid save data detected:', validation.errors);
+          if (window.APP_CONFIG?.debug?.enabled) {
+            alert('セーブデータに不正な内容が含まれています。読み込みを中止します。');
+          }
+          return false;
+        }
+      }
 
       this.state.nodeId = saveData.nodeId;
       this.state.history = Array.isArray(saveData.history) ? saveData.history : [];
