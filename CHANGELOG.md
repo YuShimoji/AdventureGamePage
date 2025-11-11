@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2025-11-11]
+
+- feat(gameEngine): 変数システム条件分岐を完成 [#38]
+  - `GameEngineUtils.checkConditions`: 変数関連の条件を追加（variable_exists, variable_equals, variable_not_equals, variable_greater_than, variable_less_than, variable_greater_equal, variable_less_equal）
+  - `tests/gameEngine.variables.spec.js`: 包括的テストスイート追加（設定・操作・条件分岐・永続化を網羅）
+  - すべてのテストが成功し、変数システムが完全に動作
+- docs: 開発項目サマリー作成
+  - `development_summary.md`: 直近の開発項目と今後の開発予定項目を表形式で整理
+
 ## [2025-11-10]
 
 - fix(test): テストランナーを安定化（Windows/ポート競合対応）

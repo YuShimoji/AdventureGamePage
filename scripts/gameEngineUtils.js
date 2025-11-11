@@ -209,25 +209,46 @@
         }
       };
     }
-  }
 
-  static checkConditions(conditions, state) {
-    if (!conditions || !Array.isArray(conditions)) return true;
+    static checkConditions(conditions, state) {
+      if (!conditions || !Array.isArray(conditions)) return true;
 
-    for (const cond of conditions) {
-      switch (cond.type) {
-        case 'has_item':
-          if (!state.playerState.inventory.items.some(item => item.id === cond.itemId && item.quantity >= (cond.minQuantity || 1))) return false;
-          break;
-        case 'inventory_empty':
-          if (state.playerState.inventory.items.length > 0) return false;
-          break;
-        default:
-          console.warn(`Unknown condition type: ${cond.type}`);
-          return false;
+      for (const cond of conditions) {
+        switch (cond.type) {
+          case 'has_item':
+            if (!state.playerState.inventory.items.some(item => item.id === cond.itemId && item.quantity >= (cond.minQuantity || 1))) return false;
+            break;
+          case 'inventory_empty':
+            if (state.playerState.inventory.items.length > 0) return false;
+            break;
+          case 'variable_exists':
+            if (!(cond.key in state.playerState.variables)) return false;
+            break;
+          case 'variable_equals':
+            if (state.playerState.variables[cond.key] !== cond.value) return false;
+            break;
+          case 'variable_not_equals':
+            if (state.playerState.variables[cond.key] === cond.value) return false;
+            break;
+          case 'variable_greater_than':
+            if (!(state.playerState.variables[cond.key] > cond.value)) return false;
+            break;
+          case 'variable_less_than':
+            if (!(state.playerState.variables[cond.key] < cond.value)) return false;
+            break;
+          case 'variable_greater_equal':
+            if (!(state.playerState.variables[cond.key] >= cond.value)) return false;
+            break;
+          case 'variable_less_equal':
+            if (!(state.playerState.variables[cond.key] <= cond.value)) return false;
+            break;
+          default:
+            console.warn(`Unknown condition type: ${cond.type}`);
+            return false;
+        }
       }
+      return true;
     }
-    return true;
   }
 
   window.GameEngineUtils = GameEngineUtils;
