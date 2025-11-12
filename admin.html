@@ -1,23 +1,23 @@
 <!doctype html>
 <html lang="ja">
   <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>管理画面</title>
-    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E📚%3C/text%3E%3C/svg%3E">
-    <link rel="stylesheet" href="styles/common.css?v=4" />
-    <link rel="stylesheet" href="styles/admin.css?v=4" />
+    <script src="scripts/header.js"></script>
+    <script>
+      HeaderUtils.generateHead('管理画面', [
+        { rel: 'stylesheet', href: 'styles/admin.css?v=4' }
+      ]);
+    </script>
   </head>
   <body class="admin-page">
-    <header class="app-header">
-      <a class="btn" href="index.html">← トップ</a>
-      <h1>Zenライクエディタ</h1>
-      <div class="header-actions">
-        <span id="char-count" class="muted">0 文字</span>
-        <button id="btn-theme" class="btn btn-ghost btn-sm" title="テーマ設定">テーマ</button>
-        <button id="btn-toggle-sidebar" class="btn btn-ghost btn-sm" title="ツール">ツール</button>
-      </div>
-
+    <script>
+      const header = HeaderUtils.generateHeader('Zenライクエディタ', [], [
+        { type: 'link', text: '← トップ', href: 'index.html', class: 'btn' },
+        { type: 'span', id: 'char-count', class: 'muted', text: '0 文字' },
+        { type: 'button', id: 'btn-theme', class: 'btn btn-ghost btn-sm', title: 'テーマ設定', text: 'テーマ' },
+        { type: 'button', id: 'btn-toggle-sidebar', class: 'btn btn-ghost btn-sm', title: 'ツール', text: 'ツール' }
+      ]);
+      document.body.insertBefore(header, document.body.firstChild);
+    </script>
     <!-- Node Editor Fullscreen Modal -->
     <div id="node-editor-modal" class="node-editor-modal" hidden>
       <div class="node-editor-modal-header">

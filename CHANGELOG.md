@@ -12,6 +12,18 @@ All notable changes to this project will be documented in this file.
   - `GameEngineUtils`: 変数名・値の検証追加（executeSetVariableAction）
   - `tests/securityUtils.spec.js`: 包括的セキュリティテスト追加（XSS攻撃パターン・プロトタイプ汚染防止等）
   - 不正データ検出時はエラーログ出力、デバッグモードではアラート表示
+- feat(gameEngine): オートセーブ機能を実装 [#35]
+  - `GameEngineLogicManager.setNode`: ノード遷移時の自動セーブをデバウンス付きで実装
+  - `APP_CONFIG.game.autoSave`: 有効/無効切り替えと遅延時間設定が可能
+  - エラーハンドリング強化（保存失敗時も処理継続）
+  - `tests/gameEngine.spec.js`: オートセーブ有効/無効時のテスト追加
+  - 連続遷移時のパフォーマンス影響を最小化
+- feat(gameEngine): 変数システム条件分岐を完成 [#38]
+  - `GameEngineUtils.checkConditions`: 変数関連の条件を追加（variable_exists, variable_equals, variable_not_equals, variable_greater_than, variable_less_than, variable_greater_equal, variable_less_equal）
+  - `tests/gameEngine.variables.spec.js`: 包括的テストスイート追加（設定・操作・条件分岐・永続化を網羅）
+  - すべてのテストが成功し、変数システムが完全に動作
+- docs: 開発項目サマリー作成
+  - `development_summary.md`: 直近の開発項目と今後の開発予定項目を表形式で整理
 
 ## [2025-11-07]
 

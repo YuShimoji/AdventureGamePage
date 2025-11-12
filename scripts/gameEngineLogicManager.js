@@ -7,6 +7,7 @@
       this.gameData = gameData;
       this.state = state;
       this.itemsData = itemsData;
+      this.autoSaveTimeoutId = null;
     }
 
     // ノード設定
@@ -38,7 +39,28 @@
       }
 
       render();
-      saveProgress();
+      
+      // Auto-save with debounce if enabled
+      if (window.APP_CONFIG?.game?.autoSave?.enabled) {
+        const delayMs = window.APP_CONFIG.game.autoSave.delayMs || 0;
+        
+        // Clear any pending auto-save
+        if (this.autoSaveTimeoutId) {
+          clearTimeout(this.autoSaveTimeoutId);
+        }
+        
+        // Schedule auto-save with debounce
+        this.autoSaveTimeoutId = setTimeout(() => {
+          try {
+            saveProgress();
+            if (window.APP_CONFIG?.debug?.showConsoleLogs) {
+              console.log('[AutoSave] Game progress saved');
+            }
+          } catch (error) {
+            console.warn('[AutoSave] Failed to save progress:', error);
+          }
+        }, delayMs);
+      }
     }
 
     // 現在のノード取得
@@ -256,6 +278,20 @@
       document.dispatchEvent(new CustomEvent('agp-inventory-changed', {
         detail: { action: 'remove', itemId, quantity }
       }));
+      return true;
+    }
+
+    useItem(itemId) {
+      if (!this.hasItem(itemId, 1)) return false;
+
+      const itemData = this.itemsData.find(item => item.id === itemId);
+      if (!itemData || !itemData.effect) {
+        console.warn(`No effect defined for item ${itemId}`);
+        return false;
+      }
+
+      const action = { type: 'use_item', itemId, effect: itemData.effect };
+      GameEngineUtils.executeAction(action, this.state, this.itemsData, this.saveProgress.bind(this));
       return true;
     }
 

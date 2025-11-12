@@ -1,32 +1,24 @@
 <!doctype html>
 <html lang="ja">
   <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>プレイ</title>
-    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E📚%3C/text%3E%3C/svg%3E">
-    <link rel="stylesheet" href="styles/common.css?v=4">
-    <link rel="stylesheet" href="styles/play.css?v=4">
+    <script src="scripts/header.js"></script>
+    <script>
+      HeaderUtils.generateHead('プレイ', [
+        { rel: 'stylesheet', href: 'styles/common.css?v=4' },
+        { rel: 'stylesheet', href: 'styles/play.css?v=4' }
+      ]);
+    </script>
   </head>
   <body class="play-page">
-    <header class="app-header">
-      <a class="btn" href="index.html">← トップ</a>
-      <h1 id="game-title">サンプルアドベンチャー</h1>
-      <div class="header-actions">
-        <button id="btn-back" class="btn" aria-label="前のノードに戻る">戻る</button>
-        <button id="btn-forward" class="btn" aria-label="次のノードに進む">進む</button>
-        <button id="btn-save" class="btn" aria-label="保存モーダルを開く">保存</button>
-        <button id="btn-load" class="btn" aria-label="読込モーダルを開く">読込</button>
-        <button id="btn-save-slots" class="btn" title="セーブスロット" aria-label="セーブスロットを開く">スロット</button>
-        <button id="btn-inventory" class="btn" title="インベントリ" aria-label="インベントリを開く" aria-expanded="false">インベントリ</button>
-        <button id="btn-restart" class="btn" aria-label="ゲームを最初からやり直す">リスタート</button>
-        <button id="btn-theme" class="icon-btn" title="テーマ設定" aria-label="テーマ設定を開く">テーマ</button>
-        <label class="btn file-label" aria-label="ゲームデータを読み込む">
-          ゲームJSON読込
-          <input id="play-file-import" type="file" accept="application/json" hidden />
-        </label>
-      </div>
-    </header>
+    <script>
+      const header = HeaderUtils.generateHeader('', [], [
+        { type: 'link', text: '← トップ', href: 'index.html', class: 'btn' },
+        { type: 'span', id: 'game-title', text: 'サンプルアドベンチャー' },
+        { type: 'button', id: 'btn-inventory', class: 'icon-btn', title: 'インベントリ', text: 'I' },
+        { type: 'button', id: 'btn-restart', class: 'icon-btn', title: 'リスタート', text: 'R' }
+      ]);
+      document.body.insertBefore(header, document.body.firstChild);
+    </script>
 
     <main class="container play-container">
       <!-- Scene Image -->

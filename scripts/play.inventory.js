@@ -96,11 +96,7 @@
           useBtn.textContent = '使用';
           useBtn.addEventListener('click', () => {
             if (confirm(`"${item.name}" を使用しますか？`)) {
-              // TODO: Implement item usage logic based on item effects
-              alert(`"${item.name}" を使用しました`);
-              // For now, just remove one from inventory
-              this.engine.removeItem(item.id, 1);
-              this.updateInventoryList(container);
+              this.engine.useItem(item.id);
             }
           });
           actionsEl.appendChild(useBtn);
