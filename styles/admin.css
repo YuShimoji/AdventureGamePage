@@ -173,13 +173,22 @@
 
 /* Floating controls (quick actions) */
 .floating-controls {
-  position: fixed;
-  right: 16px;
-  bottom: 16px;
   display: flex;
   flex-direction: column;
   gap: 8px;
+}
+
+/* Floating controls outside panel - fixed positioning */
+body > .floating-controls {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
   z-index: 95;
+}
+
+/* Floating controls inside panel - relative positioning */
+.floating-panel .floating-controls {
+  position: relative;
 }
 .floating-controls .icon-btn {
   width: 40px; height: 40px; border-radius: 10px; background: var(--surface);
