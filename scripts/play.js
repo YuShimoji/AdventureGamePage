@@ -10,6 +10,7 @@
       window.PlaySave.init(engine, game.title);
       window.PlayInventory.init(engine);
       window.PlayInput.init(engine);
+      window.PlayDebug.init(engine);
 
       // Ensure modal is hidden on initialization
       const saveLoadModal = window.PlaySave.getModalElement?.() || document.getElementById('save-load-modal');

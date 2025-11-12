@@ -4,6 +4,42 @@ All notable changes to this project will be documented in this file.
 
 ## [2025-11-12]
 
+- fix: プレイページ表示問題とエディタツールパネル問題を修正
+  - `play.html`: 欠落していた`play.input.js`と`play.js`を追加
+    - PlayCore、PlaySave、PlayInventory、PlayInputモジュールが正しく初期化されるようになった
+    - プレイページが真っ黒だった問題を解決
+  - `admin.css`: floating-panelのスタイル問題を修正
+    - floating-panel内の.floating-controlsがposition:fixedで画面外に配置されていた問題を修正
+    - パネル内のコントロールにはposition:relativeを適用
+    - エディタのツールパネルが正しく表示されるようになった
+
+- feat: 1ページ内表示切り替え機能を実装 (SPA風ナビゲーション)
+  - `app.html`: SPA風の統合アプリページを新規作成
+    - タブナビゲーションで各機能をシームレスに切り替え
+    - ホーム、機能一覧、プレイ、管理、学習ページを統合
+    - 動的コンテンツローディング実装
+    - URLハッシュによるルーティング対応
+  - `index.html`: 統合アプリへのリンクを追加
+    - 「統合アプリ起動」ボタンを追加
+  - これにより、ページ遷移なしで全機能にアクセス可能になりました
+
+- feat: デバッグUI実装 (Issue #33)
+  - `scripts/play.debug.js`: 開発者向けデバッグツールUIを新規作成
+    - フローティングデバッグボタン（🔧）を右下に配置
+    - ゲーム状態操作（保存/読込/リセット）
+    - インベントリ操作（アイテム追加/削除/確認）
+    - ノード操作（指定ノードへジャンプ）
+    - 変数操作（設定/取得/全表示）
+    - ログ操作（コンソールログ切替/クリア）
+    - デバッグAPI公開（window.debugAddItem等）
+  - `styles/play.css`: デバッグUIのスタイル追加
+    - コンパクトなパネルデザイン
+    - レスポンシブ対応（モバイル最適化）
+  - `play.html`: `play.debug.js`スクリプトを追加
+  - `play.js`: PlayDebug.init()を統合
+  - `APP_CONFIG.debug.enabled = true`の場合のみ表示
+  - これにより、Console経由での操作が不要になり、開発効率が向上しました
+
 - feat: 機能一覧ページとインベントリデモ機能追加 [#30]
   - `features.html`: 実装済み機能を一覧表示する専用ページを作成
     - ゲームエンジン機能（オートセーブ、変数システム、戻る/進む、マルチセッション、ショートカット）
