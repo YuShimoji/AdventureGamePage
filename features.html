@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <script src="scripts/header.js"></script>
+    <script>
+      HeaderUtils.generateHead('機能一覧 - Adventure Game Page');
+    </script>
+    <style>
+      .feature-grid {
+        display: grid;
+        gap: 16px;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        margin-bottom: 24px;
+      }
+      .feature-card {
+        border: 1px solid var(--border-color, #333);
+        border-radius: 8px;
+        padding: 16px;
+        background: var(--card-bg, #1a1a1a);
+      }
+      .feature-card h3 {
+        margin: 0 0 8px;
+        font-size: 18px;
+        color: var(--accent-color, #4493f8);
+      }
+      .feature-card .status {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: bold;
+        margin-bottom: 8px;
+      }
+      .status-completed {
+        background: rgba(34, 197, 94, 0.2);
+        color: #22c55e;
+      }
+      .status-beta {
+        background: rgba(251, 191, 36, 0.2);
+        color: #fbbf24;
+      }
+      .feature-card p {
+        margin: 8px 0;
+        font-size: 14px;
+        color: var(--text-muted, #999);
+      }
+      .feature-card .demo-link {
+        display: inline-block;
+        margin-top: 8px;
+        padding: 4px 12px;
+        background: var(--accent-color, #4493f8);
+        color: white;
+        border-radius: 4px;
+        text-decoration: none;
+        font-size: 13px;
+      }
+      .feature-card .demo-link:hover {
+        opacity: 0.9;
+      }
+      .category-title {
+        font-size: 24px;
+        margin: 32px 0 16px;
+        padding-bottom: 8px;
+        border-bottom: 2px solid var(--border-color, #333);
+      }
+    </style>
+  </head>
+  <body>
+    <script>
+      const header = HeaderUtils.generateHeader('機能一覧', [
+        { text: 'ホーム', href: 'index.html' },
+        { text: '学ぶ', href: 'learn.html' },
+        { text: '管理', href: 'admin.html' },
+        { text: 'プレイ', href: 'play.html', class: 'btn btn-accent' }
+      ]);
+      document.body.insertBefore(header, document.body.firstChild);
+    </script>
+
+    <main class="container" style="margin-top: 24px; margin-bottom: 48px;">
+      <h1>実装済み機能一覧</h1>
+      <p class="muted">Adventure Game Pageで利用可能な機能を確認・テストできます。</p>
+
+      <!-- ゲームエンジン機能 -->
+      <h2 class="category-title">🎮 ゲームエンジン</h2>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <span class="status status-completed">完成</span>
+          <h3>#35 オートセーブ</h3>
+          <p>ノード遷移時に自動的にゲーム進行状態を保存。ブラウザクラッシュ時もデータを保護します。</p>
+          <ul style="font-size: 13px; color: var(--text-muted, #999); margin: 8px 0;">
+            <li>デバウンス処理で負荷軽減</li>
+            <li>設定でON/OFF可能</li>
+            <li>エラー時も処理継続</li>
+          </ul>
+          <a href="play.html" class="demo-link">プレイで試す →</a>
+        </div>
+
+        <div class="feature-card">
+          <span class="status status-completed">完成</span>
+          <h3>#38 変数システム</h3>
+          <p>動的な変数管理で高度なゲームロジックを実現。条件分岐で複雑なストーリー展開が可能です。</p>
+          <ul style="font-size: 13px; color: var(--text-muted, #999); margin: 8px 0;">
+            <li>変数の設定・比較・演算</li>
+            <li>7種類の条件演算子</li>
+            <li>永続化対応</li>
+          </ul>
+          <a href="play.html" class="demo-link">プレイで試す →</a>
+        </div>
+
+        <div class="feature-card">
+          <span class="status status-completed">完成</span>
+          <h3>#12 戻る機能</h3>
+          <p>履歴スタックで選択をやり直し可能。進行を保存・復元できます。</p>
+          <ul style="font-size: 13px; color: var(--text-muted, #999); margin: 8px 0;">
+            <li>canGoBack() / goBack()</li>
+            <li>← キーでも操作可能</li>
+            <li>永続化対応</li>
+          </ul>
+          <a href="play.html" class="demo-link">プレイで試す →</a>
+        </div>
+
+        <div class="feature-card">
+          <span class="status status-completed">完成</span>
+          <h3>#14 進む機能</h3>
+          <p>戻った後に再び進むことができるフォワードスタック機能。</p>
+          <ul style="font-size: 13px; color: var(--text-muted, #999); margin: 8px 0;">
+            <li>canGoForward() / goForward()</li>
+            <li>→ キーでも操作可能</li>
+            <li>永続化対応</li>
+          </ul>
+          <a href="play.html" class="demo-link">プレイで試す →</a>
+        </div>
+
+        <div class="feature-card">
+          <span class="status status-completed">完成</span>
+          <h3>#32 マルチセッションセーブ</h3>
+          <p>複数のセーブスロットでゲーム進行を管理。スロットごとにメタデータを保存します。</p>
+          <ul style="font-size: 13px; color: var(--text-muted, #999); margin: 8px 0;">
+            <li>スロット作成/削除/名前変更/コピー</li>
+            <li>最終更新日時・プレイ時間表示</li>
+            <li>UIパネル完備</li>
+          </ul>
+          <a href="play.html" class="demo-link">プレイで試す →</a>
+        </div>
+
+        <div class="feature-card">
+          <span class="status status-completed">完成</span>
+          <h3>#15 ショートカット</h3>
+          <p>キーボードショートカットで快適なプレイ体験。</p>
+          <ul style="font-size: 13px; color: var(--text-muted, #999); margin: 8px 0;">
+            <li>← 戻る / → 進む / R リスタート</li>
+            <li>Tab/Enter で選択肢操作</li>
+            <li>アクセシビリティ対応</li>
+          </ul>
+          <a href="play.html" class="demo-link">プレイで試す →</a>
+        </div>
+      </div>
+
+      <!-- エディター機能 -->
+      <h2 class="category-title">✏️ エディター</h2>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <span class="status status-completed">完成</span>
+          <h3>#45 ストーリービルダー</h3>
+          <p>ビジュアルなブロックUIで直感的にストーリーを作成。ドラッグ&ドロップ対応。</p>
+          <ul style="font-size: 13px; color: var(--text-muted, #999); margin: 8px 0;">
+            <li>ノード選択と本文編集の同期</li>
+            <li>選択肢/アクション追加UI</li>
+            <li>ワンクリック編集</li>
+          </ul>
+          <a href="admin.html" class="demo-link">エディタで試す →</a>
+        </div>
+
+        <div class="feature-card">
+          <span class="status status-completed">完成</span>
+          <h3>#8 Mermaidプレビュー</h3>
+          <p>分岐グラフをビジュアル表示。JSON Diffで変更内容を確認できます。</p>
+          <ul style="font-size: 13px; color: var(--text-muted, #999); margin: 8px 0;">
+            <li>リアルタイム分岐図生成</li>
+            <li>保存時の差分表示</li>
+            <li>SHA-256キャッシュ</li>
+          </ul>
+          <a href="admin.html" class="demo-link">エディタで試す →</a>
+        </div>
+
+        <div class="feature-card">
+          <span class="status status-completed">完成</span>
+          <h3>#11 自動スクロール</h3>
+          <p>入力に追従する自動スクロールとアニメーション効果。</p>
+          <ul style="font-size: 13px; color: var(--text-muted, #999); margin: 8px 0;">
+            <li>キャレット追従</li>
+            <li>入力/削除時フェード効果</li>
+            <li>設定でカスタマイズ可能</li>
+          </ul>
+          <a href="admin.html" class="demo-link">エディタで試す →</a>
+        </div>
+
+        <div class="feature-card">
+          <span class="status status-completed">完成</span>
+          <h3>#23 レスポンシブデザイン</h3>
+          <p>タブレット・モバイル対応。あらゆる画面サイズで快適に編集。</p>
+          <ul style="font-size: 13px; color: var(--text-muted, #999); margin: 8px 0;">
+            <li>1024px/768px/480pxブレークポイント</li>
+            <li>サイドバーオーバーレイ</li>
+            <li>タッチデバイス最適化</li>
+          </ul>
+          <a href="admin.html" class="demo-link">エディタで試す →</a>
+        </div>
+      </div>
+
+      <!-- セキュリティ・品質 -->
+      <h2 class="category-title">🔒 セキュリティ・品質</h2>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <span class="status status-completed">完成</span>
+          <h3>#46 セキュリティ強化</h3>
+          <p>XSS対策とデータ検証を徹底。安全にゲームを作成・プレイできます。</p>
+          <ul style="font-size: 13px; color: var(--text-muted, #999); margin: 8px 0;">
+            <li>HTMLエスケープ・サニタイズ</li>
+            <li>プロトタイプ汚染防止</li>
+            <li>セーブデータ検証</li>
+          </ul>
+          <a href="tests/test.html" class="demo-link" target="_blank">テストを見る →</a>
+        </div>
+
+        <div class="feature-card">
+          <span class="status status-completed">完成</span>
+          <h3>#29 パフォーマンス最適化</h3>
+          <p>遅延ロードとキャッシュで高速な動作を実現。</p>
+          <ul style="font-size: 13px; color: var(--text-muted, #999); margin: 8px 0;">
+            <li>非クリティカルスクリプトの遅延ロード</li>
+            <li>Mermaid描画キャッシュ</li>
+            <li>初期ロード時間短縮</li>
+          </ul>
+          <a href="tests/test.html" class="demo-link" target="_blank">テストを見る →</a>
+        </div>
+
+        <div class="feature-card">
+          <span class="status status-completed">完成</span>
+          <h3>#16 アクセシビリティ</h3>
+          <p>キーボード操作とスクリーンリーダー対応で誰でも使いやすく。</p>
+          <ul style="font-size: 13px; color: var(--text-muted, #999); margin: 8px 0;">
+            <li>選択肢自動フォーカス</li>
+            <li>Tab/Enter操作対応</li>
+            <li>ARIA属性</li>
+          </ul>
+          <a href="play.html" class="demo-link">プレイで試す →</a>
+        </div>
+      </div>
+
+      <!-- テスト・開発ツール -->
+      <h2 class="category-title">🧪 テスト・開発ツール</h2>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <span class="status status-completed">完成</span>
+          <h3>自動テストスイート</h3>
+          <p>Mocha + Chaiで包括的なテストを実行。CI/CD対応。</p>
+          <ul style="font-size: 13px; color: var(--text-muted, #999); margin: 8px 0;">
+            <li>20以上のテストファイル</li>
+            <li>Windows/ポート競合対応</li>
+            <li>動的ポート自動割当</li>
+          </ul>
+          <a href="tests/test.html" class="demo-link" target="_blank">テストを実行 →</a>
+        </div>
+
+        <div class="feature-card">
+          <span class="status status-beta">β版</span>
+          <h3>デバッグUI</h3>
+          <p>開発者向けゲーム状態表示と操作UI。（計画中）</p>
+          <ul style="font-size: 13px; color: var(--text-muted, #999); margin: 8px 0;">
+            <li>変数・インベントリ確認</li>
+            <li>ノード強制遷移</li>
+            <li>デバッグログ表示</li>
+          </ul>
+          <span style="font-size: 13px; color: var(--text-muted, #999);">Issue #33で実装予定</span>
+        </div>
+      </div>
+
+      <!-- 今後の実装予定 -->
+      <h2 class="category-title">🚀 実装予定</h2>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <span class="status status-beta">計画中</span>
+          <h3>#30 インベントリシステム</h3>
+          <p>アイテム管理UIの完全実装。取得・使用・表示機能。</p>
+          <span style="font-size: 13px; color: var(--text-muted, #999);">優先度: High</span>
+        </div>
+
+        <div class="feature-card">
+          <span class="status status-beta">計画中</span>
+          <h3>#37 画像表示</h3>
+          <p>ゲーム内に画像を埋め込み表示する機能。</p>
+          <span style="font-size: 13px; color: var(--text-muted, #999);">優先度: Medium</span>
+        </div>
+
+        <div class="feature-card">
+          <span class="status status-beta">計画中</span>
+          <h3>#40 テスト強化</h3>
+          <p>カバレッジ向上とCI/CD統合で品質保証。</p>
+          <span style="font-size: 13px; color: var(--text-muted, #999);">優先度: Medium</span>
+        </div>
+      </div>
+
+      <!-- フッター情報 -->
+      <div class="card" style="margin-top: 32px; padding: 24px; text-align: center;">
+        <h3>さらに詳しく</h3>
+        <p class="muted">各機能の詳細や使い方はドキュメントをご覧ください。</p>
+        <div style="display: flex; gap: 8px; justify-content: center; margin-top: 16px;">
+          <a href="learn.html" class="btn">ドキュメント</a>
+          <a href="CHANGELOG.md" class="btn" target="_blank">更新履歴</a>
+          <a href="https://github.com/YuShimoji/AdventureGamePage" class="btn" target="_blank">GitHub</a>
+        </div>
+      </div>
+    </main>
+
+    <div id="theme-panel" class="theme-panel" hidden></div>
+
+    <script src="scripts/storage.js"></script>
+    <script src="scripts/themeUtils.js"></script>
+    <script src="scripts/themeUIManager.js"></script>
+    <script src="scripts/themeLogicManager.js"></script>
+    <script src="scripts/theme.js"></script>
+  </body>
+</html>
