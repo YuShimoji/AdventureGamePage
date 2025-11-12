@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <script src="scripts/header.js"></script>
+    <script>
+      HeaderUtils.generateHead('Adventure Game Page - Unified');
+    </script>
+    <style>
+      /* Tab navigation styles */
+      .app-tabs {
+        display: flex;
+        gap: 8px;
+        padding: 8px 16px;
+        background: var(--surface);
+        border-bottom: 1px solid var(--border-color);
+        overflow-x: auto;
+        position: sticky;
+        top: 60px;
+        z-index: 50;
+      }
+      .app-tab {
+        padding: 8px 16px;
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        background: transparent;
+        color: var(--text-muted);
+        cursor: pointer;
+        white-space: nowrap;
+        transition: all 0.2s;
+      }
+      .app-tab:hover {
+        background: var(--surface-hover);
+        color: var(--text-color);
+      }
+      .app-tab.active {
+        background: var(--accent-color);
+        color: white;
+        border-color: var(--accent-color);
+      }
+      .app-view {
+        display: none;
+      }
+      .app-view.active {
+        display: block;
+      }
+      .loading-indicator {
+        text-align: center;
+        padding: 40px;
+        color: var(--text-muted);
+      }
+    </style>
+  </head>
+  <body>
+    <script>
+      const header = HeaderUtils.generateHeader('Adventure Game Page', [
+        { text: 'マルチページ版', href: 'index.html' }
+      ]);
+      document.body.insertBefore(header, document.body.firstChild);
+    </script>
+
+    <!-- Tab Navigation -->
+    <nav class="app-tabs">
+      <button class="app-tab active" data-view="home">🏠 ホーム</button>
+      <button class="app-tab" data-view="features">✨ 機能一覧</button>
+      <button class="app-tab" data-view="play">🎮 プレイ</button>
+      <button class="app-tab" data-view="admin">✏️ 管理</button>
+      <button class="app-tab" data-view="learn">📖 学ぶ</button>
+    </nav>
+
+    <!-- View Containers -->
+    <div id="view-home" class="app-view active">
+      <main class="container" style="margin-top: 24px;">
+        <section class="hero" style="padding: 64px 16px; text-align: center; background: radial-gradient(1200px 600px at 50% -10%, rgba(68,147,248,.18), transparent), linear-gradient(to bottom, rgba(124,58,237,.10), transparent);">
+          <div>
+            <h2 style="font-size: 36px; margin: 0 0 12px;">AdventureGamePage Studio</h2>
+            <p class="muted" style="margin: 0 0 20px; font-size: 16px;">分岐シナリオを設計・管理・検証するための内製クリエイティブワークスペース。</p>
+            <div style="display: inline-flex; gap: 8px; flex-wrap: wrap;">
+              <button class="btn btn-accent" data-view="learn">ドキュメント</button>
+              <button class="btn" data-view="admin">エディタを起動</button>
+              <button class="btn" data-view="play">プレイテスト</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="container" style="margin-top: 24px;">
+          <div class="card" style="margin-bottom: 16px;">
+            <h3>コア機能</h3>
+            <div style="display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
+              <div class="card"><strong>ノードベース</strong><br/><span class="muted">分岐・条件・アクションで物語を設計</span></div>
+              <div class="card"><strong>即時プレビュー</strong><br/><span class="muted">保存→プレイで即テスト</span></div>
+              <div class="card"><strong>拡張可能</strong><br/><span class="muted">テーマ・プラグインで進化</span></div>
+            </div>
+          </div>
+          <div class="card">
+            <h3>はじめる</h3>
+            <p class="muted">初めての方は「学ぶ」から。実例とともに最短で制作フローを体験できます。</p>
+            <div style="display:flex; gap: 8px;">
+              <button class="btn btn-primary" data-view="learn">サンプルを見る</button>
+              <button class="btn" data-view="admin">執筆を開始</button>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div id="view-features" class="app-view">
+      <div class="loading-indicator">機能一覧を読み込み中...</div>
+    </div>
+
+    <div id="view-play" class="app-view">
+      <div class="loading-indicator">プレイ画面を読み込み中...</div>
+    </div>
+
+    <div id="view-admin" class="app-view">
+      <div class="loading-indicator">管理画面を読み込み中...</div>
+    </div>
+
+    <div id="view-learn" class="app-view">
+      <div class="loading-indicator">学習ページを読み込み中...</div>
+    </div>
+
+    <div id="theme-panel" class="theme-panel" hidden></div>
+
+    <script src="scripts/storage.js"></script>
+    <script src="scripts/themeUtils.js"></script>
+    <script src="scripts/themeUIManager.js"></script>
+    <script src="scripts/themeLogicManager.js"></script>
+    <script src="scripts/theme.js"></script>
+
+    <!-- App Router Script -->
+    <script>
+      (function() {
+        const views = {
+          home: null, // Already loaded
+          features: 'features.html',
+          play: 'play.html',
+          admin: 'admin.html',
+          learn: 'learn.html'
+        };
+
+        const loadedViews = new Set(['home']);
+
+        // Tab switching
+        document.querySelectorAll('.app-tab, [data-view]').forEach(button => {
+          button.addEventListener('click', async (e) => {
+            const viewName = e.target.getAttribute('data-view');
+            if (!viewName) return;
+
+            // Update active tab
+            document.querySelectorAll('.app-tab').forEach(tab => {
+              tab.classList.toggle('active', tab.getAttribute('data-view') === viewName);
+            });
+
+            // Update active view
+            document.querySelectorAll('.app-view').forEach(view => {
+              view.classList.remove('active');
+            });
+
+            const targetView = document.getElementById(`view-${viewName}`);
+            if (targetView) {
+              targetView.classList.add('active');
+            }
+
+            // Load view content if not already loaded
+            if (!loadedViews.has(viewName) && views[viewName]) {
+              try {
+                const response = await fetch(views[viewName]);
+                const html = await response.text();
+                
+                // Parse HTML and extract body content
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const main = doc.querySelector('main') || doc.body;
+                
+                // Insert content
+                targetView.innerHTML = '';
+                targetView.appendChild(main.cloneNode(true));
+                
+                // Execute scripts from the loaded page
+                const scripts = doc.querySelectorAll('script');
+                scripts.forEach(script => {
+                  if (script.src) {
+                    const newScript = document.createElement('script');
+                    newScript.src = script.src;
+                    document.body.appendChild(newScript);
+                  } else if (script.textContent) {
+                    try {
+                      eval(script.textContent);
+                    } catch (err) {
+                      console.warn('Script execution error:', err);
+                    }
+                  }
+                });
+                
+                loadedViews.add(viewName);
+              } catch (error) {
+                console.error('Failed to load view:', error);
+                targetView.innerHTML = '<div class="container" style="margin-top: 40px;"><div class="card"><p class="muted">ページの読み込みに失敗しました。</p></div></div>';
+              }
+            }
+
+            // Update URL hash
+            window.location.hash = viewName;
+          });
+        });
+
+        // Handle initial hash
+        window.addEventListener('DOMContentLoaded', () => {
+          const hash = window.location.hash.slice(1);
+          if (hash && views.hasOwnProperty(hash)) {
+            const tab = document.querySelector(`.app-tab[data-view="${hash}"]`);
+            if (tab) tab.click();
+          }
+        });
+
+        // Handle hash changes
+        window.addEventListener('hashchange', () => {
+          const hash = window.location.hash.slice(1);
+          if (hash && views.hasOwnProperty(hash)) {
+            const tab = document.querySelector(`.app-tab[data-view="${hash}"]`);
+            if (tab) tab.click();
+          }
+        });
+      })();
+    </script>
+  </body>
+</html>
