@@ -16,7 +16,7 @@
 - **デバッグUI**: 🔧ボタンでリアルタイムデバッグ（開発時のみ）
 
 #### ✏️ **管理機能** (`admin.html`)
-- **Zenライク執筆**: 集中できる執筆環境
+- **ストーリーエディタ**: 集中できる執筆環境
 - **ノード編集**: ビジュアルノードエディタ
 - **条件分岐**: アイテム/変数ベースの複雑な分岐設定
 - **アクション設定**: アイテム操作/変数操作/効果設定
@@ -31,7 +31,7 @@
 - **デバッグ操作**: UIから変数操作/ノードジャンプ可能
 
 - 管理（`admin.html`）
-  - Zen ライクな執筆画面（contenteditable）
+  - ストーリーエディタ（contenteditable）
   - 文字数カウント
   - 基本的な文字装飾（太字/斜体/下線、左右中央揃え）
   - 保存（シンプル＝プレーンテキスト、完全＝HTML+メタ）
@@ -220,7 +220,7 @@ AdventureGamePage/
 ## アーキテクチャ（概要）
 - `scripts/storage.js`: localStorage の便利関数
 - `scripts/theme.js`: テーマ（色）管理とパネル UI
-- `scripts/admin.js`: 執筆エディタ（Zen ライク）と保存/読み込み
+- `scripts/admin.js`: 執筆エディタ（ストーリーエディタ）と保存/読み込み
 - `scripts/storageProvider.js`: StorageProvider 抽象化（LocalStorageProvider 実装と StorageHub を含む）
 - `scripts/savePreview.js`: 保存プレビューのUIロジック（一覧/読込/削除、フラグで有効化）
 - `scripts/gameEngine.js`: シンプルなノード/選択肢エンジン

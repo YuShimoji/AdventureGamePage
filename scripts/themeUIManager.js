@@ -8,20 +8,45 @@
       this.listenersAttached = false;
     }
 
-    // Close panel
     closePanel(panel) {
+      if (!panel) return;
       panel.hidden = true;
       panel.style.display = 'none';
+      panel.setAttribute('aria-hidden', 'true');
     }
 
-    // Open panel
     openPanel(panel) {
+      if (!panel) return;
       panel.hidden = false;
       panel.style.display = 'flex';
+      panel.setAttribute('aria-hidden', 'false');
+      panel.focus?.();
+    }
+
+    togglePanel(panel) {
+      if (!panel) return;
+      panel.hidden ? this.openPanel(panel) : this.closePanel(panel);
     }
 
     // Build theme panel UI
     buildThemePanel(panel) {
+      if (!panel) return;
+
+      this.panel = panel;
+      panel.innerHTML = `
+        <div class="theme-modal" role="dialog" aria-modal="true" aria-labelledby="theme-panel-title" tabindex="-1">
+          <header class="theme-panel-header">
+            <div class="theme-panel-heading">
+              <h3 id="theme-panel-title">テーマ設定</h3>
+              <p class="theme-panel-subtitle">プリセットとカラーパレット</p>
+            </div>
+            <button type="button" id="theme-panel-close" class="btn btn-ghost btn-icon" aria-label="テーマ設定を閉じる">
+              <span aria-hidden="true">×</span>
+            </button>
+          </header>
+          <div class="theme-modal-body"></div>
+        </div>`;
+
       const modalBody = panel.querySelector('.theme-modal-body');
       if (!modalBody) return;
 
@@ -259,8 +284,10 @@
 
       ioSection.appendChild(ioRow);
       modalBody.appendChild(ioSection);
-
       modalBody.appendChild(customSection);
+
+      this.listenersAttached = false;
+      this.attachListeners(panel);
     }
 
     // Update preview box with new colors
@@ -287,12 +314,10 @@
       if (this.listenersAttached) return;
 
       const btn = document.getElementById("btn-theme");
-      const closeBtn = document.getElementById("theme-close");
+      const closeBtn = document.getElementById("theme-panel-close");
 
       if (panel && btn) {
-        btn.addEventListener("click", () => {
-          panel.hidden ? this.openPanel(panel) : this.closePanel(panel);
-        });
+        btn.addEventListener("click", () => this.togglePanel(panel));
       }
 
       if (closeBtn) {

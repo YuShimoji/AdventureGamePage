@@ -69,6 +69,10 @@
       getItemCount: logicManager.getItemCount.bind(logicManager),
       getInventory: logicManager.getInventory.bind(logicManager),
       getInventoryItems: logicManager.getInventoryItems.bind(logicManager),
+      getState: logicManager.getStateSnapshot.bind(logicManager),
+      getVariables: logicManager.getVariables.bind(logicManager),
+      setVariable: logicManager.setVariable.bind(logicManager),
+      getVariable: logicManager.getVariable.bind(logicManager),
       getItemsData: () => itemsData,
       checkConditions: (conditions) => GameEngineUtils.checkConditions(conditions, logicManager.state),
       // Multi-session save slot management

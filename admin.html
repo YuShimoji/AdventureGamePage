@@ -10,11 +10,11 @@
   </head>
   <body class="admin-page">
     <script>
-      const header = HeaderUtils.generateHeader('Zenライクエディタ', [], [
+      const header = HeaderUtils.generateHeader('ストーリーエディタ', [], [
         { type: 'link', text: '← トップ', href: 'index.html', class: 'btn' },
         { type: 'span', id: 'char-count', class: 'muted', text: '0 文字' },
-        { type: 'button', id: 'btn-theme', class: 'btn btn-ghost btn-sm', title: 'テーマ設定', text: 'テーマ' },
-        { type: 'button', id: 'btn-toggle-sidebar', class: 'btn btn-ghost btn-sm', title: 'ツール', text: 'ツール' }
+        { type: 'icon-button', id: 'btn-theme', class: 'btn btn-ghost btn-sm', title: 'テーマ設定', icon: 'settings', iconSize: '16px' },
+        { type: 'icon-button', id: 'btn-toggle-sidebar', class: 'btn btn-ghost btn-sm', title: 'サイドバー', icon: 'sidebar', iconSize: '16px' }
       ]);
       document.body.insertBefore(header, document.body.firstChild);
     </script>
@@ -424,14 +424,14 @@
       </div>
       <div class="floating-panel-content">
         <div class="floating-controls">
-          <button id="btn-quick-zen" class="btn btn-ghost btn-sm" title="Zen切替">Zen Mode</button>
-          <button id="btn-quick-sidebar" class="btn btn-ghost btn-sm" title="ツール切替">Toggle Sidebar</button>
-          <button id="btn-quick-theme" class="btn btn-ghost btn-sm" title="テーマ設定">Theme Settings</button>
+          <button id="btn-quick-zen" class="btn btn-ghost btn-sm" title="ヘッダとサイドバーの表示を切り替え">表示切替</button>
+          <button id="btn-quick-sidebar" class="btn btn-ghost btn-sm" title="サイドバーを表示/非表示">サイドバー</button>
+          <button id="btn-quick-theme" class="btn btn-ghost btn-sm" title="テーマ設定">テーマ</button>
           <div class="floating-controls-group">
-            <button id="btn-quick-more" class="btn btn-ghost btn-sm" title="その他の操作">More Options</button>
+            <button id="btn-quick-more" class="btn btn-ghost btn-sm" title="その他の操作">その他</button>
             <div id="floating-controls-dropdown" class="floating-controls-dropdown" hidden>
-              <button id="btn-quick-preview" class="btn btn-ghost btn-sm" title="保存プレビュー">Save Preview</button>
-              <button id="btn-quick-memos" class="btn btn-ghost btn-sm" title="メモ">Memos</button>
+              <button id="btn-quick-preview" class="btn btn-ghost btn-sm" title="保存プレビュー">保存プレビュー</button>
+              <button id="btn-quick-memos" class="btn btn-ghost btn-sm" title="メモ">メモ</button>
             </div>
           </div>
         </div>
@@ -587,4 +587,6 @@
     <script src="scripts/adminApiManager.js"></script>
     <script src="scripts/uiAdjuster.js"></script>
     <script src="scripts/utilsManager.js"></script>
+    <!-- Lucide icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <script src="scripts/admin.core.js?v=4"></script>

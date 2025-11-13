@@ -1,15 +1,15 @@
-# Issue: Zenモードを既定ONにして上部要素を隠す
+# Issue: 表示切替を既定ONにして上部要素を隠す
 
 - 種別: enhancement/ux
 - 優先度: high
 - 画面: `admin.html`
 
 ## 要件
-- 初期表示はヘッダ/サイドバー等を隠し、本文に集中できる状態にする（Zen）
+- 初期表示はヘッダ/サイドバー等を隠し、本文に集中できる状態にする（表示切替）
 - ユーザー操作でヘッダ/サイドバー/テーマを個別にトグル可能
 
 ## 現状
-- `config.js` の `editor.startZen=true` で既定ON
+- `config.js` の `editor.startCompactView=true` で既定ON
 - フローティング操作（🧘/☰/🎨）で切替可能
 
 ## 受け入れ条件

@@ -162,9 +162,13 @@
       });
 
       document.getElementById('debug-show-inv').addEventListener('click', () => {
-        const inv = this.engine.getState().inventory || {};
-        console.table(inv);
-        this.log(`📦 インベントリ: ${Object.keys(inv).length}件`, 'info');
+        const inventory = this.engine.getInventory?.();
+        if (!inventory) {
+          this.log('⚠️ インベントリ情報を取得できませんでした', 'warn');
+          return;
+        }
+        console.table(inventory.items || []);
+        this.log(`📦 インベントリ: ${(inventory.items || []).length}件`, 'info');
       });
 
       // Node operations
@@ -191,7 +195,7 @@
           this.log('⚠️ 変数名を入力してください', 'warn');
           return;
         }
-        this.engine.setVariable(key, value);
+        this.engine.setVariable?.(key, value);
         this.log(`✅ 変数設定: ${key} = ${value}`);
       });
 
@@ -201,12 +205,12 @@
           this.log('⚠️ 変数名を入力してください', 'warn');
           return;
         }
-        const value = this.engine.getVariable(key);
+        const value = this.engine.getVariable?.(key);
         this.log(`📋 変数取得: ${key} = ${JSON.stringify(value)}`, 'info');
       });
 
       document.getElementById('debug-show-vars').addEventListener('click', () => {
-        const vars = this.engine.getState().variables || {};
+        const vars = this.engine.getVariables?.() || {};
         console.table(vars);
         this.log(`📋 変数: ${Object.keys(vars).length}件`, 'info');
       });
@@ -233,21 +237,31 @@
     updateStateInfo: function() {
       if (!this.engine) return;
 
-      const state = this.engine.getState();
+      const state = this.engine.getState?.();
       const stateInfo = document.getElementById('debug-state-info');
       const nodeInfo = document.getElementById('debug-node-info');
+
+      if (!state) {
+        this.log('⚠️ ステート情報を取得できませんでした', 'warn');
+        return;
+      }
+
+      const playerState = state.playerState || {};
+      const inventoryItems = playerState.inventory?.items || [];
+      const variables = playerState.variables || {};
+      const history = state.history || [];
 
       if (stateInfo) {
         stateInfo.innerHTML = `
           <div class="debug-info-item"><strong>現在ノード:</strong> ${state.nodeId || 'N/A'}</div>
-          <div class="debug-info-item"><strong>アイテム数:</strong> ${Object.keys(state.inventory || {}).length}</div>
-          <div class="debug-info-item"><strong>変数数:</strong> ${Object.keys(state.variables || {}).length}</div>
+          <div class="debug-info-item"><strong>アイテム数:</strong> ${inventoryItems.length}</div>
+          <div class="debug-info-item"><strong>変数数:</strong> ${Object.keys(variables).length}</div>
         `;
       }
 
       if (nodeInfo) {
         nodeInfo.innerHTML = `
-          <div class="debug-info-item"><strong>履歴:</strong> ${state.history?.length || 0}件</div>
+          <div class="debug-info-item"><strong>履歴:</strong> ${history.length}件</div>
         `;
       }
     },
@@ -270,12 +284,12 @@
       };
 
       window.debugSetVar = (key, value) => {
-        this.engine.setVariable(key, value);
+        this.engine.setVariable?.(key, value);
         console.log(`[Debug] Set variable: ${key} = ${value}`);
       };
 
       window.debugGetVar = (key) => {
-        const value = this.engine.getVariable(key);
+        const value = this.engine.getVariable?.(key);
         console.log(`[Debug] Get variable: ${key} = ${JSON.stringify(value)}`);
         return value;
       };
@@ -291,7 +305,7 @@
       };
 
       window.debugState = () => {
-        const state = this.engine.getState();
+        const state = this.engine.getState?.();
         console.log('[Debug] Current state:', state);
         return state;
       };

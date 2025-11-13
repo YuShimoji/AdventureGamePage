@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2025-11-13]
+
+- feat: UI表示安定化と名称統一、フォント調整、ドキュメント更新 [#UI-Improvements]
+  - 管理画面ヘッダー表示を「Zenライクエディタ」から「ストーリーエディタ」に統一
+  - テーマパネルをモーダル構造化（ヘッダー＋サブタイトル＋クローズボタン、ARIA属性追加）
+  - 共通スタイルでフォント縮小（本文14px, ヘッダー16px, ボタン13px）、ゴーストボタン配色調整
+  - フローティング操作ラベルを「表示切替」「サイドバー」「テーマ」に統一
+  - コード内`zen-mode`クラスを`compact-view`に統一、`startZen`設定を`startCompactView`に変更
+  - README, docs/, CHANGELOG.md のZen関連表記を一括更新
+  - UI要素確認テスト追加（tests/ui-elements.spec.js）
+  - これにより、UIの整合性とドキュメントの一貫性が向上
+
 ## [2025-11-12]
 
 - fix: プレイページ表示問題とエディタツールパネル問題を修正

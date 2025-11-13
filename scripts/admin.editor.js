@@ -131,9 +131,9 @@
         editor.setAttribute('data-placeholder', window.APP_CONFIG.editor.placeholder);
       }
 
-      // Zen mode
-      if (window.APP_CONFIG?.editor?.startZen) {
-        document.body.classList.add('zen-mode');
+      // Compact view
+      if (window.APP_CONFIG?.editor?.startCompactView) {
+        document.body.classList.add('compact-view');
       }
     },
 

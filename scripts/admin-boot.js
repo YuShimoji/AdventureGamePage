@@ -130,11 +130,11 @@
         log('info', '初期状態を設定（空）');
       }
 
-      // Zenモードの初期設定
-      if (window.APP_CONFIG?.editor?.startZen) {
+      // Compact view mode initialization
+      if (window.APP_CONFIG?.editor?.startCompactView) {
         setTimeout(() => {
-          document.body.classList.add('zen-mode');
-          log('info', 'Zenモードを有効化');
+          document.body.classList.add('compact-view');
+          log('info', 'Compact viewを有効化');
         }, 100);
       }
 
@@ -153,7 +153,7 @@
       if (!window.APP_CONFIG) {
         log('warn', 'APP_CONFIGが見つからないため、デフォルト設定を使用');
         window.APP_CONFIG = {
-          editor: { placeholder: '入力を開始……', startZen: true },
+          editor: { placeholder: '入力を開始……', startCompactView: false },
           ui: { showFloatingFormatbar: true, showFloatingControls: true },
           debug: { enabled: false, showConsoleLogs: true }
         };
@@ -245,8 +245,8 @@
         });
       }
 
-      // 5. 初期フォーカス設定（Zenモード以外）
-      if (!window.APP_CONFIG?.editor?.startZen) {
+      // 5. 初期フォーカス設定（Compact view以外）
+      if (!window.APP_CONFIG?.editor?.startCompactView) {
         setTimeout(() => {
           elements.editor.focus();
           log('info', '初期フォーカス設定');

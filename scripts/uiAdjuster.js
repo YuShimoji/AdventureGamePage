@@ -20,7 +20,7 @@
           const replacements = [
             ['btn-theme', 'テーマ'],
             ['btn-toggle-sidebar', 'ツール'],
-            ['btn-quick-zen', 'Zen'],
+            ['btn-quick-zen', '集中モード'],
             ['btn-quick-sidebar', 'ツール'],
             ['btn-quick-theme', 'テーマ'],
             ['btn-quick-preview', '保存'],

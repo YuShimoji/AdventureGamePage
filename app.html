@@ -126,8 +126,37 @@
     <script src="scripts/themeUIManager.js"></script>
     <script src="scripts/themeLogicManager.js"></script>
     <script src="scripts/theme.js"></script>
+    <!-- Lucide icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 
     <!-- App Router Script -->
+    <script>
+      (function() {
+        // Replace emoji with Lucide icons
+        document.addEventListener('DOMContentLoaded', function() {
+          if (window.lucide) {
+            const iconMap = {
+              '🏠': 'home',
+              '✨': 'sparkles',
+              '🎮': 'gamepad-2',
+              '✏️': 'edit',
+              '📖': 'book-open'
+            };
+            document.querySelectorAll('.app-tab').forEach(tab => {
+              const text = tab.textContent;
+              const emoji = text.charAt(0);
+              const label = text.slice(1).trim();
+              if (iconMap[emoji]) {
+                tab.innerHTML = '';
+                const icon = window.lucide.createIcon(iconMap[emoji], { size: 16 });
+                tab.appendChild(icon);
+                tab.appendChild(document.createTextNode(' ' + label));
+              }
+            });
+          }
+        });
+      })();
+    </script>
     <script>
       (function() {
         const views = {

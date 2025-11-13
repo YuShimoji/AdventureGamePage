@@ -3,7 +3,7 @@
   window.APP_CONFIG = {
     editor: {
       placeholder: "入力を開始……",
-      startZen: false,
+      startCompactView: false,
       autoScroll: {
         enabled: true,
         safeTopRatio: 0.20,

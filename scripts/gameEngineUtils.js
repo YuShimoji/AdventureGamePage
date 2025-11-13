@@ -232,6 +232,140 @@
       };
     }
 
+    static clonePlayerState(playerState) {
+      if (!playerState || typeof playerState !== 'object') {
+        return {
+          inventory: { items: [], maxSlots: 20 },
+          flags: {},
+          variables: {},
+          history: []
+        };
+      }
+
+      const inventory = playerState.inventory || {};
+
+      return {
+        inventory: {
+          items: Array.isArray(inventory.items)
+            ? inventory.items.map(item => ({ ...item }))
+            : [],
+          maxSlots: inventory.maxSlots ?? 20
+        },
+        flags: { ...(playerState.flags || {}) },
+        variables: { ...(playerState.variables || {}) },
+        history: Array.isArray(playerState.history) ? playerState.history.slice() : []
+      };
+    }
+
+    static sanitizeNodeList(list, nodes) {
+      if (!Array.isArray(list)) return [];
+      if (!nodes || typeof nodes !== 'object') return list.slice();
+      return list.filter((id) => typeof id === 'string' && nodes[id]);
+    }
+
+    static createProgressPayload(gameData, state) {
+      if (!gameData || !state) return null;
+      const now = Date.now();
+      const history = Array.isArray(state.history) ? state.history.slice() : [];
+      const forward = Array.isArray(state.forward) ? state.forward.slice() : [];
+      const playerState = this.clonePlayerState(state.playerState);
+
+      const metadata = {
+        updatedAt: now,
+        startNode: gameData.start || 'start',
+        nodesVisited: history.length + 1,
+        inventoryCount: playerState.inventory.items.length,
+        flagsCount: Object.keys(playerState.flags).length,
+        variablesCount: Object.keys(playerState.variables).length
+      };
+
+      return this.normalizeProgressPayload({
+        version: '2.0.0',
+        formatVersion: 2,
+        title: gameData.title,
+        timestamp: now,
+        nodeId: state.nodeId,
+        history,
+        forward,
+        playerState,
+        metadata
+      });
+    }
+
+    static normalizeProgressPayload(payload) {
+      if (!payload || typeof payload !== 'object') return null;
+      const normalizedPlayerState = this.clonePlayerState(payload.playerState);
+      return {
+        version: payload.version || '2.0.0',
+        formatVersion: payload.formatVersion || 2,
+        title: payload.title || 'Unknown Game',
+        nodeId: payload.nodeId,
+        timestamp: payload.timestamp || Date.now(),
+        history: Array.isArray(payload.history) ? payload.history.slice() : [],
+        forward: Array.isArray(payload.forward) ? payload.forward.slice() : [],
+        playerState: normalizedPlayerState,
+        metadata: { ...(payload.metadata || {}) }
+      };
+    }
+
+    static toLegacyProgress(payload) {
+      const normalized = this.normalizeProgressPayload(payload);
+      if (!normalized) return null;
+      return {
+        title: normalized.title,
+        nodeId: normalized.nodeId,
+        history: normalized.history.slice(),
+        forward: normalized.forward.slice(),
+        playerState: this.clonePlayerState(normalized.playerState)
+      };
+    }
+
+    static fromLegacyProgress(data) {
+      if (!data || typeof data !== 'object') return null;
+      const now = Date.now();
+      return this.normalizeProgressPayload({
+        version: '2.0.0',
+        formatVersion: 2,
+        title: data.title,
+        nodeId: data.nodeId,
+        history: Array.isArray(data.history) ? data.history.slice() : [],
+        forward: Array.isArray(data.forward) ? data.forward.slice() : [],
+        playerState: data.playerState,
+        timestamp: data.timestamp || now,
+        metadata: {
+          migratedFrom: 'legacy',
+          migratedAt: now
+        }
+      });
+    }
+
+    static restoreStateFromPayload(state, payload, gameData, itemsData = []) {
+      if (!state || !payload || !gameData) return;
+      const normalized = this.normalizeProgressPayload(payload);
+      if (!normalized) return;
+
+      const nodes = gameData.nodes || {};
+      const startNode = gameData.start || 'start';
+      const validNodeId = (normalized.nodeId && nodes[normalized.nodeId]) ? normalized.nodeId : startNode;
+
+      state.nodeId = validNodeId;
+      state.history = this.sanitizeNodeList(normalized.history, nodes);
+      state.forward = this.sanitizeNodeList(normalized.forward, nodes);
+
+      const migratedInventory = this.migrateInventory(normalized.playerState.inventory, itemsData);
+      const playerHistory = this.sanitizeNodeList(normalized.playerState.history, nodes);
+
+      state.playerState = {
+        inventory: {
+          items: migratedInventory.items.map(item => ({ ...item })),
+          maxSlots: migratedInventory.maxSlots
+        },
+        flags: { ...(normalized.playerState.flags || {}) },
+        variables: { ...(normalized.playerState.variables || {}) },
+        history: playerHistory
+      };
+    }
+
     static checkConditions(conditions, state) {
       if (!conditions || !Array.isArray(conditions)) return true;
 
@@ -273,5 +407,73 @@
     }
   }
 
+  const GameEnginePersistence = {
+    PRIMARY_PREFIX: 'agp_progress_v2',
+    LEGACY_KEY: 'agp_progress',
+    INDEX_KEY: 'agp_progress_index',
+
+    getPrimaryKey(title) {
+      const base = (title || 'default').toString().toLowerCase();
+      const slug = base
+        .normalize('NFKD')
+        .replace(/[^a-z0-9]+/g, '_')
+        .replace(/^_+|_+$/g, '') || 'default';
+      return `${this.PRIMARY_PREFIX}_${slug}`;
+    },
+
+    savePrimary(payload) {
+      const normalized = GameEngineUtils.normalizeProgressPayload(payload);
+      if (!normalized || !normalized.title) return false;
+      normalized.timestamp = normalized.timestamp || Date.now();
+      normalized.metadata = {
+        ...(normalized.metadata || {}),
+        savedAt: Date.now()
+      };
+
+      const key = this.getPrimaryKey(normalized.title);
+      StorageUtil.saveJSON(key, normalized);
+
+      // Maintain simple index for future enumeration
+      const index = StorageUtil.loadJSON(this.INDEX_KEY) || {};
+      index[normalized.title] = { key, updatedAt: normalized.metadata.savedAt };
+      StorageUtil.saveJSON(this.INDEX_KEY, index);
+
+      const legacy = GameEngineUtils.toLegacyProgress(normalized);
+      if (legacy) {
+        StorageUtil.saveJSON(this.LEGACY_KEY, legacy);
+      }
+      return true;
+    },
+
+    loadPrimary(title, options = {}) {
+      if (!title) return null;
+      const key = this.getPrimaryKey(title);
+      const payload = StorageUtil.loadJSON(key);
+      if (payload && payload.title === title) {
+        return GameEngineUtils.normalizeProgressPayload(payload);
+      }
+
+      if (options.allowLegacy) {
+        const legacy = StorageUtil.loadJSON(this.LEGACY_KEY);
+        if (legacy && legacy.title === title) {
+          const migrated = GameEngineUtils.fromLegacyProgress(legacy);
+          if (migrated) {
+            this.savePrimary(migrated);
+            return migrated;
+          }
+        }
+      }
+
+      return null;
+    },
+
+    clearPrimary(title) {
+      if (!title) return;
+      const key = this.getPrimaryKey(title);
+      StorageUtil.remove(key);
+    }
+  };
+
   window.GameEngineUtils = GameEngineUtils;
+  window.GameEnginePersistence = GameEnginePersistence;
 })();

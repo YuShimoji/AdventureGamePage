@@ -129,54 +129,22 @@
 
     // プログレス保存
     saveProgress() {
-      const hist = Array.isArray(this.state.history) ? this.state.history.slice() : [];
-      const fwd = Array.isArray(this.state.forward) ? this.state.forward.slice() : [];
-      const progressData = {
-        title: this.gameData.title,
-        nodeId: this.state.nodeId,
-        history: hist,
-        forward: fwd,
-        playerState: JSON.parse(JSON.stringify(this.state.playerState)) // Deep copy
-      };
-      StorageUtil.saveJSON('agp_progress', progressData);
+      const payload = GameEngineUtils.createProgressPayload(this.gameData, this.state);
+      GameEnginePersistence.savePrimary(payload);
     }
 
     // プログレスのロード
-    loadProgress() {
-      const p = StorageUtil.loadJSON('agp_progress');
-      if (!p || p.title !== this.gameData.title) {
+    loadProgress(options = {}) {
+      const { force = false } = options;
+      const payload = GameEnginePersistence.loadPrimary(this.gameData.title, { allowLegacy: true });
+      if (!payload) {
+        if (force) {
+          this.reset(() => {}, () => {});
+        }
         return;
       }
 
-      // セキュリティ検証
-      if (window.SecurityUtils) {
-        const validation = window.SecurityUtils.validateSaveData(p);
-        if (!validation.valid) {
-          console.error('[Security] Invalid save data detected:', validation.errors);
-          if (window.APP_CONFIG?.debug?.enabled) {
-            alert('セーブデータに不正な内容が含まれています。詳細はコンソールを確認してください。');
-          }
-          return;
-        }
-      }
-
-      if (p.nodeId && this.gameData.nodes[p.nodeId]) {
-        this.state.nodeId = p.nodeId;
-      }
-      const hist = Array.isArray(p.history) ? p.history.filter((id) => !!this.gameData.nodes[id]) : [];
-      const fwd = Array.isArray(p.forward) ? p.forward.filter((id) => !!this.gameData.nodes[id]) : [];
-      this.state.history = hist;
-      this.state.forward = fwd;
-
-      // Load player state if available
-      if (p.playerState) {
-        this.state.playerState = {
-          inventory: GameEngineUtils.migrateInventory(p.playerState.inventory, this.itemsData),
-          flags: p.playerState.flags || {},
-          variables: p.playerState.variables || {},
-          history: Array.isArray(p.playerState.history) ? p.playerState.history : []
-        };
-      }
+      GameEngineUtils.restoreStateFromPayload(this.state, payload, this.gameData, this.itemsData);
     }
 
     // ゲームセーブ
@@ -319,6 +287,15 @@
       return this.state.playerState.inventory.items.slice(); // Return copy with full item data
     }
 
+    getStateSnapshot() {
+      return {
+        nodeId: this.state.nodeId,
+        history: Array.isArray(this.state.history) ? this.state.history.slice() : [],
+        forward: Array.isArray(this.state.forward) ? this.state.forward.slice() : [],
+        playerState: GameEngineUtils.clonePlayerState(this.state.playerState)
+      };
+    }
+
     // プレイヤーステート管理
     getPlayerState() {
       return JSON.parse(JSON.stringify(this.state.playerState));
@@ -334,6 +311,27 @@
         };
         this.saveProgress();
       }
+    }
+
+    setVariable(key, value, options = {}) {
+      if (!key) return false;
+      const action = {
+        type: 'set_variable',
+        key,
+        value,
+        operation: options.operation || 'set'
+      };
+      GameEngineUtils.executeSetVariableAction(action, this.state, this.itemsData, this.saveProgress.bind(this));
+      return true;
+    }
+
+    getVariable(key) {
+      if (!key) return undefined;
+      return this.state.playerState.variables?.[key];
+    }
+
+    getVariables() {
+      return { ...(this.state.playerState.variables || {}) };
     }
 
     // セーブスロット管理

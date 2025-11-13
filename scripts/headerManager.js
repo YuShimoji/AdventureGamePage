@@ -40,7 +40,8 @@
       'book-open': '📖',
       'edit': '✏️',
       'play': '▶️',
-      'settings': '⚙️',
+      'settings': '🎨',
+      'sidebar': '☰',
       'sun': '☀️',
       'moon': '🌙'
     };

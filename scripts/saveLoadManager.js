@@ -93,7 +93,7 @@
       const dropdown = document.getElementById('floating-controls-dropdown');
       const panelHandle = document.getElementById('floating-panel-handle');
 
-      if (btnQuickZen) btnQuickZen.addEventListener('click', () => document.body.classList.toggle('zen-mode'));
+      if (btnQuickZen) btnQuickZen.addEventListener('click', () => document.body.classList.toggle('compact-view'));
       if (btnQuickSidebar) btnQuickSidebar.addEventListener('click', () => {
         const sidebar = document.getElementById('sidebar');
         const hidden = sidebar.hidden;

@@ -2,6 +2,7 @@
   const isJson = (v) => typeof v === "object" && v !== null;
   const save = (k, v) => localStorage.setItem(k, v);
   const load = (k) => localStorage.getItem(k);
+  const remove = (k) => localStorage.removeItem(k);
 
   function saveJSON(key, obj) {
     try {
@@ -26,5 +27,13 @@
     return load(key) ?? fallback;
   }
 
-  window.StorageUtil = { saveJSON, loadJSON, saveText, loadText };
+  function removeKey(key) {
+    try {
+      remove(key);
+    } catch (e) {
+      console.error("removeKey", e);
+    }
+  }
+
+  window.StorageUtil = { saveJSON, loadJSON, saveText, loadText, remove: removeKey };
 })();

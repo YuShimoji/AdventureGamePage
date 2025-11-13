@@ -272,7 +272,8 @@
     
     // UI events
     SIDEBAR_TOGGLE: 'ui:sidebar:toggle',
-    ZEN_MODE_TOGGLE: 'ui:zen:toggle'
+    ZEN_MODE_TOGGLE: 'ui:zen:toggle', // deprecated, use COMPACT_VIEW_TOGGLE
+    COMPACT_VIEW_TOGGLE: 'ui:compact:toggle'
   };
 
   console.log('[EventBus] Initialized');

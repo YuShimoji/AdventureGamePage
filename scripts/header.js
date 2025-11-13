@@ -77,12 +77,30 @@
             a.href = action.href;
             a.textContent = action.text;
             actionsDiv.appendChild(a);
-          } else if (action.type === 'button') {
+          } else if (action.type === 'icon-button') {
             const btn = document.createElement('button');
             btn.id = action.id;
             btn.className = action.class || 'btn';
             btn.title = action.title;
-            btn.textContent = action.text;
+            btn.setAttribute('aria-label', action.title);
+            // Add icon if specified
+            if (action.icon) {
+              const emojiMap = {
+                'home': '🏠',
+                'book-open': '📖',
+                'edit': '✏️',
+                'play': '▶️',
+                'settings': '🎨',
+                'sidebar': '☰',
+                'sun': '☀️',
+                'moon': '🌙'
+              };
+              const span = document.createElement('span');
+              span.textContent = emojiMap[action.icon] || '•';
+              span.style.display = 'inline-block';
+              span.style.fontSize = action.iconSize || '18px';
+              btn.appendChild(span);
+            }
             actionsDiv.appendChild(btn);
           } else if (action.type === 'span') {
             const span = document.createElement('span');
@@ -93,14 +111,6 @@
           }
         });
         header.appendChild(actionsDiv);
-      } else {
-        // Default theme button if no actions
-        const btnTheme = document.createElement('button');
-        btnTheme.id = 'btn-theme';
-        btnTheme.className = 'icon-btn';
-        btnTheme.title = 'テーマ設定';
-        btnTheme.textContent = 'テーマ';
-        header.appendChild(btnTheme);
       }
 
       return header;

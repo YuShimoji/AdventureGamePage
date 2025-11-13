@@ -3,20 +3,24 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>管理（Zenライク執筆エディタ）</title>
+    <title>管理（ストーリーエディタ）</title>
+
     <link rel="stylesheet" href="styles/common.css" />
     <link rel="stylesheet" href="styles/admin.css" />
     <!-- Mermaid -->
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <!-- Lucide icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
   </head>
   <body>
     <header class="app-header">
       <a class="btn" href="index.html">← トップ</a>
-      <h1>Zenライクエディタ</h1>
+      <h1>ストーリーエディタ</h1>
+
       <div class="header-actions">
         <span id="char-count" class="muted">0 文字</span>
-        <button id="btn-theme" class="btn btn-ghost btn-sm" title="テーマ設定">🎨</button>
-        <button id="btn-toggle-sidebar" class="btn btn-ghost btn-sm" title="ツール">☰</button>
+        <button id="btn-theme" class="icon-btn" title="テーマ設定"></button>
+        <button id="btn-toggle-sidebar" class="icon-btn" title="サイドバー"></button>
       </div>
 
     <!-- Node Editor Fullscreen Modal -->
@@ -358,13 +362,13 @@
       </div>
       <div class="floating-panel-content">
         <div class="floating-controls">
-          <button id="btn-quick-zen" class="btn btn-ghost btn-sm" title="Zen切替">集中</button>
-          <button id="btn-quick-sidebar" class="btn btn-ghost btn-sm" title="ツール切替">ツール</button>
+          <button id="btn-quick-zen" class="btn btn-ghost btn-sm" title="ヘッダとサイドバーの表示を切り替え">表示切替</button>
+          <button id="btn-quick-sidebar" class="btn btn-ghost btn-sm" title="サイドバーを表示/非表示">サイドバー</button>
           <button id="btn-quick-theme" class="btn btn-ghost btn-sm" title="テーマ設定">テーマ</button>
           <div class="floating-controls-group">
             <button id="btn-quick-more" class="btn btn-ghost btn-sm" title="その他の操作">その他</button>
             <div id="floating-controls-dropdown" class="floating-controls-dropdown" hidden>
-              <button id="btn-quick-preview" class="btn btn-ghost btn-sm" title="保存プレビュー">保存一覧</button>
+              <button id="btn-quick-preview" class="btn btn-ghost btn-sm" title="保存プレビュー">保存プレビュー</button>
               <button id="btn-quick-memos" class="btn btn-ghost btn-sm" title="メモ">メモ</button>
             </div>
           </div>
@@ -496,3 +500,22 @@
     <script src="scripts/admin-boot.js"></script>
     <script src="scripts/storyBuilder.js"></script>
     <script src="scripts/admin.js"></script>
+    <script>
+      // Replace emoji with Lucide icons
+      document.addEventListener('DOMContentLoaded', function() {
+        if (window.lucide) {
+          const btnTheme = document.getElementById('btn-theme');
+          const btnSidebar = document.getElementById('btn-toggle-sidebar');
+          if (btnTheme) {
+            btnTheme.innerHTML = '';
+            const icon = window.lucide.createIcon('settings', { size: 18 });
+            btnTheme.appendChild(icon);
+          }
+          if (btnSidebar) {
+            btnSidebar.innerHTML = '';
+            const icon = window.lucide.createIcon('menu', { size: 18 });
+            btnSidebar.appendChild(icon);
+          }
+        }
+      });
+    </script>
