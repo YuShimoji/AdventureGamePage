@@ -503,19 +503,22 @@
     <script>
       // Replace emoji with Lucide icons
       document.addEventListener('DOMContentLoaded', function() {
-        if (window.lucide) {
-          const btnTheme = document.getElementById('btn-theme');
-          const btnSidebar = document.getElementById('btn-toggle-sidebar');
-          if (btnTheme) {
-            btnTheme.innerHTML = '';
-            const icon = window.lucide.createIcon('settings', { size: 18 });
-            btnTheme.appendChild(icon);
-          }
-          if (btnSidebar) {
-            btnSidebar.innerHTML = '';
-            const icon = window.lucide.createIcon('menu', { size: 18 });
-            btnSidebar.appendChild(icon);
-          }
+        const btnTheme = document.getElementById('btn-theme');
+        const btnSidebar = document.getElementById('btn-toggle-sidebar');
+        if (btnTheme) {
+          btnTheme.innerHTML = '';
+          const i = document.createElement('i');
+          i.setAttribute('data-lucide', 'settings');
+          btnTheme.appendChild(i);
+        }
+        if (btnSidebar) {
+          btnSidebar.innerHTML = '';
+          const i = document.createElement('i');
+          i.setAttribute('data-lucide', 'menu');
+          btnSidebar.appendChild(i);
+        }
+        if (window.lucide && typeof window.lucide.createIcons === 'function') {
+          window.lucide.createIcons({ attrs: { width: 18, height: 18 } });
         }
       });
     </script>

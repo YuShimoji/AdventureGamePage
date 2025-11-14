@@ -132,28 +132,33 @@
     <!-- App Router Script -->
     <script>
       (function() {
-        // Replace emoji with Lucide icons
+        window.EMBEDDED_APP = true;
         document.addEventListener('DOMContentLoaded', function() {
-          if (window.lucide) {
-            const iconMap = {
-              '🏠': 'home',
-              '✨': 'sparkles',
-              '🎮': 'gamepad-2',
-              '✏️': 'edit',
-              '📖': 'book-open'
-            };
-            document.querySelectorAll('.app-tab').forEach(tab => {
-              const text = tab.textContent;
-              const emoji = text.charAt(0);
-              const label = text.slice(1).trim();
-              if (iconMap[emoji]) {
+          const iconMap = {
+            '🏠': 'home',
+            '✨': 'sparkles',
+            '🎮': 'gamepad-2',
+            '✏️': 'edit',
+            '📖': 'book-open'
+          };
+          document.querySelectorAll('.app-tab').forEach(tab => {
+            const text = tab.textContent.trim();
+            const emoji = text.charAt(0);
+            const label = text.slice(1).trim() || text;
+            const name = iconMap[emoji];
+            if (name) {
+              if (window.lucide && window.lucide.createIcons) {
                 tab.innerHTML = '';
-                const icon = window.lucide.createIcon(iconMap[emoji], { size: 16 });
-                tab.appendChild(icon);
+                const i = document.createElement('i');
+                i.setAttribute('data-lucide', name);
+                tab.appendChild(i);
                 tab.appendChild(document.createTextNode(' ' + label));
+                window.lucide.createIcons({ attrs: { width: 16, height: 16 } });
+              } else {
+                tab.textContent = label;
               }
-            });
-          }
+            }
+          });
         });
       })();
     </script>
@@ -172,7 +177,7 @@
         // Tab switching
         document.querySelectorAll('.app-tab, [data-view]').forEach(button => {
           button.addEventListener('click', async (e) => {
-            const viewName = e.target.getAttribute('data-view');
+            const viewName = e.currentTarget.getAttribute('data-view');
             if (!viewName) return;
 
             // Update active tab

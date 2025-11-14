@@ -85,21 +85,27 @@
             btn.setAttribute('aria-label', action.title);
             // Add icon if specified
             if (action.icon) {
-              const emojiMap = {
-                'home': '🏠',
-                'book-open': '📖',
-                'edit': '✏️',
-                'play': '▶️',
-                'settings': '🎨',
-                'sidebar': '☰',
-                'sun': '☀️',
-                'moon': '🌙'
-              };
-              const span = document.createElement('span');
-              span.textContent = emojiMap[action.icon] || '•';
-              span.style.display = 'inline-block';
-              span.style.fontSize = action.iconSize || '18px';
-              btn.appendChild(span);
+              if (window.lucide && typeof window.lucide.createIcons === 'function') {
+                const i = document.createElement('i');
+                i.setAttribute('data-lucide', action.icon);
+                btn.appendChild(i);
+              } else {
+                const emojiMap = {
+                  'home': '🏠',
+                  'book-open': '📖',
+                  'edit': '✏️',
+                  'play': '▶️',
+                  'settings': '🎨',
+                  'sidebar': '☰',
+                  'sun': '☀️',
+                  'moon': '🌙'
+                };
+                const span = document.createElement('span');
+                span.textContent = emojiMap[action.icon] || '•';
+                span.style.display = 'inline-block';
+                span.style.fontSize = action.iconSize || '18px';
+                btn.appendChild(span);
+              }
             }
             actionsDiv.appendChild(btn);
           } else if (action.type === 'span') {

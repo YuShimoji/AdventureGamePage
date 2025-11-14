@@ -3,21 +3,25 @@
   <head>
     <script src="scripts/header.js"></script>
     <script>
-      HeaderUtils.generateHead('プレイ', [
-        { rel: 'stylesheet', href: 'styles/common.css?v=4' },
-        { rel: 'stylesheet', href: 'styles/play.css?v=4' }
-      ]);
+      if (!window.EMBEDDED_APP) {
+        HeaderUtils.generateHead('プレイ', [
+          { rel: 'stylesheet', href: 'styles/common.css?v=4' },
+          { rel: 'stylesheet', href: 'styles/play.css?v=4' }
+        ]);
+      }
     </script>
   </head>
   <body class="play-page">
     <script>
-      const header = HeaderUtils.generateHeader('', [], [
-        { type: 'link', text: '← トップ', href: 'index.html', class: 'btn' },
-        { type: 'span', id: 'game-title', text: 'サンプルアドベンチャー' },
-        { type: 'button', id: 'btn-inventory', class: 'icon-btn', title: 'インベントリ', text: 'I' },
-        { type: 'button', id: 'btn-restart', class: 'icon-btn', title: 'リスタート', text: 'R' }
-      ]);
-      document.body.insertBefore(header, document.body.firstChild);
+      if (!window.EMBEDDED_APP) {
+        const header = HeaderUtils.generateHeader('', [], [
+          { type: 'link', text: '← トップ', href: 'index.html', class: 'btn' },
+          { type: 'span', id: 'game-title', text: 'サンプルアドベンチャー' },
+          { type: 'button', id: 'btn-inventory', class: 'icon-btn', title: 'インベントリ', text: 'I' },
+          { type: 'button', id: 'btn-restart', class: 'icon-btn', title: 'リスタート', text: 'R' }
+        ]);
+        document.body.insertBefore(header, document.body.firstChild);
+      }
     </script>
 
     <main class="container play-container">

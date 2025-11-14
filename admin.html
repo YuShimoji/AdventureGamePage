@@ -3,20 +3,24 @@
   <head>
     <script src="scripts/header.js"></script>
     <script>
-      HeaderUtils.generateHead('管理画面', [
-        { rel: 'stylesheet', href: 'styles/admin.css?v=4' }
-      ]);
+      if (!window.EMBEDDED_APP) {
+        HeaderUtils.generateHead('管理画面', [
+          { rel: 'stylesheet', href: 'styles/admin.css?v=4' }
+        ]);
+      }
     </script>
   </head>
   <body class="admin-page">
     <script>
-      const header = HeaderUtils.generateHeader('ストーリーエディタ', [], [
-        { type: 'link', text: '← トップ', href: 'index.html', class: 'btn' },
-        { type: 'span', id: 'char-count', class: 'muted', text: '0 文字' },
-        { type: 'icon-button', id: 'btn-theme', class: 'btn btn-ghost btn-sm', title: 'テーマ設定', icon: 'settings', iconSize: '16px' },
-        { type: 'icon-button', id: 'btn-toggle-sidebar', class: 'btn btn-ghost btn-sm', title: 'サイドバー', icon: 'sidebar', iconSize: '16px' }
-      ]);
-      document.body.insertBefore(header, document.body.firstChild);
+      if (!window.EMBEDDED_APP) {
+        const header = HeaderUtils.generateHeader('ストーリーエディタ', [], [
+          { type: 'link', text: '← トップ', href: 'index.html', class: 'btn' },
+          { type: 'span', id: 'char-count', class: 'muted', text: '0 文字' },
+          { type: 'icon-button', id: 'btn-theme', class: 'btn btn-ghost btn-sm', title: 'テーマ設定', icon: 'settings', iconSize: '16px' },
+          { type: 'icon-button', id: 'btn-toggle-sidebar', class: 'btn btn-ghost btn-sm', title: 'サイドバー', icon: 'sidebar', iconSize: '16px' }
+        ]);
+        document.body.insertBefore(header, document.body.firstChild);
+      }
     </script>
     <!-- Node Editor Fullscreen Modal -->
     <div id="node-editor-modal" class="node-editor-modal" hidden>
@@ -589,4 +593,25 @@
     <script src="scripts/utilsManager.js"></script>
     <!-- Lucide icons -->
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        if (window.lucide && typeof window.lucide.createIcons === 'function') {
+          const btnTheme = document.getElementById('btn-theme');
+          const btnSidebar = document.getElementById('btn-toggle-sidebar');
+          if (btnTheme) {
+            btnTheme.innerHTML = '';
+            const i = document.createElement('i');
+            i.setAttribute('data-lucide', 'settings');
+            btnTheme.appendChild(i);
+          }
+          if (btnSidebar) {
+            btnSidebar.innerHTML = '';
+            const i = document.createElement('i');
+            i.setAttribute('data-lucide', 'menu');
+            btnSidebar.appendChild(i);
+          }
+          window.lucide.createIcons({ attrs: { width: 18, height: 18 } });
+        }
+      });
+    </script>
     <script src="scripts/admin.core.js?v=4"></script>

@@ -67,13 +67,15 @@
   </head>
   <body>
     <script>
-      const header = HeaderUtils.generateHeader('機能一覧', [
-        { text: 'ホーム', href: 'index.html' },
-        { text: '学ぶ', href: 'learn.html' },
-        { text: '管理', href: 'admin.html' },
-        { text: 'プレイ', href: 'play.html', class: 'btn btn-accent' }
-      ]);
-      document.body.insertBefore(header, document.body.firstChild);
+      if (!window.EMBEDDED_APP) {
+        const header = HeaderUtils.generateHeader('機能一覧', [
+          { text: 'ホーム', href: 'index.html' },
+          { text: '学ぶ', href: 'learn.html' },
+          { text: '管理', href: 'admin.html' },
+          { text: 'プレイ', href: 'play.html', class: 'btn btn-accent' }
+        ]);
+        document.body.insertBefore(header, document.body.firstChild);
+      }
     </script>
 
     <main class="container" style="margin-top: 24px; margin-bottom: 48px;">
