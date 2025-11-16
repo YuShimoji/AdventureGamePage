@@ -4,7 +4,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Adventure Game Page</title>
-    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E📚%3C/text%3E%3C/svg%3E">
+    <link
+      rel="icon"
+      type="image/x-icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E📚%3C/text%3E%3C/svg%3E"
+    />
     <link rel="stylesheet" href="styles/common.css" />
   </head>
   <body class="index-page">
@@ -19,11 +23,22 @@
     </header>
 
     <main>
-      <section class="hero" style="padding: 64px 16px; text-align: center; background: radial-gradient(1200px 600px at 50% -10%, rgba(68,147,248,.18), transparent), linear-gradient(to bottom, rgba(124,58,237,.10), transparent);">
+      <section
+        class="hero"
+        style="
+          padding: 64px 16px;
+          text-align: center;
+          background:
+            radial-gradient(1200px 600px at 50% -10%, rgba(68, 147, 248, 0.18), transparent),
+            linear-gradient(to bottom, rgba(124, 58, 237, 0.1), transparent);
+        "
+      >
         <div class="container">
-          <h2 style="font-size: 36px; margin: 0 0 12px;">AdventureGamePage Studio</h2>
-          <p class="muted" style="margin: 0 0 20px; font-size: 16px;">分岐シナリオを設計・管理・検証するための内製クリエイティブワークスペース。</p>
-          <div style="display: inline-flex; gap: 8px; flex-wrap: wrap;">
+          <h2 style="font-size: 36px; margin: 0 0 12px">AdventureGamePage Studio</h2>
+          <p class="muted" style="margin: 0 0 20px; font-size: 16px">
+            分岐シナリオを設計・管理・検証するための内製クリエイティブワークスペース。
+          </p>
+          <div style="display: inline-flex; gap: 8px; flex-wrap: wrap">
             <a class="btn btn-accent" href="learn.html">ドキュメント</a>
             <a class="btn" href="admin.html">エディタを起動</a>
             <a class="btn" href="play.html">プレイテスト</a>
@@ -31,19 +46,23 @@
         </div>
       </section>
 
-      <section class="container" style="margin-top: 24px;">
-        <div class="card" style="margin-bottom: 16px;">
+      <section class="container" style="margin-top: 24px">
+        <div class="card" style="margin-bottom: 16px">
           <h3>コア</h3>
-          <div style="display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
-            <div class="card"><strong>ノードベース</strong><br/><span class="muted">分岐・条件・アクションで物語を設計</span></div>
-            <div class="card"><strong>即時プレビュー</strong><br/><span class="muted">保存→プレイで即テスト</span></div>
-            <div class="card"><strong>拡張可能</strong><br/><span class="muted">テーマ・プラグインで進化</span></div>
+          <div style="display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr))">
+            <div class="card">
+              <strong>ノードベース</strong><br /><span class="muted">分岐・条件・アクションで物語を設計</span>
+            </div>
+            <div class="card">
+              <strong>即時プレビュー</strong><br /><span class="muted">保存→プレイで即テスト</span>
+            </div>
+            <div class="card"><strong>拡張可能</strong><br /><span class="muted">テーマ・プラグインで進化</span></div>
           </div>
         </div>
         <div class="card">
           <h3>はじめる</h3>
           <p class="muted">初めての方は「学ぶ」から。実例とともに最短で制作フローを体験できます。</p>
-          <div style="display:flex; gap: 8px;">
+          <div style="display: flex; gap: 8px">
             <a class="btn btn-primary" href="learn.html">サンプルを見る</a>
             <a class="btn" href="admin.html">執筆を開始</a>
           </div>
@@ -54,6 +73,7 @@
     <div id="theme-panel" class="theme-panel" hidden></div>
 
     <script src="scripts/storage.js"></script>
+    <script src="scripts/strings.js"></script>
     <script src="scripts/themeUtils.js"></script>
     <script src="scripts/themeUIManager.js"></script>
     <script src="scripts/themeLogicManager.js"></script>
@@ -62,15 +82,17 @@
     <!-- ページ固有の初期化 -->
     <script>
       // メインページ用の初期化
-      document.addEventListener('DOMContentLoaded', function() {
+      document.addEventListener('DOMContentLoaded', function () {
         // 他のページの要素が残っている可能性があるため、強制的に非表示
         const adminElements = [
-          'preview-panel', 'memos-panel', 'mermaid-fullscreen-modal',
-          'playtest-modal', 'node-editor-modal', 'mermaid-inline-panel'
+          'preview-panel',
+          'memos-panel',
+          'mermaid-fullscreen-modal',
+          'playtest-modal',
+          'node-editor-modal',
+          'mermaid-inline-panel',
         ];
-        const playElements = [
-          'save-slots-panel', 'inventory-panel', 'save-load-modal'
-        ];
+        const playElements = ['save-slots-panel', 'inventory-panel', 'save-load-modal'];
 
         adminElements.forEach(id => {
           const el = document.getElementById(id);
@@ -96,4 +118,4 @@
       });
     </script>
   </body>
-  </html>
+</html>

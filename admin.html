@@ -4,7 +4,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>管理画面</title>
-    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E📚%3C/text%3E%3C/svg%3E">
+    <link
+      rel="icon"
+      type="image/x-icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E📚%3C/text%3E%3C/svg%3E"
+    />
     <link rel="stylesheet" href="styles/common.css?v=4" />
     <link rel="stylesheet" href="styles/admin.css?v=4" />
   </head>
@@ -18,46 +22,46 @@
         <button id="btn-toggle-sidebar" class="btn btn-ghost btn-sm" title="ツール">ツール</button>
       </div>
 
-    <!-- Node Editor Fullscreen Modal -->
-    <div id="node-editor-modal" class="node-editor-modal" hidden>
-      <div class="node-editor-modal-header">
-        <h3>ノードエディタ（フルスクリーン）</h3>
-        <button id="node-editor-modal-close" class="btn btn-ghost btn-sm" title="閉じる">閉じる</button>
-      </div>
-      <div class="node-editor-modal-content">
-        <div class="node-editor-split">
-          <div class="node-editor-editor-panel">
-            <!-- Editor content will be inserted here by JS -->
-            <div id="node-editor-modal-editor" class="node-editor-modal-editor"></div>
-          </div>
-          <div class="node-editor-preview-panel">
-            <div class="node-editor-preview-header">
-              <h4>リアルタイムプレビュー</h4>
-              <div class="node-editor-preview-controls">
-                <button id="ne-preview-refresh" class="btn btn-ghost btn-sm" title="プレビュー更新">更新</button>
-                <button id="ne-preview-toggle" class="btn btn-ghost btn-sm" title="プレビュー切替">切替</button>
-              </div>
+      <!-- Node Editor Fullscreen Modal -->
+      <div id="node-editor-modal" class="node-editor-modal" hidden>
+        <div class="node-editor-modal-header">
+          <h3>ノードエディタ（フルスクリーン）</h3>
+          <button id="node-editor-modal-close" class="btn btn-ghost btn-sm" title="閉じる">閉じる</button>
+        </div>
+        <div class="node-editor-modal-content">
+          <div class="node-editor-split">
+            <div class="node-editor-editor-panel">
+              <!-- Editor content will be inserted here by JS -->
+              <div id="node-editor-modal-editor" class="node-editor-modal-editor"></div>
             </div>
-            <div class="node-editor-preview-content">
-              <div class="node-editor-game-preview" id="ne-game-preview">
-                <div class="game-node-display">
-                  <div class="game-node-title" id="ne-preview-title"></div>
-                  <div class="game-node-text" id="ne-preview-text"></div>
-                  <div class="game-node-image" id="ne-preview-image" hidden></div>
-                  <div class="game-node-choices" id="ne-preview-choices"></div>
+            <div class="node-editor-preview-panel">
+              <div class="node-editor-preview-header">
+                <h4>リアルタイムプレビュー</h4>
+                <div class="node-editor-preview-controls">
+                  <button id="ne-preview-refresh" class="btn btn-ghost btn-sm" title="プレビュー更新">更新</button>
+                  <button id="ne-preview-toggle" class="btn btn-ghost btn-sm" title="プレビュー切替">切替</button>
                 </div>
               </div>
-              <div class="node-editor-mermaid-preview" id="ne-mermaid-preview" hidden>
-                <div id="ne-modal-mermaid-view" class="mermaid-view"></div>
+              <div class="node-editor-preview-content">
+                <div class="node-editor-game-preview" id="ne-game-preview">
+                  <div class="game-node-display">
+                    <div class="game-node-title" id="ne-preview-title"></div>
+                    <div class="game-node-text" id="ne-preview-text"></div>
+                    <div class="game-node-image" id="ne-preview-image" hidden></div>
+                    <div class="game-node-choices" id="ne-preview-choices"></div>
+                  </div>
+                </div>
+                <div class="node-editor-mermaid-preview" id="ne-mermaid-preview" hidden>
+                  <div id="ne-modal-mermaid-view" class="mermaid-view"></div>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
     </header>
 
-    <aside id="sidebar" class="sidebar" hidden>
+    <aside id="sidebar" class="sidebar show">
       <div class="sidebar-inner">
         <div class="accordion-mode" data-accordion-mode-toggle>
           <label class="accordion-mode-toggle">
@@ -70,7 +74,15 @@
         <details class="agp-accordion" id="acc-tools" data-accordion-id="tools">
           <summary data-has-hint>
             <span class="summary-label">ツール / 保存</span>
-            <button class="accordion-hint-toggle" type="button" aria-expanded="false" aria-label="ツール / 保存のヒント" data-accordion-hint="tools">?</button>
+            <button
+              class="accordion-hint-toggle"
+              type="button"
+              aria-expanded="false"
+              aria-label="ツール / 保存のヒント"
+              data-accordion-hint="tools"
+            >
+              ?
+            </button>
           </summary>
           <div class="accordion-content">
             <div class="accordion-hint" data-hint-for="tools" hidden></div>
@@ -104,27 +116,78 @@
           </div>
         </details>
 
-    <!-- 保存一覧パネル -->
-    <section id="saves-panel" class="saves-panel" hidden>
-      <header class="memos-header">
-        <h3>保存一覧</h3>
-        <button id="saves-refresh" class="btn btn-ghost btn-sm" title="更新">更新</button>
-        <button id="saves-close" class="btn btn-ghost btn-sm" title="閉じる">閉じる</button>
-      </header>
-      <div id="saves-list" class="memos-list"></div>
-    </section>
+        <details class="agp-accordion" id="acc-story-workflow" data-accordion-id="story-workflow">
+          <summary data-has-hint>
+            <span class="summary-label">ストーリー作成フロー</span>
+            <button
+              class="accordion-hint-toggle"
+              type="button"
+              aria-expanded="false"
+              aria-label="ストーリー作成フローのヒント"
+              data-accordion-hint="story-workflow"
+            >
+              ?
+            </button>
+          </summary>
+          <div class="accordion-content">
+            <div class="accordion-hint" data-hint-for="story-workflow" hidden></div>
+            <section id="story-workflow-panel" class="card">
+              <h3>ストーリー作成の手順</h3>
+              <ol class="story-workflow-steps">
+                <li>
+                  <button id="story-step-write" class="btn btn-ghost btn-sm">1. テキストを書く</button>
+                </li>
+                <li>
+                  <button id="story-step-nodes" class="btn btn-ghost btn-sm">2. ノード構造を編集</button>
+                </li>
+                <li>
+                  <button id="story-step-branches" class="btn btn-ghost btn-sm">3. 分岐を確認（Mermaid）</button>
+                </li>
+                <li>
+                  <button id="story-step-playtest" class="btn btn-ghost btn-sm">4. プレイテスト</button>
+                </li>
+                <li>
+                  <button id="story-step-ai" class="btn btn-ghost btn-sm">5. AIで改善点を確認</button>
+                </li>
+                <li>
+                  <button id="story-step-sample" class="btn btn-ghost btn-sm">サンプルから始める</button>
+                </li>
+              </ol>
+            </section>
+          </div>
+        </details>
+
+        <!-- 保存一覧パネル -->
+        <section id="saves-panel" class="saves-panel" hidden>
+          <header class="memos-header">
+            <h3>保存一覧</h3>
+            <button id="saves-refresh" class="btn btn-ghost btn-sm" title="更新">更新</button>
+            <button id="saves-close" class="btn btn-ghost btn-sm" title="閉じる">閉じる</button>
+          </header>
+          <div id="saves-list" class="memos-list"></div>
+        </section>
 
         <details class="agp-accordion" id="acc-editor-settings" data-accordion-id="editor-settings">
           <summary data-has-hint>
             <span class="summary-label">エディタ設定</span>
-            <button class="accordion-hint-toggle" type="button" aria-expanded="false" aria-label="エディタ設定のヒント" data-accordion-hint="editor-settings">?</button>
+            <button
+              class="accordion-hint-toggle"
+              type="button"
+              aria-expanded="false"
+              aria-label="エディタ設定のヒント"
+              data-accordion-hint="editor-settings"
+            >
+              ?
+            </button>
           </summary>
           <div class="accordion-content">
             <div class="accordion-hint" data-hint-for="editor-settings" hidden></div>
             <section id="editor-settings" class="card">
               <h3>エディタ設定</h3>
               <div class="field">
-                <label class="muted"><input id="cfg-autoscroll-enabled" type="checkbox" /> 自動スクロールを有効にする</label>
+                <label class="muted"
+                  ><input id="cfg-autoscroll-enabled" type="checkbox" /> 自動スクロールを有効にする</label
+                >
               </div>
               <div class="field">
                 <span>安全領域（上） <small id="cfg-safe-top-label">20%</small></span>
@@ -135,7 +198,9 @@
                 <input id="cfg-safe-bottom" type="range" min="55" max="90" step="1" value="60" />
               </div>
               <div class="field">
-                <label class="muted"><input id="cfg-ink-enabled" type="checkbox" /> 入力アニメーションを有効にする</label>
+                <label class="muted"
+                  ><input id="cfg-ink-enabled" type="checkbox" /> 入力アニメーションを有効にする</label
+                >
               </div>
               <div class="field">
                 <span>アニメーション時間 <small id="cfg-ink-duration-label">160ms</small></span>
@@ -152,7 +217,15 @@
         <details class="agp-accordion" id="acc-node-editor" data-accordion-id="node-editor" open>
           <summary data-has-hint>
             <span class="summary-label">ノード編集（MVP）</span>
-            <button class="accordion-hint-toggle" type="button" aria-expanded="false" aria-label="ノード編集（MVP）のヒント" data-accordion-hint="node-editor">?</button>
+            <button
+              class="accordion-hint-toggle"
+              type="button"
+              aria-expanded="false"
+              aria-label="ノード編集（MVP）のヒント"
+              data-accordion-hint="node-editor"
+            >
+              ?
+            </button>
           </summary>
           <div class="accordion-content">
             <div class="accordion-hint" data-hint-for="node-editor" hidden></div>
@@ -250,8 +323,8 @@
               <div class="field">
                 <span>部分エクスポート（到達可能サブグラフ）</span>
                 <div class="ne-row">
-                  <select id="ne-export-multiselect" multiple size="6" style="flex:1"></select>
-                  <div class="ne-subactions" style="display:grid; gap:6px;">
+                  <select id="ne-export-multiselect" multiple size="6" style="flex: 1"></select>
+                  <div class="ne-subactions" style="display: grid; gap: 6px">
                     <button id="ne-export-select-all" class="btn">全選択</button>
                     <button id="ne-export-select-none" class="btn">全解除</button>
                     <button id="ne-export-partial" class="btn">選択からエクスポート</button>
@@ -266,7 +339,15 @@
         <details class="agp-accordion" id="acc-wysiwyg-editor" data-accordion-id="wysiwyg-editor">
           <summary data-has-hint>
             <span class="summary-label">WYSIWYGストーリーエディタ</span>
-            <button class="accordion-hint-toggle" type="button" aria-expanded="false" aria-label="WYSIWYGストーリーエディタのヒント" data-accordion-hint="wysiwyg-editor">?</button>
+            <button
+              class="accordion-hint-toggle"
+              type="button"
+              aria-expanded="false"
+              aria-label="WYSIWYGストーリーエディタのヒント"
+              data-accordion-hint="wysiwyg-editor"
+            >
+              ?
+            </button>
           </summary>
           <div class="accordion-content">
             <div class="accordion-hint" data-hint-for="wysiwyg-editor" hidden>
@@ -275,11 +356,11 @@
             <section id="wysiwyg-editor-panel" class="card">
               <h3>WYSIWYGストーリーエディタ</h3>
               <p class="muted">ビジュアルなドラッグ&ドロップでストーリーを作成できます。</p>
-              <div class="btn-group" style="margin-bottom: 12px;">
+              <div class="btn-group" style="margin-bottom: 12px">
                 <button id="wysiwyg-open" class="btn btn-primary">エディタを開く</button>
                 <button id="wysiwyg-load" class="btn btn-ghost">現在のストーリーを読み込み</button>
               </div>
-              <div id="wysiwyg-status" class="muted" style="margin-top: 8px;"></div>
+              <div id="wysiwyg-status" class="muted" style="margin-top: 8px"></div>
             </section>
           </div>
         </details>
@@ -287,17 +368,27 @@
         <details class="agp-accordion" id="acc-mermaid" data-accordion-id="mermaid">
           <summary data-has-hint>
             <span class="summary-label">Mermaid設定</span>
-            <button class="accordion-hint-toggle" type="button" aria-expanded="false" aria-label="Mermaid設定のヒント" data-accordion-hint="mermaid">?</button>
+            <button
+              class="accordion-hint-toggle"
+              type="button"
+              aria-expanded="false"
+              aria-label="Mermaid設定のヒント"
+              data-accordion-hint="mermaid"
+            >
+              ?
+            </button>
           </summary>
           <div class="accordion-content">
             <div class="accordion-hint" data-hint-for="mermaid" hidden></div>
             <section id="mermaid-panel" class="card">
               <div class="field">
-                <label class="muted"><input id="ne-mermaid-show-labels" type="checkbox" checked /> エッジに選択肢ラベルを表示</label>
+                <label class="muted"
+                  ><input id="ne-mermaid-show-labels" type="checkbox" checked /> エッジに選択肢ラベルを表示</label
+                >
               </div>
               <label class="field">
                 <span>Mermaid ソース</span>
-                <textarea id="ne-mermaid-src" rows="8" placeholder="flowchart TD..." style="width:100%;"></textarea>
+                <textarea id="ne-mermaid-src" rows="8" placeholder="flowchart TD..." style="width: 100%"></textarea>
               </label>
             </section>
           </div>
@@ -306,18 +397,26 @@
         <details class="agp-accordion" id="acc-playtest" data-accordion-id="playtest">
           <summary data-has-hint>
             <span class="summary-label">プレイテスト</span>
-            <button class="accordion-hint-toggle" type="button" aria-expanded="false" aria-label="プレイテストのヒント" data-accordion-hint="playtest">?</button>
+            <button
+              class="accordion-hint-toggle"
+              type="button"
+              aria-expanded="false"
+              aria-label="プレイテストのヒント"
+              data-accordion-hint="playtest"
+            >
+              ?
+            </button>
           </summary>
           <div class="accordion-content">
             <div class="accordion-hint" data-hint-for="playtest" hidden></div>
             <section id="ai-improvement-panel" class="card">
               <h3>AIストーリー改善</h3>
               <p class="muted">AIがストーリーの改善点を分析して提案します。</p>
-              <div class="btn-group" style="margin-bottom: 12px;">
+              <div class="btn-group" style="margin-bottom: 12px">
                 <button id="ai-analyze" class="btn btn-primary">分析して改善提案</button>
                 <button id="ai-auto-fix" class="btn btn-accent">自動修正</button>
               </div>
-              <div id="ai-status" class="muted" style="margin-top: 8px;"></div>
+              <div id="ai-status" class="muted" style="margin-top: 8px"></div>
             </section>
           </div>
         </details>
@@ -356,7 +455,9 @@
                 aria-expanded="false"
                 aria-controls="mermaid-inline-content"
                 aria-label="分岐プレビューを開く"
-              >開く</button>
+              >
+                開く
+              </button>
             </div>
           </div>
           <div id="mermaid-inline-content" class="preview-content" hidden>
@@ -396,7 +497,7 @@
 
       <!-- WYSIWYG Story Editor View -->
       <div class="wysiwyg-editor-view" id="wysiwyg-editor-view" hidden>
-        <div id="wysiwyg-editor-container" style="display: flex; height: 100%;"></div>
+        <div id="wysiwyg-editor-container" style="display: flex; height: 100%"></div>
       </div>
     </main>
 
@@ -462,21 +563,23 @@
 
     <!-- 保存プレビューパネル -->
     <section id="preview-panel" class="preview-panel overlay-panel" hidden>
-      <header class="preview-header" style="flex-direction: column; align-items: stretch; gap: 12px;">
-        <div style="display: flex; align-items: center; gap: 12px;">
-          <h3 style="margin: 0;">保存プレビュー</h3>
+      <header class="preview-header" style="flex-direction: column; align-items: stretch; gap: 12px">
+        <div style="display: flex; align-items: center; gap: 12px">
+          <h3 style="margin: 0">保存プレビュー</h3>
           <div class="spacer"></div>
           <button id="snapshot-compare-btn" class="btn" disabled>比較 (0/2)</button>
           <button id="preview-delete-selected" class="btn" disabled>選択削除</button>
           <button id="preview-refresh" class="btn">再読込</button>
           <button id="preview-close" class="icon-btn" title="閉じる">閉じる</button>
         </div>
-        
-        <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center; font-size: 13px;">
-          <label class="muted">検索
-            <input id="preview-search" type="text" placeholder="タイトル・内容・ラベル" style="width: 150px;" />
+
+        <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center; font-size: 13px">
+          <label class="muted"
+            >検索
+            <input id="preview-search" type="text" placeholder="タイトル・内容・ラベル" style="width: 150px" />
           </label>
-          <label class="muted">タグ
+          <label class="muted"
+            >タグ
             <select id="preview-filter-tag">
               <option value="all">全て</option>
               <option value="draft">下書き</option>
@@ -484,7 +587,8 @@
               <option value="backup">バックアップ</option>
             </select>
           </label>
-          <label class="muted">種類
+          <label class="muted"
+            >種類
             <select id="preview-filter-type">
               <option value="all">全て</option>
               <option value="simple">シンプル保存</option>
@@ -492,13 +596,16 @@
               <option value="snapshot">スナップショット</option>
             </select>
           </label>
-          <label class="muted">開始日
-            <input id="preview-date-from" type="date" style="width: 130px;" />
+          <label class="muted"
+            >開始日
+            <input id="preview-date-from" type="date" style="width: 130px" />
           </label>
-          <label class="muted">終了日
-            <input id="preview-date-to" type="date" style="width: 130px;" />
+          <label class="muted"
+            >終了日
+            <input id="preview-date-to" type="date" style="width: 130px" />
           </label>
-          <label class="muted">並び替え
+          <label class="muted"
+            >並び替え
             <select id="preview-sort">
               <option value="date_desc">保存日時（新しい順）</option>
               <option value="date_asc">保存日時（古い順）</option>
@@ -535,12 +642,13 @@
         <button id="playtest-modal-close" class="btn btn-ghost btn-sm" title="閉じる">閉じる</button>
       </div>
       <div class="playtest-modal-content">
-        <iframe id="playtest-iframe" style="width: 100%; height: 100%; border: none;"></iframe>
+        <iframe id="playtest-iframe" style="width: 100%; height: 100%; border: none"></iframe>
       </div>
     </div>
 
     <script src="scripts/eventBus.js"></script>
     <script src="scripts/storage.js"></script>
+    <script src="scripts/strings.js"></script>
     <script src="scripts/config.js"></script>
     <script src="scripts/themeUtils.js"></script>
     <script src="scripts/themeUIManager.js"></script>
@@ -587,4 +695,7 @@
     <script src="scripts/adminApiManager.js"></script>
     <script src="scripts/uiAdjuster.js"></script>
     <script src="scripts/utilsManager.js"></script>
+    <script src="scripts/storyWorkflowPanel.js"></script>
     <script src="scripts/admin.core.js?v=4"></script>
+  </body>
+</html>

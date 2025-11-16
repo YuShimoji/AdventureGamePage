@@ -2,12 +2,12 @@
   // Admin Core Module - Main initialization coordinator for admin interface (Refactored for modularity)
 
   window.AdminCore = {
-    init: function() {
+    init: function () {
       this.setupCore();
       console.log('AdminCore initialized');
     },
 
-    setupCore: function() {
+    setupCore: function () {
       // Initialize all admin modules
       if (window.AdminEditor) {
         window.AdminEditor.init();
@@ -47,7 +47,10 @@
       if (window.UtilsManager) {
         window.UtilsManager.init();
       }
-    }
+      if (window.StoryWorkflowPanel) {
+        window.StoryWorkflowPanel.init();
+      }
+    },
   };
 
   // Initialize AdminCore when boot completes

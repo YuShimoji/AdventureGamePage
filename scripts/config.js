@@ -1,19 +1,24 @@
-(function(){
+(function () {
   // グローバル設定（ハードコーディング回避用）
+  // 言語は APP_CONFIG.lang で管理し、文字列は AGStrings 経由で取得する
+  var hasAGStrings = !!(window.AGStrings && typeof window.AGStrings.t === 'function');
+
   window.APP_CONFIG = {
+    // 初期言語（将来的にUIから切り替え可能にする想定）
+    lang: 'ja',
     editor: {
-      placeholder: "入力を開始……",
+      placeholder: hasAGStrings ? window.AGStrings.t('editor.placeholder') : '入力を開始……',
       startZen: false,
       autoScroll: {
         enabled: true,
-        safeTopRatio: 0.20,
-        safeBottomRatio: 0.60,
-        behavior: 'smooth'
+        safeTopRatio: 0.2,
+        safeBottomRatio: 0.6,
+        behavior: 'smooth',
       },
       inputFx: {
         enabled: true,
-        durationMs: 160
-      }
+        durationMs: 160,
+      },
     },
     ui: {
       showFloatingFormatbar: true,
@@ -24,32 +29,32 @@
       // ヘッダー固定のON/OFF（falseで固定解除）
       stickyHeader: false,
       // アイコン表現: 'emoji' | 'text'
-      iconStyle: 'text'
+      iconStyle: 'text',
     },
     storage: {
       backend: 'idb',
       useBridge: true,
       keys: {
         simple: 'agp_manuscript_simple',
-        full: 'agp_manuscript_full'
+        full: 'agp_manuscript_full',
       },
       snapshots: {
         enabled: true,
-        prefix: 'agp_snap_'
-      }
+        prefix: 'agp_snap_',
+      },
     },
     strings: {
-      defaultTitle: "無題"
+      defaultTitle: hasAGStrings ? window.AGStrings.t('strings.defaultTitle') : '無題',
     },
     debug: {
       enabled: true, // 開発時にtrueに設定してデバッグUIを表示
-      showConsoleLogs: true
+      showConsoleLogs: true,
     },
     game: {
       autoSave: {
         enabled: true, // ノード遷移時の自動セーブ
-        delayMs: 100  // 連続遷移時の負荷軽減
-      }
-    }
+        delayMs: 100, // 連続遷移時の負荷軽減
+      },
+    },
   };
 })();

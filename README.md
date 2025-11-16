@@ -1,4 +1,5 @@
 # AdventureGamePage
+
 ## ビジュアルノベル・アドベンチャーゲーム制作プラットフォーム
 
 サーバー不要で動作する、アドベンチャーゲームの「管理（執筆）」と「プレイ」を行う静的Webページです。`index.html` をブラウザで開くだけで利用できます。
@@ -6,6 +7,7 @@
 ### 主な機能
 
 #### 🎮 **プレイ機能** (`play.html`)
+
 - **インタラクティブストーリー**: ノードベースの分岐型ストーリー
 - **自動保存**: ノード遷移時の自動セーブ（設定で有効/無効切り替え）
 - **履歴管理**: 戻る/進む機能で快適なナビゲーション
@@ -16,6 +18,7 @@
 - **デバッグUI**: 🔧ボタンでリアルタイムデバッグ（開発時のみ）
 
 #### ✏️ **管理機能** (`admin.html`)
+
 - **Zenライク執筆**: 集中できる執筆環境
 - **ノード編集**: ビジュアルノードエディタ
 - **条件分岐**: アイテム/変数ベースの複雑な分岐設定
@@ -25,6 +28,7 @@
 - **プレイテスト**: エディタ内で即座にテスト可能
 
 #### 🧪 **テスト機能** (`test-rpg.html`)
+
 - **サンプルゲーム**: 基本/RPG/複雑ストーリーのサンプル
 - **自動テスト**: 各機能のテストスイート実行
 - **リアルタイム監視**: ノード/変数/インベントリの状態表示
@@ -51,11 +55,13 @@
   - アクセシビリティ: 選択肢の自動フォーカス（最初のボタンに focus）
 
 ### 使い方（サーバー不要）
+
 1. このディレクトリで `index.html` をブラウザで開きます（ダブルクリックでOK）。
 2. 管理画面からゲームを作成・編集、プレイ画面で動作確認。
 3. テスト画面でサンプルを試したり、自動テストを実行。
 
 ### クイックスタート
+
 ```bash
 # 1. ブラウザで開く
 open index.html
@@ -68,63 +74,62 @@ open test-rpg.html
 ```
 
 ### ゲーム作成例
+
 ```javascript
 // シンプルなゲームデータ
 const myGame = {
-  title: "マイゲーム",
-  start: "start",
+  title: 'マイゲーム',
+  start: 'start',
   nodes: {
-    "start": {
-      title: "スタート",
-      text: "冒険の始まりです",
-      image: "images/forest.jpg",
+    start: {
+      title: 'スタート',
+      text: '冒険の始まりです',
+      image: 'images/forest.jpg',
       choices: [
         {
-          label: "森へ行く",
-          target: "forest"
-        }
+          label: '森へ行く',
+          target: 'forest',
+        },
       ],
-      actions: [
-        { type: "set_variable", key: "visited_start", value: true }
-      ]
+      actions: [{ type: 'set_variable', key: 'visited_start', value: true }],
     },
-    "forest": {
-      title: "森",
-      text: "深い森に到着しました",
+    forest: {
+      title: '森',
+      text: '深い森に到着しました',
       choices: [
         {
-          label: "戻る",
-          target: "start",
-          conditions: [
-            { type: "has_item", itemId: "key" }
-          ]
-        }
+          label: '戻る',
+          target: 'start',
+          conditions: [{ type: 'has_item', itemId: 'key' }],
+        },
       ],
-      actions: [
-        { type: "add_item", itemId: "herb", quantity: 1 }
-      ]
-    }
-  }
+      actions: [{ type: 'add_item', itemId: 'herb', quantity: 1 }],
+    },
+  },
 };
 ```
 
 ### キーボードショートカット（プレイ画面）
+
 - ←（ArrowLeft）: 戻る
 - →（ArrowRight）: 進む
 - R: リスタート
 - I/Z: インベントリ表示
 
 ### 設定
+
 - `scripts/config.js` で各種設定変更可能
 - `APP_CONFIG.debug.enabled = true` でデバッグUI有効化
 - `APP_CONFIG.game.autoSave.enabled = true` で自動セーブ有効化
 
 ### テスト
+
 - `test-rpg.html` で包括的テスト実行
 - コンソールで詳細なテスト結果確認
 - サンプルゲームの即時切り替え可能
 
 ## ディレクトリ構成
+
 ```
 AdventureGamePage/
   index.html              # スタートページ
@@ -151,23 +156,27 @@ AdventureGamePage/
 ## 技術仕様
 
 ### ゲームデータ構造
+
 - **ノードベース**: シーン単位の分岐管理
 - **条件分岐**: アイテム/変数ベースの動的分岐
 - **アクション**: ノード到着時の自動実行処理
 - **永続化**: localStorageによる自動保存
 
 ### 対応ブラウザ
+
 - Chrome 80+
 - Firefox 75+
 - Safari 13+
 - Edge 80+
 
 ### パフォーマンス
+
 - 軽量設計（~50KB gzipped）
 - メモリリーク対策済み
 - サーバー不要でオフライン動作
 
 ## ディレクトリ構成
+
 ```
 AdventureGamePage/
   index.html
@@ -207,9 +216,10 @@ AdventureGamePage/
 ```
 
 ## アーキテクチャ（概要）
+
 - `scripts/storage.js`: localStorage の便利関数
 - `scripts/theme.js`: テーマ（色）管理とパネル UI
-- `scripts/admin.js`: 執筆エディタ（Zen ライク）と保存/読み込み
+- `scripts/admin-boot.js` / `scripts/admin.core.js`: 管理画面のブート処理と執筆エディタ統合（Zen ライク編集・保存/読み込み）
 - `scripts/storageProvider.js`: StorageProvider 抽象化（LocalStorageProvider 実装と StorageHub を含む）
 - `scripts/savePreview.js`: 保存プレビューのUIロジック（一覧/読込/削除、フラグで有効化）
 - `scripts/gameEngine.js`: シンプルなノード/選択肢エンジン
@@ -239,6 +249,7 @@ flowchart LR
 ```
 
 ## 推奨ツール/拡張と使い分け
+
 - Mermaid（Windsurf/VSCodeでプレビュー可能）
   - アーキ図・分岐図のドラフトに最適。`docs/architecture.md` 参照。
 - PlantUML（拡張: jebbs.plantuml）
@@ -251,6 +262,7 @@ flowchart LR
   - Prettier を使用（`.vscode/settings.json` で保存時フォーマット）。
 
 ## ワークフロー（概要）
+
 - 管理（執筆）
   1. `admin.html` を開き、本文を執筆
   2. 文字装飾や整形はサイドバーのツールから
@@ -263,12 +275,14 @@ flowchart LR
 詳細は `docs/workflow.md` を参照してください。
 
 ### 手動テスト（戻る機能）
+
 1. `play.html` を開く
 2. サンプルの選択肢で 2 ノード以上遷移
 3. ヘッダーの「戻る」をクリックし、直前のノードへ戻ることを確認
 4. リロード後も再度「戻る」で直前ノードに戻れることを確認（進行保存に履歴が含まれます）
 
 ### 手動テスト（進む機能）
+
 1. `play.html` を開く
 2. 2 ノード以上遷移 → 「戻る」で1手前へ
 3. 「進む」をクリックし、元のノードへ進めることを確認
@@ -283,6 +297,7 @@ flowchart LR
 注: `APP_CONFIG.ui.shortcutsEnabled` が true の場合のみ有効。入力中（`input`/`textarea`/`contenteditable`）では無効化されます。
 
 ## 設定
+
 - `scripts/config.js`
   - `APP_CONFIG.ui.showSavePreview`: 保存プレビュー機能の有効/無効（既定: false）
   - 有効化すると、管理画面右下の 🗂 ボタンで「保存プレビュー」パネルが開き、一覧・読込・削除が可能になります。
@@ -293,14 +308,17 @@ flowchart LR
     - `prefix`: スナップショットIDの接頭辞（既定: `agp_snap_`）
 
 ## ゲームデータJSONスキーマ（ドラフト）
+
 仕様のドラフトは `docs/specs/game-data-schema.md` を参照してください。
 管理側では以下をサポートしています。
+
 - 「ゲームJSONエクスポート」: 現在のエディタ内容から最小構成のJSONを生成
 - 「ゲームJSON再エクスポート（プレイ用）」: 現在 `agp_game_data`（または内蔵サンプル）をドラフト仕様に変換して書き出し
-プレイ側では以下をサポートしています。
+  プレイ側では以下をサポートしています。
 - 「ゲームJSON読込」: ドラフト仕様JSONを読み込み、エンジン形式に正規化して `agp_game_data` に保存（即リロード）
 
 ## 保存モードの違い（現状の仕様）
+
 - シンプル保存
   - 本文のプレーンテキストのみを保存（`localStorage`）
   - 互換性が高く、容量も小さい
@@ -311,6 +329,7 @@ flowchart LR
 注意: `localStorage` にはブラウザ実装に依存しますが約 5MB 程度の制限があります。長文・画像などを扱う場合は将来の設計（IndexedDB / File System Access API など）に移行します。画像の保存は現状サポートしていません（`data:` での埋め込みは容量的に非推奨）。詳細は `docs/issues/05-save-architecture.md` を参照してください。
 
 ### 保存アーキテクチャの抽象化（新規）
+
 - 保存先は `LocalStorage` と `IndexedDB` を「ストレージプロバイダ」として抽象化しています。
 - 既定は IndexedDB（`scripts/config.js` の `storage.backend`）。サイドバーから切替可能。
 - 「保存一覧」で保存内容を確認・開く・エクスポート・削除が可能です。
@@ -319,6 +338,7 @@ flowchart LR
 ## アーキテクチャ（モジュラー設計）
 
 ### 概要
+
 プロジェクトは保守性と拡張性を高めるため、大規模JavaScriptファイルをモジュラーなコンポーネントにリファクタリングしました。各ファイルは以下の3つのマネージャーに分割されています：
 
 - **Utils**: 純粋なユーティリティ関数（計算、変換、ストレージ操作）
@@ -328,37 +348,49 @@ flowchart LR
 ### リファクタリングされたコンポーネント
 
 #### 🎮 GameEngine (ゲームエンジン)
+
 - **gameEngineUtils.js**: アイテムアイコン生成、アクション実行、エフェクト処理
 - **gameEngineUIManager.js**: UIレンダリング、キーボードナビゲーション、アクセシビリティ
 - **gameEngineLogicManager.js**: ゲーム状態管理、ナビゲーション、インベントリ管理
 - **gameEngine.js**: マネージャー統合とAPI提供
 
 #### ✏️ NodeEditor (ノードエディタ)
+
 - **nodeEditorUtils.js**: ノード操作ユーティリティ、検証関数
 - **nodeEditorUIManager.js**: UI状態管理、レンダリング、イベントバインディング
 - **nodeEditorLogicManager.js**: ロード/保存/検証/エクスポートロジック
 - **nodeEditor.js**: マネージャー統合とAPI提供
 
 #### 📊 MermaidPreview (Mermaidプレビュー)
+
 - **mermaidPreviewUtils.js**: グラフ処理、Mermaid生成ユーティリティ
 - **mermaidPreviewUIManager.js**: UI状態管理、インタラクション処理
 - **mermaidPreviewLogicManager.js**: グラフ構築、レンダリングロジック
 - **mermaidPreview.js**: マネージャー統合とAPI提供
 
 #### 🎨 Theme (テーマ管理)
+
 - **themeUtils.js**: テーマ適用、プリセット管理、ストレージ操作
 - **themeUIManager.js**: パネル構築、プレビュー更新、イベントハンドリング
 - **themeLogicManager.js**: 初期化、テーマ適用、設定管理
 - **theme.js**: マネージャー統合とAPI提供
 
 #### ⚙️ AdminCore (管理コア)
+
 - 複数のマネージャーモジュール（UI調整、API管理、ストレージ操作など）に分割済み
 - **admin.core.js**: マネージャー統合と初期化
 
 #### 💾 SavePreview (保存プレビュー)
+
 - すでにクラスベースのモジュラー設計を実装済み
 
+#### 🧭 Header / SPA Routing（実験的）
+
+- **headerManager.js**: ページ種別に応じた共通ヘッダー/ナビゲーションの生成（ホームへの戻りボタン、テーマボタンなど）
+- **spaRouter.js**: ハッシュベースの単一ページアプリケーション（SPA）ルーター基盤（`#!/admin`/`#!/play` 等のビュー切り替え、将来の統合用）
+
 ### 利点
+
 - **保守性向上**: 各コンポーネントの責任が明確化
 - **テスト容易性**: 個別コンポーネントのユニットテストが可能
 - **拡張性**: 新機能追加時の影響範囲が局所化
@@ -366,12 +398,15 @@ flowchart LR
 - **開発効率**: 並行開発時の競合減少
 
 ### 開発時の注意点
+
 - スクリプト読み込み順序を `admin.html` で確認してください
 - 新規マネージャー追加時は、対応するUtils/UIManager/LogicManagerの3ファイルを検討
 - イベント駆動型初期化（DOMContentLoaded）を維持してください
 
 ## Troubleshooting（ブラウザが開かない時）
+
 環境により GUI アプリの自動起動が制限される場合があります。以下のいずれかの方法でご確認ください。
+
 1. IDE のブラウザプレビューを使用する（推奨）
 2. ローカル静的サーバーを起動してアクセス
    - `py -3 -m http.server 5500`
@@ -381,4 +416,5 @@ flowchart LR
 詳細は `docs/issues/02-browser-open-unstable.md` を参照。
 
 ## ライセンス
+
 プロジェクト内のサンプルコード・文書はあなたのプロジェクト要件に合わせて自由に改変可能です。
