@@ -2,7 +2,9 @@
   // Utils Manager - Provides common utility functions for admin core
   window.UtilsManager = {
     init: function() {
-      console.log('UtilsManager initialized');
+      if (window.APP_CONFIG?.debug?.showConsoleLogs) {
+        console.log('UtilsManager initialized');
+      }
     },
 
     // Utility functions

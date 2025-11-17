@@ -42,8 +42,8 @@
       defaultTitle: "無題"
     },
     debug: {
-      enabled: true, // 開発時にtrueに設定してデバッグUIを表示
-      showConsoleLogs: true
+      enabled: false, // 開発時にtrueに設定してデバッグUIを表示
+      showConsoleLogs: false
     },
     game: {
       autoSave: {

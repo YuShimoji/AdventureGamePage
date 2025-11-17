@@ -12,7 +12,9 @@
     initialize() {
       if (this.initialized) return;
 
-      console.log('[DEBUG] ThemeLogicManager.initialize() called');
+      if (window.APP_CONFIG?.debug?.showConsoleLogs) {
+        console.log('[DEBUG] ThemeLogicManager.initialize() called');
+      }
 
       // Apply theme on load
       ThemeUtils.applyTheme(ThemeUtils.loadTheme());
@@ -27,7 +29,9 @@
       }
 
       this.initialized = true;
-      console.log('[DEBUG] ThemeLogicManager initialization complete');
+      if (window.APP_CONFIG?.debug?.showConsoleLogs) {
+        console.log('[DEBUG] ThemeLogicManager initialization complete');
+      }
     }
 
     // Get UI manager

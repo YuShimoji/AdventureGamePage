@@ -204,22 +204,27 @@
 
       // 4.6 SavePreviewPanelManagerの初期化（admin.jsより先に実行）
       if (window.SavePreviewPanelManager && window.APP_CONFIG?.ui?.showSavePreview) {
-        console.log('[DEBUG] SavePreviewPanelManager found, initializing...');
-        console.log('[DEBUG] APP_CONFIG.ui.showSavePreview:', window.APP_CONFIG?.ui?.showSavePreview);
+        log('info', 'SavePreviewPanelManager initializing', {
+          showSavePreview: window.APP_CONFIG?.ui?.showSavePreview
+        });
         try {
           await window.SavePreviewPanelManager.initialize();
-          console.log('[DEBUG] SavePreviewPanelManager initialized successfully');
-          console.log('[DEBUG] SavePreviewPanelManager.isOpen():', window.SavePreviewPanelManager.isOpen());
+          log('info', 'SavePreviewPanelManager initialized successfully', {
+            isOpen: window.SavePreviewPanelManager.isOpen()
+          });
 
           // パネルの初期状態を確認
           const panel = document.getElementById('preview-panel');
-          console.log('[DEBUG] After initialization - panel.hidden:', panel?.hidden);
-          console.log('[DEBUG] After initialization - panel.dataset.state:', panel?.dataset?.state);
-          console.log('[DEBUG] After initialization - panel.classList:', panel?.classList?.toString());
+          if (panel) {
+            log('info', 'SavePreviewPanelManager panel state after init', {
+              hidden: panel.hidden,
+              state: panel.dataset?.state,
+              classList: panel.classList?.toString()
+            });
+          }
 
         } catch (e) {
-          console.error('[DEBUG] SavePreviewPanelManager initialization failed:', e);
-          log('error', 'SavePreviewPanelManager initialization failed', { error: e.message });
+          log('error', 'SavePreviewPanelManager initialization failed', { error: e });
 
           // 初期化失敗時はadmin.jsの実行をブロック
           const errorMsg = `保存プレビューパネルの初期化に失敗しました: ${e.message}\\n管理画面の機能が制限される可能性があります。`;
@@ -233,13 +238,13 @@
             document.dispatchEvent(new CustomEvent('admin-boot-complete', {
               detail: { error: e, config: window.APP_CONFIG, savePreviewFailed: true }
             }));
-            console.log('[DEBUG] admin-boot-complete fired with SavePreview failure');
+            log('info', 'admin-boot-complete fired with SavePreview failure');
           }, 100);
 
           return; // 初期化を中止
         }
       } else {
-        console.log('[DEBUG] SavePreviewPanelManager not found or disabled:', {
+        log('info', 'SavePreviewPanelManager not found or disabled', {
           manager: !!window.SavePreviewPanelManager,
           config: window.APP_CONFIG?.ui?.showSavePreview
         });
@@ -326,9 +331,9 @@
     if (window.SavePreviewPanelManager && typeof window.SavePreviewPanelManager.close === 'function') {
       try {
         window.SavePreviewPanelManager.close({ restoreFocus: false });
-        console.log('[AdminBoot] SavePreviewPanelManager cleaned up');
+        log('info', 'SavePreviewPanelManager cleaned up');
       } catch (e) {
-        console.warn('[AdminBoot] SavePreviewPanelManager cleanup failed:', e);
+        log('warn', 'SavePreviewPanelManager cleanup failed', { error: e });
       }
     }
 
@@ -336,9 +341,9 @@
     if (window.MermaidPreviewUIManager && typeof window.MermaidPreviewUIManager.unbind === 'function') {
       try {
         window.MermaidPreviewUIManager.unbind();
-        console.log('[AdminBoot] MermaidPreviewUIManager cleaned up');
+        log('info', 'MermaidPreviewUIManager cleaned up');
       } catch (e) {
-        console.warn('[AdminBoot] MermaidPreviewUIManager cleanup failed:', e);
+        log('warn', 'MermaidPreviewUIManager cleanup failed', { error: e });
       }
     }
 
@@ -346,9 +351,9 @@
     try {
       document.removeEventListener('agp-node-selection-changed', window.MermaidPreview?.focusNode);
       document.removeEventListener('agp-spec-updated', window.MermaidPreview?.refreshData);
-      console.log('[AdminBoot] Event listeners cleaned up');
+      log('info', 'Event listeners cleaned up');
     } catch (e) {
-      console.warn('[AdminBoot] Event listener cleanup failed:', e);
+      log('warn', 'Event listener cleanup failed', { error: e });
     }
   }
 
@@ -356,7 +361,7 @@
   let currentPath = window.location.pathname;
   window.addEventListener('popstate', () => {
     if (window.location.pathname !== currentPath) {
-      console.log('[AdminBoot] Page changed, cleaning up UI managers');
+      log('info', 'Page changed, cleaning up UI managers');
       cleanupOnPageChange();
       currentPath = window.location.pathname;
     }
@@ -384,7 +389,7 @@
         }
       });
 
-      console.log('[ADMIN-BOOT] Admin elements hidden for non-admin page');
+      log('info', 'Admin elements hidden for non-admin page');
     }
   });
 

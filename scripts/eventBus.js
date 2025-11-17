@@ -42,7 +42,7 @@
       // Sort by priority (higher priority first)
       listeners.sort((a, b) => b.priority - a.priority);
 
-      if (this.debugMode) {
+      if (this.debugMode && window.APP_CONFIG?.debug?.showConsoleLogs) {
         console.log(`[EventBus] Subscribed to "${event}"`, { options });
       }
 
@@ -75,7 +75,7 @@
 
       if (index !== -1) {
         listeners.splice(index, 1);
-        if (this.debugMode) {
+        if (this.debugMode && window.APP_CONFIG?.debug?.showConsoleLogs) {
           console.log(`[EventBus] Unsubscribed from "${event}"`);
         }
       }
@@ -94,7 +94,7 @@
      */
     async emit(event, data) {
       if (!this.listeners.has(event)) {
-        if (this.debugMode) {
+        if (this.debugMode && window.APP_CONFIG?.debug?.showConsoleLogs) {
           console.log(`[EventBus] No listeners for "${event}"`);
         }
         return;
@@ -110,7 +110,7 @@
       // Log event
       this.logEvent(eventInfo);
 
-      if (this.debugMode) {
+      if (this.debugMode && window.APP_CONFIG?.debug?.showConsoleLogs) {
         console.log(`[EventBus] Emitting "${event}"`, data);
       }
 
@@ -153,7 +153,7 @@
       // Log event
       this.logEvent(eventInfo);
 
-      if (this.debugMode) {
+      if (this.debugMode && window.APP_CONFIG?.debug?.showConsoleLogs) {
         console.log(`[EventBus] Emitting (sync) "${event}"`, data);
       }
 
@@ -179,12 +179,12 @@
     clear(event) {
       if (event) {
         this.listeners.delete(event);
-        if (this.debugMode) {
+        if (this.debugMode && window.APP_CONFIG?.debug?.showConsoleLogs) {
           console.log(`[EventBus] Cleared listeners for "${event}"`);
         }
       } else {
         this.listeners.clear();
-        if (this.debugMode) {
+        if (this.debugMode && window.APP_CONFIG?.debug?.showConsoleLogs) {
           console.log('[EventBus] Cleared all listeners');
         }
       }
@@ -235,7 +235,9 @@
      */
     setDebugMode(enabled) {
       this.debugMode = !!enabled;
-      console.log(`[EventBus] Debug mode ${enabled ? 'enabled' : 'disabled'}`);
+      if (window.APP_CONFIG?.debug?.showConsoleLogs) {
+        console.log(`[EventBus] Debug mode ${enabled ? 'enabled' : 'disabled'}`);
+      }
     }
   }
 
@@ -276,5 +278,7 @@
     COMPACT_VIEW_TOGGLE: 'ui:compact:toggle'
   };
 
-  console.log('[EventBus] Initialized');
+  if (window.APP_CONFIG?.debug?.showConsoleLogs) {
+    console.log('[EventBus] Initialized');
+  }
 })();
