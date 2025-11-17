@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2025-11-14]
+
+- fix/ui: モダンなミニマルアイコンへ移行（Lucide）と統合アプリ安定化
+  - app.html: タブの絵文字を Lucide アイコンへ置換（`data-lucide` + `lucide.createIcons()`）
+  - admin.html / admin-debug.html: ヘッダーアイコンを Lucide に統一、初期化を `createIcons` に変更
+  - scripts/header.js: `icon-button` は Lucideが存在すれば `<i data-lucide>` を使用、なければ絵文字にフォールバック
+  - features.html / play.html / admin.html: 統合ページ埋め込み時（`window.EMBEDDED_APP`）はヘッダー/ヘッド生成を抑止し、二重ヘッダーで高さが伸びる不具合を解消
+  - app.html: タブ変換のフォールバック強化（Lucide未読み込み時はラベル文字を表示）。クリック取得は `currentTarget` を使用
+  - エラー解消: `window.lucide.createIcon is not a function`
+
 ## [2025-11-13]
 
 - feat: UI表示安定化と名称統一、フォント調整、ドキュメント更新 [#UI-Improvements]
