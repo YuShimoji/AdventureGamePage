@@ -37,9 +37,13 @@
       const editor = document.getElementById('editor');
       const count = document.getElementById('char-count');
 
-      if (!editor || !count) {
-        console.warn('AdminEditor: Editor elements not found');
+      if (!editor) {
+        console.warn('AdminEditor: editor element not found');
         return;
+      }
+
+      if (!count) {
+        console.warn('AdminEditor: char-count element not found (embedded header?)');
       }
 
       // Initialize WYSIWYG editor
@@ -120,11 +124,13 @@
         });
       }
 
-      // Initialize character count
-      this.updateCharCount(editor, count);
+      // Initialize character count (if counter exists)
+      if (count) {
+        this.updateCharCount(editor, count);
 
-      // Input event listener for character count updates
-      editor.addEventListener('input', () => this.updateCharCount(editor, count));
+        // Input event listener for character count updates
+        editor.addEventListener('input', () => this.updateCharCount(editor, count));
+      }
 
       // Placeholder configuration
       if (window.APP_CONFIG?.editor?.placeholder) {

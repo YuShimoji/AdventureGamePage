@@ -53,11 +53,14 @@
     // Sidebar accordion management
     initSidebarAccordion: function() {
       // Sidebar toggle
-      document.getElementById('btn-toggle-sidebar').addEventListener('click', () => {
-        const sidebar = document.getElementById('sidebar');
-        sidebar.hidden = !sidebar.hidden;
-        sidebar.classList.toggle('show', !sidebar.hidden);
-      });
+      const toggleBtn = document.getElementById('btn-toggle-sidebar');
+      const sidebar = document.getElementById('sidebar');
+      if (toggleBtn && sidebar) {
+        toggleBtn.addEventListener('click', () => {
+          sidebar.hidden = !sidebar.hidden;
+          sidebar.classList.toggle('show', !sidebar.hidden);
+        });
+      }
 
       // Sidebar accordion (details.agp-accordion): exclusive open + persist last open
       (function initSidebarAccordion(){

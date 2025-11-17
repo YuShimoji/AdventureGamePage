@@ -129,36 +129,38 @@
     <!-- Lucide icons -->
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 
-    <!-- App Router Script -->
+    <!-- App Router + Tab Icons Script -->
     <script>
       (function() {
         window.EMBEDDED_APP = true;
         document.addEventListener('DOMContentLoaded', function() {
-          const iconMap = {
-            '🏠': 'home',
-            '✨': 'sparkles',
-            '🎮': 'gamepad-2',
-            '✏️': 'edit',
-            '📖': 'book-open'
+          const tabConfig = {
+            home: { icon: 'home', label: 'ホーム' },
+            features: { icon: 'list', label: '機能一覧' },
+            play: { icon: 'gamepad-2', label: 'プレイ' },
+            admin: { icon: 'pencil', label: '管理' },
+            learn: { icon: 'book-open', label: '学ぶ' }
           };
+
           document.querySelectorAll('.app-tab').forEach(tab => {
-            const text = tab.textContent.trim();
-            const emoji = text.charAt(0);
-            const label = text.slice(1).trim() || text;
-            const name = iconMap[emoji];
-            if (name) {
-              if (window.lucide && window.lucide.createIcons) {
-                tab.innerHTML = '';
-                const i = document.createElement('i');
-                i.setAttribute('data-lucide', name);
-                tab.appendChild(i);
-                tab.appendChild(document.createTextNode(' ' + label));
-                window.lucide.createIcons({ attrs: { width: 16, height: 16 } });
-              } else {
-                tab.textContent = label;
-              }
+            const view = tab.getAttribute('data-view');
+            const cfg = view && tabConfig[view];
+            if (!cfg) return;
+
+            if (window.lucide && typeof window.lucide.createIcons === 'function') {
+              tab.innerHTML = '';
+              const i = document.createElement('i');
+              i.setAttribute('data-lucide', cfg.icon);
+              tab.appendChild(i);
+              tab.appendChild(document.createTextNode(' ' + cfg.label));
+            } else {
+              tab.textContent = cfg.label;
             }
           });
+
+          if (window.lucide && typeof window.lucide.createIcons === 'function') {
+            window.lucide.createIcons({ attrs: { width: 16, height: 16 } });
+          }
         });
       })();
     </script>
