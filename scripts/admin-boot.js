@@ -1,4 +1,4 @@
-(function() {
+(function () {
   'use strict';
 
   // Admin Boot Script - エディタ初期化の堅牢化
@@ -75,7 +75,7 @@
       { id: 'btn-toggle-sidebar', description: 'サイドバートグルボタン' },
       { id: 'title-input', description: 'タイトル入力' },
       { id: 'btn-save-simple', description: 'シンプル保存ボタン' },
-      { id: 'btn-load-simple', description: 'シンプル読込ボタン' }
+      { id: 'btn-load-simple', description: 'シンプル読込ボタン' },
     ];
 
     const missing = [];
@@ -103,7 +103,10 @@
   function initializeEditor(editor) {
     try {
       // contenteditable属性の確認
-      if (!editor.hasAttribute('contenteditable') || editor.getAttribute('contenteditable') !== 'true') {
+      if (
+        !editor.hasAttribute('contenteditable') ||
+        editor.getAttribute('contenteditable') !== 'true'
+      ) {
         editor.setAttribute('contenteditable', 'true');
         log('info', 'contenteditable属性を設定');
       }
@@ -140,7 +143,6 @@
 
       log('info', 'エディタ初期化完了');
       return true;
-
     } catch (error) {
       throw new BootError('エディタ初期化失敗', { error: error.message, stack: error.stack });
     }
@@ -155,7 +157,7 @@
         window.APP_CONFIG = {
           editor: { placeholder: '入力を開始……', startZen: true },
           ui: { showFloatingFormatbar: true, showFloatingControls: true },
-          debug: { enabled: false, showConsoleLogs: true }
+          debug: { enabled: false, showConsoleLogs: true },
         };
       }
 
@@ -172,7 +174,6 @@
 
       log('info', '設定読み込み完了');
       return true;
-
     } catch (error) {
       throw new BootError('設定読み込み失敗', { error: error.message });
     }
@@ -205,18 +206,26 @@
       // 4.6 SavePreviewPanelManagerの初期化（admin.jsより先に実行）
       if (window.SavePreviewPanelManager && window.APP_CONFIG?.ui?.showSavePreview) {
         console.log('[DEBUG] SavePreviewPanelManager found, initializing...');
-        console.log('[DEBUG] APP_CONFIG.ui.showSavePreview:', window.APP_CONFIG?.ui?.showSavePreview);
+        console.log(
+          '[DEBUG] APP_CONFIG.ui.showSavePreview:',
+          window.APP_CONFIG?.ui?.showSavePreview
+        );
         try {
           await window.SavePreviewPanelManager.initialize();
           console.log('[DEBUG] SavePreviewPanelManager initialized successfully');
-          console.log('[DEBUG] SavePreviewPanelManager.isOpen():', window.SavePreviewPanelManager.isOpen());
+          console.log(
+            '[DEBUG] SavePreviewPanelManager.isOpen():',
+            window.SavePreviewPanelManager.isOpen()
+          );
 
           // パネルの初期状態を確認
           const panel = document.getElementById('preview-panel');
           console.log('[DEBUG] After initialization - panel.hidden:', panel?.hidden);
           console.log('[DEBUG] After initialization - panel.dataset.state:', panel?.dataset?.state);
-          console.log('[DEBUG] After initialization - panel.classList:', panel?.classList?.toString());
-
+          console.log(
+            '[DEBUG] After initialization - panel.classList:',
+            panel?.classList?.toString()
+          );
         } catch (e) {
           console.error('[DEBUG] SavePreviewPanelManager initialization failed:', e);
           log('error', 'SavePreviewPanelManager initialization failed', { error: e.message });
@@ -230,9 +239,11 @@
 
           // admin-boot-completeを発火するが、admin.jsの実行は許可しない
           setTimeout(() => {
-            document.dispatchEvent(new CustomEvent('admin-boot-complete', {
-              detail: { error: e, config: window.APP_CONFIG, savePreviewFailed: true }
-            }));
+            document.dispatchEvent(
+              new CustomEvent('admin-boot-complete', {
+                detail: { error: e, config: window.APP_CONFIG, savePreviewFailed: true },
+              })
+            );
             console.log('[DEBUG] admin-boot-complete fired with SavePreview failure');
           }, 100);
 
@@ -241,7 +252,7 @@
       } else {
         console.log('[DEBUG] SavePreviewPanelManager not found or disabled:', {
           manager: !!window.SavePreviewPanelManager,
-          config: window.APP_CONFIG?.ui?.showSavePreview
+          config: window.APP_CONFIG?.ui?.showSavePreview,
         });
       }
 
@@ -256,26 +267,27 @@
       // 6. 初期化完了イベントの発火（DOM + EventBus）
       setTimeout(() => {
         const detail = { elements, config: window.APP_CONFIG };
-        
+
         // Legacy DOM event
         document.dispatchEvent(new CustomEvent('admin-boot-complete', { detail }));
-        
+
         // EventBus event
         if (window.EventBus) {
           window.EventBus.emit(window.EventBus.Events.ADMIN_BOOT_COMPLETE, detail);
         }
-        
+
         log('info', '管理画面ブート完了');
       }, 100);
-
     } catch (error) {
       log('error', 'ブート失敗', { error: error.message, context: error.context });
 
       // エラーが発生しても admin-boot-complete イベントを発火（admin.js の初期化を許可）
       setTimeout(() => {
-        document.dispatchEvent(new CustomEvent('admin-boot-complete', {
-          detail: { error: error, config: window.APP_CONFIG }
-        }));
+        document.dispatchEvent(
+          new CustomEvent('admin-boot-complete', {
+            detail: { error: error, config: window.APP_CONFIG },
+          })
+        );
         log('info', 'admin-boot-complete イベントを発火（エラー時）');
       }, 100);
 
@@ -317,13 +329,16 @@
     ensureEditorElements,
     initializeEditor,
     loadAndApplyConfig,
-    showBootError
+    showBootError,
   };
 
   // ページ変更時のクリーンアップ処理
   function cleanupOnPageChange() {
     // SavePreviewPanelManagerのクリーンアップ
-    if (window.SavePreviewPanelManager && typeof window.SavePreviewPanelManager.close === 'function') {
+    if (
+      window.SavePreviewPanelManager &&
+      typeof window.SavePreviewPanelManager.close === 'function'
+    ) {
       try {
         window.SavePreviewPanelManager.close({ restoreFocus: false });
         console.log('[AdminBoot] SavePreviewPanelManager cleaned up');
@@ -333,7 +348,10 @@
     }
 
     // MermaidPreview関連のクリーンアップ
-    if (window.MermaidPreviewUIManager && typeof window.MermaidPreviewUIManager.unbind === 'function') {
+    if (
+      window.MermaidPreviewUIManager &&
+      typeof window.MermaidPreviewUIManager.unbind === 'function'
+    ) {
       try {
         window.MermaidPreviewUIManager.unbind();
         console.log('[AdminBoot] MermaidPreviewUIManager cleaned up');
@@ -366,12 +384,15 @@
   window.addEventListener('beforeunload', cleanupOnPageChange);
 
   // ページ固有のクリーンアップ（どのページでも実行）
-  document.addEventListener('DOMContentLoaded', function() {
-    // admin.html以外では管理要素を強制的に非表示
-    if (!(window.location.pathname.endsWith('admin.html') || window.location.pathname === '/admin.html')) {
+  document.addEventListener('DOMContentLoaded', function () {
+    // adminコンテキスト以外では管理要素を強制的に非表示
+    if (!isAdminContext()) {
       const adminElements = [
-        'preview-panel', 'memos-panel', 'mermaid-fullscreen-modal',
-        'playtest-modal', 'node-editor-modal'
+        'preview-panel',
+        'memos-panel',
+        'mermaid-fullscreen-modal',
+        'playtest-modal',
+        'node-editor-modal',
       ];
 
       adminElements.forEach(id => {
@@ -388,22 +409,19 @@
     }
   });
 
-  // 自動起動（admin.htmlでのみ実行）
+  // 自動起動（adminコンテキストでのみ実行）
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
-      // admin.htmlでのみ実行
-      if (window.location.pathname.endsWith('admin.html') || window.location.pathname === '/admin.html') {
+      if (isAdminContext()) {
         boot();
       }
     });
   } else {
     // 既にDOM準備済みの場合は少し待ってから起動（スクリプト読み込み順序対策）
     setTimeout(() => {
-      // admin.htmlでのみ実行
-      if (window.location.pathname.endsWith('admin.html') || window.location.pathname === '/admin.html') {
+      if (isAdminContext()) {
         boot();
       }
     }, 10);
   }
-
 })();
