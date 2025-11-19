@@ -1,7 +1,7 @@
 (function () {
   // Play Core Module - Game initialization and engine setup
   window.PlayCore = {
-    init: function() {
+    init: function () {
       const elements = this.getUIElements();
       const game = this.loadGameData();
       const engine = this.createEngine(elements, game);
@@ -10,8 +10,8 @@
       try {
         engine.loadProgress();
       } catch (e) {
-        console.error("進行データの読み込みエラー:", e);
-        alert("進行データの読み込みに失敗しました。最初から開始します。");
+        console.error('進行データの読み込みエラー:', e);
+        alert('進行データの読み込みに失敗しました。最初から開始します。');
         engine.reset();
       }
 
@@ -21,71 +21,69 @@
       return { elements, engine, game };
     },
 
-    getUIElements: function() {
+    getUIElements: function () {
       return {
-        titleEl: document.getElementById("game-title"),
-        textEl: document.getElementById("scene"),
-        choicesEl: document.getElementById("choices"),
-        btnRestart: document.getElementById("btn-restart"),
-        backBtn: document.getElementById("btn-back"),
-        forwardBtn: document.getElementById("btn-forward")
+        titleEl: document.getElementById('game-title'),
+        textEl: document.getElementById('scene'),
+        choicesEl: document.getElementById('choices'),
+        btnRestart: document.getElementById('btn-restart'),
+        backBtn: document.getElementById('btn-back'),
+        forwardBtn: document.getElementById('btn-forward'),
       };
     },
 
-    loadGameData: function() {
+    loadGameData: function () {
       function normalizeSpecToEngine(data) {
         if (!data) return null;
         if (Array.isArray(data.nodes)) {
           const nodes = {};
-          data.nodes.forEach((n) => {
+          data.nodes.forEach(n => {
             if (!n || !n.id) return;
             nodes[n.id] = {
-              title: n.title || "",
-              text: n.text || "",
+              title: n.title || '',
+              text: n.text || '',
               choices: Array.isArray(n.choices)
-                ? n.choices.map((c) => ({
-                    text: c.label ?? c.text ?? "",
-                    to: c.target ?? c.to ?? "",
+                ? n.choices.map(c => ({
+                    text: c.label ?? c.text ?? '',
+                    to: c.target ?? c.to ?? '',
                   }))
                 : [],
             };
           });
           return {
-            title: data?.meta?.title || data.title || "Adventure",
-            start: data?.meta?.start || data.start || "start",
+            title: data?.meta?.title || data.title || 'Adventure',
+            start: data?.meta?.start || data.start || 'start',
             nodes,
           };
         }
         return data;
       }
 
-      const loaded = StorageUtil.loadJSON("agp_game_data");
-      console.log("Loaded game data from storage:", loaded);
+      const loaded = StorageUtil.loadJSON('agp_game_data');
+      console.log('Loaded game data from storage:', loaded);
       const normalize = window.Converters?.normalizeSpecToEngine || normalizeSpecToEngine;
-      console.log("Using normalize function:", normalize);
+      console.log('Using normalize function:', normalize);
       let game;
       try {
         game = normalize(loaded);
-        console.log("Normalized game data:", game);
+        console.log('Normalized game data:', game);
         if (!game && loaded) {
-          throw new Error("保存されたゲームデータの形式が無効です。");
+          throw new Error('保存されたゲームデータの形式が無効です。');
         }
         if (!game) {
-          game = window.SAMPLE_GAME;
-          console.info("サンプルゲームを使用します。");
+          throw new Error('ゲームデータが保存されていません。管理画面でゲームを作成してください。');
         }
       } catch (e) {
-        console.error("ゲームデータの読み込みエラー:", e);
-        alert(`ゲームデータの読み込みに失敗しました: ${e.message}\nサンプルゲームを使用します。`);
-        game = window.SAMPLE_GAME;
+        console.error('ゲームデータの読み込みエラー:', e);
+        throw new Error(`ゲームデータの読み込みに失敗しました: ${e.message}`);
       }
-      console.log("Final game data:", game);
+      console.log('Final game data:', game);
       return game;
     },
 
-    createEngine: function(elements, game) {
-      console.log("Creating engine with game data:", game);
-      console.log("Game data start property:", game?.start);
+    createEngine: function (elements, game) {
+      console.log('Creating engine with game data:', game);
+      console.log('Game data start property:', game?.start);
       return GameEngine.createEngine(game, {
         titleEl: elements.titleEl,
         textEl: elements.textEl,
@@ -93,6 +91,6 @@
         backBtn: elements.backBtn,
         forwardBtn: elements.forwardBtn,
       });
-    }
+    },
   };
 })();
