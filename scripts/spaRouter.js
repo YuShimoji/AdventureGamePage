@@ -32,6 +32,7 @@
         'scripts/play.save.js',
         'scripts/play.inventory.js',
         'scripts/play.input.js',
+        'scripts/play.modal.js',
         'scripts/play.js'
       ]
     }

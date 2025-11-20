@@ -68,14 +68,28 @@
         game = normalize(loaded);
         console.log('Normalized game data:', game);
         if (!game && loaded) {
-          throw new Error('保存されたゲームデータの形式が無効です。');
+          const invalidError = new Error('保存されたゲームデータの形式が無効です。');
+          invalidError.code = 'INVALID_GAME_DATA';
+          throw invalidError;
         }
         if (!game) {
-          throw new Error('ゲームデータが保存されていません。管理画面でゲームを作成してください。');
+          const noDataError = new Error('ゲームデータが保存されていません。管理画面でゲームを作成してください。');
+          noDataError.code = 'NO_GAME_DATA';
+          throw noDataError;
         }
       } catch (e) {
-        console.error('ゲームデータの読み込みエラー:', e);
-        throw new Error(`ゲームデータの読み込みに失敗しました: ${e.message}`);
+        if (e && e.code === 'NO_GAME_DATA') {
+          if (window.APP_CONFIG?.debug?.showConsoleLogs) {
+            console.info('[PLAY] No game data found in storage (expected for first-time users).', e);
+          }
+        } else {
+          console.error('ゲームデータの読み込みエラー:', e);
+        }
+        const wrapped = new Error(`ゲームデータの読み込みに失敗しました: ${e.message}`);
+        if (e && e.code) {
+          wrapped.code = e.code;
+        }
+        throw wrapped;
       }
       console.log('Final game data:', game);
       return game;
