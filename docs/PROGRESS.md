@@ -1,32 +1,42 @@
-# 開発進捗レポート (2025-11-20 更新)
+# 開発進捗レポート (2025-11-25 更新)
 
 ## 現在の状況
 
 ### 完了済みタスク
 
+#### プロジェクト総点検・リファクタリング ✅ (2025-11-25)
+
+##### Phase 1: 不要ファイルのクリーンアップ
+- 一時バックアップファイル削除 (`temp_origin_play.js`, `temp_original_gameEngine.js`)
+- 空のコミットメッセージファイル削除 (`commit-msg*.txt`, `merge-msg.txt`)
+- 空の設定ファイル削除 (`eslint.config.js`, `webpack.config.js`, `jsdoc.json`)
+- 空のスクリプト削除 (`create-debug-page.js`, `test-lint.js`, `admin.js`)
+- **削除ファイル数**: 12ファイル、約70KB削減
+
+##### Phase 2: 長大スクリプトの分割
+- **wysiwygStoryEditor.js** (727行) → 4モジュールに分割:
+  - `wysiwygStoryEditor.core.js`: 状態管理・初期化・公開API
+  - `wysiwygStoryEditor.canvas.js`: Canvas描画・マウスイベント
+  - `wysiwygStoryEditor.ui.js`: UI生成・ツールバー・プロパティパネル
+  - `wysiwygStoryEditor.conditions.js`: 条件分岐エディタ
+- **nodeEditorLogicManager.js** (445行 → 340行):
+  - `nodeEditorValidation.js`: バリデーションロジック分離
+
+##### Phase 3: コード品質改善
+- `config.js`: ストレージキーを集約（ハードコーディング削減）
+- `play.inventory.js`: TODOコメントを実装に置換
+  - `executeItemEffect()` メソッド追加
+  - heal, set_flag, set_variable, show_text エフェクトをサポート
+
 #### RF-05: Play.js のモーダル/フォーカス制御分離 ✅ (2025-11-20)
 - **新規モジュール作成**: `scripts/play.modal.js`
-  - モーダル開閉/フォーカストラップ/スクリーンリーダーアナウンス担当
-  - セーブ/ロード、テーマ、セーブスロット、インベントリの各パネル管理
 - **play.js 簡素化**: PlayCore/PlaySave/PlayInventory/PlayInput/PlayModal の接着コードのみ
-- **スクリプト順序調整**: play.html, spaRouter.js の読み込み順更新
-- **コミット**: `feat(play): モーダル＆フォーカス制御の分離と空状態UI改善` (729fe6b)
 
 #### UX改善: ゲームデータ未保存時の空状態UI ✅ (2025-11-20)
 - エラーダイアログ → ページ内カードUIに変更
 - 「管理画面を開く」「ゲームJSONを読み込む」誘導ボタン追加
-- ログレベル調整: 想定内の未設定状態で `console.error` 抑制
-- 結果: 初回利用時の体験向上
 
 ### 進行中/保留タスク
-
-#### RF-03: NodeEditor ロジック/フォームの責務整理 🔄 (優先高)
-- 対象ファイル: `nodeEditorLogicManager.js`, `nodeEditor/ui/forms.js`
-- 計画:
-  1. 両ファイルの責務分析 (ロジック/バリデーション/DOM生成)
-  2. 分割方針検討 (NodeEditorState, NodeEditorActions, NodeEditorFormsUI 等)
-  3. 小規模実装から開始
-- 開始時期: 次回セッション
 
 #### UI全体モダナイズ 🔄 (優先中)
 - 対象: レガシーなレイアウト/スタイル/コンポーネント
@@ -34,19 +44,29 @@
   - 短期: Play/Admin画面の状態別UI改善
   - 中期: ヘッダー/ナビ統一デザイン、カード/モーダル刷新
   - 長期: コンポーネント指向CSS/JS整理、モバイル対応
-- 開始時期: RF-03完了後
+
+#### 残りの長大ファイル (300行超)
+| ファイル | 行数 | 状態 |
+|---------|------|------|
+| savePreview.js | 539行 | 要分割検討 |
+| mermaidPreviewUIManager.js | 531行 | 要分割検討 |
+| storageProvider.js | 387行 | 許容範囲 |
+| aiStoryImprover.js | 377行 | 許容範囲 |
+| admin-boot.js | 373行 | 許容範囲 |
+| play.save.js | 362行 | 許容範囲 |
 
 ## 今後の開発ロードマップ
 
-### フェーズ1: モジュール化完了 (今月内)
-- RF-03: NodeEditor リファクタ
-- 残りの大規模ファイル (admin.js 等) の分割検討
+### フェーズ1: 基盤安定化 ✅ (完了)
+- モジュール分割
+- 不要ファイル削除
+- コード品質改善
 
-### フェーズ2: UX/UI刷新 (来月)
+### フェーズ2: UX/UI刷新 (次フェーズ)
 - UIモダナイズ実施
 - アクセシビリティ/モバイル対応強化
 
-### フェーズ3: 機能拡張 (来月以降)
+### フェーズ3: 機能拡張 (以降)
 - バックログの優先タスク実行
   - インベントリシステム強化
   - ゲーム状態永続化
@@ -55,13 +75,14 @@
 ## 技術的メモ
 
 - **モジュール化方針**: 責務単一の小モジュール群 + 接着コード
+- **ストレージキー**: `APP_CONFIG.storage.keys` で一元管理
 - **エラーハンドリング**: コード付きエラーでUI分岐 (NO_GAME_DATA 等)
 - **ログ管理**: `APP_CONFIG.debug.showConsoleLogs` で制御
-- **Gitワークフロー**: featureブランチ → mainマージ → 即プッシュ
+- **Gitワークフロー**: mainブランチで直接作業 → 即プッシュ
 
 ## 次のアクション
-1. RF-03 の分析を開始
-2. UI改善の具体化 (必要に応じて)
+1. UIモダナイズの具体化
+2. 残りの長大ファイル分割検討（優先度に応じて）
 
 ## 連絡事項
 - 進捗はこちらのドキュメントで随時更新
