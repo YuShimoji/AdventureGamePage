@@ -37,6 +37,14 @@
       keys: {
         simple: 'agp_manuscript_simple',
         full: 'agp_manuscript_full',
+        gameData: 'agp_game_data',
+        gameProgress: 'agp_game_progress',
+        saveSlots: 'agp_save_slots',
+        theme: 'agp_theme',
+        sidebarState: 'agp_sidebar_state',
+        editorSettings: 'agp_editor_settings',
+        floatingPanel: 'agp_floating_panel',
+        memos: 'agp_memos',
       },
       snapshots: {
         enabled: true,

@@ -96,9 +96,12 @@
           useBtn.textContent = '使用';
           useBtn.addEventListener('click', () => {
             if (confirm(`"${item.name}" を使用しますか？`)) {
-              // TODO: Implement item usage logic based on item effects
+              // Execute item effect if defined
+              if (item.effect && typeof item.effect === 'object') {
+                this.executeItemEffect(item);
+              }
               alert(`"${item.name}" を使用しました`);
-              // For now, just remove one from inventory
+              // Remove one from inventory (consume)
               this.engine.removeItem(item.id, 1);
               this.updateInventoryList(container);
             }
@@ -163,6 +166,49 @@
           inventoryCountBtn.textContent = inventory.currentSlots;
         }
       });
+    },
+
+    // Execute item effect based on effect type
+    executeItemEffect: function(item) {
+      if (!item.effect) return;
+
+      const effect = item.effect;
+      switch (effect.type) {
+        case 'heal':
+          // Heal player (if health system exists)
+          if (this.engine.setPlayerState) {
+            const state = this.engine.getPlayerState();
+            const newHealth = Math.min((state.health || 0) + (effect.value || 10), effect.maxHealth || 100);
+            this.engine.setPlayerState({ ...state, health: newHealth });
+          }
+          break;
+        case 'set_flag':
+          // Set a game flag
+          if (this.engine.setPlayerState && effect.flag) {
+            const state = this.engine.getPlayerState();
+            state.flags = state.flags || {};
+            state.flags[effect.flag] = effect.value !== undefined ? effect.value : true;
+            this.engine.setPlayerState(state);
+          }
+          break;
+        case 'set_variable':
+          // Set a game variable
+          if (this.engine.setPlayerState && effect.key) {
+            const state = this.engine.getPlayerState();
+            state.variables = state.variables || {};
+            state.variables[effect.key] = effect.value;
+            this.engine.setPlayerState(state);
+          }
+          break;
+        case 'show_text':
+          // Show text message
+          if (effect.text) {
+            alert(effect.text);
+          }
+          break;
+        default:
+          console.warn('Unknown item effect type:', effect.type);
+      }
     }
   };
 })();
