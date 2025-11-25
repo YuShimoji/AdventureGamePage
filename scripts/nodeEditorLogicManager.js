@@ -1,5 +1,6 @@
 (function(){
   // Node Editor Logic Manager - Handles business logic operations
+  // Validation logic has been extracted to nodeEditorValidation.js
 
   async function loadFromStorage(){
     try {
@@ -8,10 +9,8 @@
       if(!raw){ alert('agp_game_data が見つかりません。プレイ用JSONをインポートしてください。'); return; }
       let spec = null;
       if(Array.isArray(raw.nodes)){
-        // spec-like already
         spec = window.NodeEditorUtils.normalizeSpec(raw);
       } else {
-        // engine -> spec
         spec = window.Converters?.engineToSpec ? window.Converters.engineToSpec(raw) : null;
         if(!spec) throw new Error('engineToSpec 変換に失敗');
       }
@@ -27,142 +26,29 @@
     } catch(e){ console.error('NodeEditor.load', e); alert('取込に失敗しました'); }
   }
 
+  // Delegate validation to NodeEditorValidation module
   function validateSpec(){
-    if(window.Validator?.validateGameSpec){
-      const v = window.Validator.validateGameSpec(window.NodeEditorUIManager.getSpecData());
-      try {
-        const panel = document.getElementById('validation-panel');
-        const listEl = document.getElementById('validation-list');
-        if(panel && listEl){
-          listEl.innerHTML = '';
-          // エラーのみ表示（警告は未解決targetパネルで可視化）
-          (v.errors||[]).forEach(msg => { const li=document.createElement('li'); li.className='err'; li.textContent = msg; listEl.appendChild(li); });
-          // 未解決以外の警告はここに表示
-          const warnDetails = Array.isArray(v.warningDetails) ? v.warningDetails : [];
-          warnDetails.filter(w => w && w.code !== 'WARN_UNRESOLVED_TARGET').forEach(w => {
-            const li=document.createElement('li'); li.className='warn'; li.textContent = w.message; listEl.appendChild(li);
-          });
-          panel.hidden = (listEl.children.length === 0);
-        }
-      } catch{}
-      // 警告はalertも出さず、未解決targetパネルを更新
-      window.NodeEditorUIManager.refreshUnresolvedPanel();
-    } else {
-      // Fallback validation
-      performBasicValidation();
+    if(window.NodeEditorValidation?.validateSpec){
+      window.NodeEditorValidation.validateSpec();
     }
   }
 
   function performBasicValidation(){
-    const specData = window.NodeEditorUIManager.getSpecData();
-    const errors = [];
-    const warnings = [];
-
-    // Check for missing start node
-    if(!specData?.meta?.start){
-      errors.push('開始ノードが設定されていません');
-    } else if(!specData.nodes?.some(n => n.id === specData.meta.start)){
-      errors.push(`開始ノード "${specData.meta.start}" が見つかりません`);
-    }
-
-    // Check for nodes without content
-    specData.nodes?.forEach(node => {
-      if(!node.title && !node.text){
-        warnings.push(`ノード "${node.id}" にタイトルと本文がありません`);
-      }
-      // Check for choices without targets
-      node.choices?.forEach((choice, idx) => {
-        if(!choice.target && !choice.to){
-          errors.push(`ノード "${node.id}" の選択肢 ${idx + 1} にターゲットが設定されていません`);
-        }
-      });
-    });
-
-    // Check for unreachable nodes
-    if(specData?.meta?.start){
-      const reachable = new Set();
-      const queue = [specData.meta.start];
-      reachable.add(specData.meta.start);
-
-      while(queue.length){
-        const current = queue.shift();
-        const node = specData.nodes?.find(n => n.id === current);
-        node?.choices?.forEach(choice => {
-          const target = choice.target || choice.to;
-          if(target && !reachable.has(target) && specData.nodes?.some(n => n.id === target)){
-            reachable.add(target);
-            queue.push(target);
-          }
-        });
-      }
-
-      specData.nodes?.forEach(node => {
-        if(node.id && !reachable.has(node.id)){
-          warnings.push(`ノード "${node.id}" は開始ノードから到達できません`);
-        }
-      });
-    }
-
-    // Update UI
-    const panel = document.getElementById('validation-panel');
-    const listEl = document.getElementById('validation-list');
-    if(panel && listEl){
-      listEl.innerHTML = '';
-      errors.forEach(msg => {
-        const li = document.createElement('li');
-        li.className = 'err';
-        li.textContent = msg;
-        listEl.appendChild(li);
-      });
-      warnings.forEach(msg => {
-        const li = document.createElement('li');
-        li.className = 'warn';
-        li.textContent = msg;
-        listEl.appendChild(li);
-      });
-      panel.hidden = (listEl.children.length === 0);
+    if(window.NodeEditorValidation?.performBasicValidation){
+      window.NodeEditorValidation.performBasicValidation();
     }
   }
 
   function validateField(fieldName, value, nodeId){
-    const errors = [];
-    const warnings = [];
-
-    switch(fieldName){
-      case 'id':
-        if(!value || !value.trim()){
-          errors.push('ノードIDは必須です');
-        } else if(window.NodeEditorUIManager.getSpecData().nodes?.some(n => n.id === value.trim() && n.id !== nodeId)){
-          errors.push('ノードIDが重複しています');
-        }
-        break;
-      case 'title':
-        if(!value || !value.trim()){
-          warnings.push('ノードにタイトルを設定することを推奨します');
-        }
-        break;
-      case 'text':
-        if(!value || !value.trim()){
-          warnings.push('ノードに本文を設定することを推奨します');
-        }
-        break;
-      case 'choice_target':
-        if(!value || !value.trim()){
-          errors.push('選択肢のターゲットは必須です');
-        } else if(!window.NodeEditorUIManager.getSpecData().nodes?.some(n => n.id === value.trim())){
-          warnings.push(`ターゲット "${value.trim()}" のノードが見つかりません`);
-        }
-        break;
+    if(window.NodeEditorValidation?.validateField){
+      return window.NodeEditorValidation.validateField(fieldName, value, nodeId);
     }
-
-    return { errors, warnings };
+    return { errors: [], warnings: [] };
   }
 
   function updateValidationStatus(){
-    // Real-time validation status update
-    const validationPanel = document.getElementById('validation-panel');
-    if(validationPanel && !validationPanel.hidden){
-      validateSpec();
+    if(window.NodeEditorValidation?.updateValidationStatus){
+      window.NodeEditorValidation.updateValidationStatus();
     }
   }
 
