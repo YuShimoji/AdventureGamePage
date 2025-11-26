@@ -4,64 +4,152 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>学ぶ | Adventure Game Page</title>
+    <!-- Modern UI Theme -->
+    <link rel="stylesheet" href="styles/modern.css?v=1" />
     <link rel="stylesheet" href="styles/common.css" />
     <style>
-      .grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
-      .code { background: #0b0f16; border: 1px solid var(--border); border-radius: 10px; padding: 12px; overflow: auto; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; }
-      .actions { display: flex; gap: 8px; flex-wrap: wrap; }
-      .badge { font-size: 12px; color: var(--text-secondary); }
+      .learn-main {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: var(--space-xl) var(--space-md);
+      }
+      
+      .intro-card {
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-lg);
+        padding: var(--space-lg);
+        margin-bottom: var(--space-xl);
+      }
+      
+      .intro-card h2 {
+        font-size: var(--text-xl);
+        margin: 0 0 var(--space-sm);
+      }
+      
+      .intro-card p {
+        font-size: var(--text-sm);
+        color: var(--text-secondary);
+        margin: 0;
+      }
+      
+      .examples-grid {
+        display: grid;
+        gap: var(--space-md);
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      }
+      
+      .example-card {
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+      }
+      
+      .example-header {
+        padding: var(--space-md);
+        border-bottom: 1px solid var(--border-subtle);
+      }
+      
+      .example-header h3 {
+        font-size: var(--text-base);
+        font-weight: 600;
+        margin: 0 0 var(--space-xs);
+      }
+      
+      .example-badge {
+        font-size: var(--text-xs);
+        color: var(--text-muted);
+      }
+      
+      .example-code {
+        flex: 1;
+        background: var(--bg-primary);
+        padding: var(--space-md);
+        overflow: auto;
+        max-height: 280px;
+        font-family: var(--font-mono);
+        font-size: var(--text-xs);
+        line-height: var(--line-height-relaxed);
+        color: var(--text-secondary);
+      }
+      
+      .example-footer {
+        padding: var(--space-md);
+        border-top: 1px solid var(--border-subtle);
+      }
     </style>
   </head>
   <body>
+    <!-- Header -->
     <header class="app-header">
-      <a class="btn" href="index.html">← トップ</a>
-      <h1>学ぶ</h1>
-      <nav class="nav">
-        <a class="btn" href="admin.html">管理</a>
-        <a class="btn btn-accent" href="play.html">プレイ</a>
+      <a class="header-brand" href="index.html">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M15 18l-6-6 6-6"/>
+        </svg>
+        <span>トップ</span>
+      </a>
+      <h1 class="header-title">学ぶ</h1>
+      <nav class="nav-tabs">
+        <a class="nav-tab" href="index.html">ホーム</a>
+        <a class="nav-tab active" href="learn.html">学ぶ</a>
+        <a class="nav-tab" href="admin.html">管理</a>
+        <a class="nav-tab" href="play.html">プレイ</a>
       </nav>
     </header>
 
-    <main class="container">
-      <section class="card">
+    <main class="learn-main">
+      <!-- Intro -->
+      <section class="intro-card">
         <h2>インタラクティブなサンプル</h2>
-        <p class="muted">各カードの「読み込んでプレイ」を押すと、サンプルが保存され <code>play.html</code> で即実行できます。</p>
+        <p>各カードの「読み込んでプレイ」を押すと、サンプルが保存され <code>play.html</code> で即実行できます。</p>
       </section>
 
-      <section class="grid">
-        <article class="card">
-          <h3>基本分岐</h3>
-          <p class="badge">ノード/選択肢</p>
-          <pre class="code" id="code-basic"></pre>
-          <div class="actions">
-            <button class="btn btn-primary" id="btn-basic">読み込んでプレイ</button>
+      <!-- Examples Grid -->
+      <section class="examples-grid">
+        <article class="example-card">
+          <div class="example-header">
+            <h3>基本分岐</h3>
+            <span class="example-badge">ノード / 選択肢</span>
+          </div>
+          <pre class="example-code" id="code-basic"></pre>
+          <div class="example-footer">
+            <button class="btn btn-primary w-full" id="btn-basic">読み込んでプレイ</button>
           </div>
         </article>
 
-        <article class="card">
-          <h3>インベントリ</h3>
-          <p class="badge">add_item / use_item</p>
-          <pre class="code" id="code-inventory"></pre>
-          <div class="actions">
-            <button class="btn btn-primary" id="btn-inventory">読み込んでプレイ</button>
+        <article class="example-card">
+          <div class="example-header">
+            <h3>インベントリ</h3>
+            <span class="example-badge">add_item / use_item</span>
+          </div>
+          <pre class="example-code" id="code-inventory"></pre>
+          <div class="example-footer">
+            <button class="btn btn-primary w-full" id="btn-inventory">読み込んでプレイ</button>
           </div>
         </article>
 
-        <article class="card">
-          <h3>変数と条件分岐</h3>
-          <p class="badge">set_variable / variable_equals</p>
-          <pre class="code" id="code-variables"></pre>
-          <div class="actions">
-            <button class="btn btn-primary" id="btn-variables">読み込んでプレイ</button>
+        <article class="example-card">
+          <div class="example-header">
+            <h3>変数と条件分岐</h3>
+            <span class="example-badge">set_variable / variable_equals</span>
+          </div>
+          <pre class="example-code" id="code-variables"></pre>
+          <div class="example-footer">
+            <button class="btn btn-primary w-full" id="btn-variables">読み込んでプレイ</button>
           </div>
         </article>
 
-        <article class="card">
-          <h3>画像とサウンド</h3>
-          <p class="badge">image / play_bgm / play_sfx</p>
-          <pre class="code" id="code-media"></pre>
-          <div class="actions">
-            <button class="btn btn-primary" id="btn-media">読み込んでプレイ</button>
+        <article class="example-card">
+          <div class="example-header">
+            <h3>画像とサウンド</h3>
+            <span class="example-badge">image / play_bgm / play_sfx</span>
+          </div>
+          <pre class="example-code" id="code-media"></pre>
+          <div class="example-footer">
+            <button class="btn btn-primary w-full" id="btn-media">読み込んでプレイ</button>
           </div>
         </article>
       </section>
