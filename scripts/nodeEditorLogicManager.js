@@ -60,7 +60,14 @@
       window.StorageUtil?.saveJSON?.('agp_game_data', engine);
       window.NodeEditorUIManager.setDirty(false);
       alert('適用保存しました（play.html で反映）');
-    } catch(e){ console.error('NodeEditor.save', e); alert('適用保存に失敗しました'); }
+    } catch(e){
+      console.error('NodeEditor.save', e);
+      if(window.ErrorHandler){
+        window.ErrorHandler.showError(e, { details: 'ゲームデータの保存に失敗しました' });
+      } else {
+        alert('適用保存に失敗しました');
+      }
+    }
   }
 
   function exportJson(){
@@ -70,7 +77,14 @@
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob); a.download = 'game-spec.json'; a.click();
       URL.revokeObjectURL(a.href);
-    } catch(e){ console.error('NodeEditor.export', e); alert('JSON出力に失敗しました'); }
+    } catch(e){
+      console.error('NodeEditor.export', e);
+      if(window.ErrorHandler){
+        window.ErrorHandler.showError(e, { details: 'JSONファイルのエクスポートに失敗しました' });
+      } else {
+        alert('JSON出力に失敗しました');
+      }
+    }
   }
 
   function setupDragAndDrop(){
@@ -106,11 +120,22 @@
             imageInput.value = e.target.result;
             // 入力イベントをトリガーして保存処理を実行
             imageInput.dispatchEvent(new Event('input'));
-            alert('画像を挿入しました。保存してください。');
+            // Success notification
+            if(window.ErrorHandler){
+              // For success messages, we can use a simple alert or create a success notification
+              alert('画像を挿入しました。保存してください。');
+            } else {
+              alert('画像を挿入しました。保存してください。');
+            }
           };
           reader.readAsDataURL(file);
         } else {
-          alert('画像ファイルのみドロップ可能です。');
+          if(window.ErrorHandler){
+            const error = new Error('画像ファイルのみドロップ可能です。');
+            window.ErrorHandler.showError(error, { details: '対応していないファイル形式がドロップされました' });
+          } else {
+            alert('画像ファイルのみドロップ可能です。');
+          }
         }
       }
     });
@@ -127,7 +152,12 @@
           reader.onload = (e) => {
             imageInput.value = e.target.result;
             imageInput.dispatchEvent(new Event('input'));
-            alert('画像を挿入しました。保存してください。');
+            // Success notification
+            if(window.ErrorHandler){
+              alert('画像を挿入しました。保存してください。');
+            } else {
+              alert('画像を挿入しました。保存してください。');
+            }
           };
           reader.readAsDataURL(file);
         }
@@ -351,13 +381,28 @@
     if(exportPartial) exportPartial.addEventListener('click', () => {
       if(!exportMulti) return;
       const seed = Array.from(exportMulti.selectedOptions).map(o => o.value);
-      if(seed.length === 0){ alert('少なくとも1つノードを選択してください'); return; }
+      if(seed.length === 0){
+        if(window.ErrorHandler){
+          const error = new Error('少なくとも1つノードを選択してください');
+          window.ErrorHandler.showError(error, { details: '部分エクスポートにはノードの選択が必要です' });
+        } else {
+          alert('少なくとも1つノードを選択してください');
+        }
+        return;
+      }
       const specData = window.NodeEditorUIManager.getSpecData();
       const sub = window.NodeEditorUtils.collectSubgraph(specData, seed);
       try {
         const blob = new Blob([JSON.stringify(sub, null, 2)], { type: 'application/json' });
         const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'game-spec.partial.json'; a.click(); URL.revokeObjectURL(a.href);
-      } catch(e){ console.error('exportPartial', e); alert('部分エクスポートに失敗しました'); }
+      } catch(e){
+        console.error('exportPartial', e);
+        if(window.ErrorHandler){
+          window.ErrorHandler.showError(e, { details: '部分エクスポートに失敗しました' });
+        } else {
+          alert('部分エクスポートに失敗しました');
+        }
+      }
     });
 
     // Keyboard shortcuts (when focus is within node-editor)
