@@ -2,6 +2,32 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2025-11-26]
+
+- feat(ui): Typora風モダンUI/UXへの総改修
+  - **新規CSSテーマシステム**
+    - `styles/modern.css`: デザイントークン、カラーパレット、タイポグラフィ、コンポーネント基盤
+    - `styles/play-modern.css`: Play画面専用のモダンスタイル
+    - `styles/admin-modern.css`: Admin画面専用のモダンスタイル
+  - **ヘッダー・ナビゲーション改善**
+    - 全画面でSVGアイコンを使用したツールバーボタン
+    - タブスタイルのナビゲーション統一
+    - クリーンでミニマルなレイアウト
+  - **Play画面**
+    - モダンな空状態UI（ゲームデータ未登録時）
+    - アイコン付きツールバー（戻る/進む/保存/読込など）
+    - 改善されたシーン表示・選択肢レイアウト
+  - **Admin画面**
+    - サイドバーアコーディオン改善（アイコン付きセクション）
+    - フォームフィールド・アクショングリッドの整理
+    - ワークフローパネルのUI改善
+  - **Learn画面**
+    - サンプルカードのグリッドレイアウト改善
+    - コードプレビューエリアのスタイリング
+  - **Index画面**
+    - ヒーローセクションの改善
+    - フィーチャーカードのグリッドレイアウト
+
 ## [2025-11-07]
 
 - feat(merge): merge conflicts resolved and latest changes integrated [closes #12]
