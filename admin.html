@@ -88,99 +88,109 @@
       </div>
     </header>
 
-    <aside id="sidebar" class="sidebar show">
+    <!-- Sidebar -->
+    <aside id="sidebar" class="sidebar admin-sidebar show">
       <div class="sidebar-inner">
-        <div class="accordion-mode" data-accordion-mode-toggle>
-          <label class="accordion-mode-toggle">
+        <!-- Accordion Mode Toggle -->
+        <div class="sidebar-mode-toggle" data-accordion-mode-toggle>
+          <label class="toggle-label">
             <input type="checkbox" id="accordion-multi-open" />
-            <span data-toggle-label>複数セクションを同時に開く (OFF)</span>
+            <span data-toggle-label>複数展開 (OFF)</span>
           </label>
-          <p class="accordion-mode-note">排他モードでは最後に開いたセクションのみ保持されます。</p>
         </div>
 
-        <details class="agp-accordion" id="acc-tools" data-accordion-id="tools">
-          <summary data-has-hint>
-            <span class="summary-label">ツール / 保存</span>
+        <!-- Tools Section -->
+        <details class="sidebar-section" id="acc-tools" data-accordion-id="tools">
+          <summary class="section-header" data-has-hint>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/>
+              <polyline points="17,21 17,13 7,13 7,21"/>
+              <polyline points="7,3 7,8 15,8"/>
+            </svg>
+            <span class="section-title">ツール / 保存</span>
             <button
-              class="accordion-hint-toggle"
+              class="hint-btn"
               type="button"
               aria-expanded="false"
               aria-label="ツール / 保存のヒント"
               data-accordion-hint="tools"
-            >
-              ?
-            </button>
+            >?</button>
           </summary>
-          <div class="accordion-content">
+          <div class="section-content">
             <div class="accordion-hint" data-hint-for="tools" hidden></div>
-            <label class="field">
-              <span>タイトル</span>
-              <input id="title-input" type="text" placeholder="無題" />
-            </label>
+            
+            <!-- Title Input -->
+            <div class="form-field">
+              <label for="title-input">タイトル</label>
+              <input id="title-input" type="text" class="form-input" placeholder="無題" />
+            </div>
 
-            <label class="field">
-              <span>保存先（ストレージ）</span>
-              <select id="storage-provider-select">
+            <!-- Storage Provider -->
+            <div class="form-field">
+              <label for="storage-provider-select">保存先</label>
+              <select id="storage-provider-select" class="form-select">
                 <option value="idb">IndexedDB（推奨）</option>
                 <option value="local">LocalStorage</option>
               </select>
-            </label>
+            </div>
 
-            <!-- 書式ツールはフローティングバーに分離 -->
-
-            <div class="actions">
+            <!-- Action Buttons -->
+            <div class="action-grid">
               <button id="btn-save-simple" class="btn btn-primary">クイック保存</button>
-              <button id="btn-load-simple" class="btn btn-ghost">クイック読込</button>
+              <button id="btn-load-simple" class="btn">クイック読込</button>
               <button id="btn-save-full" class="btn btn-accent">完全保存</button>
-              <button id="btn-load-full" class="btn btn-ghost">完全読込</button>
-              <button id="btn-export" class="btn btn-ghost">エクスポート</button>
-              <label class="btn btn-ghost file-label">
+              <button id="btn-load-full" class="btn">完全読込</button>
+              <button id="btn-export" class="btn">エクスポート</button>
+              <label class="btn file-label">
                 インポート
                 <input id="file-import" type="file" accept="application/json" hidden />
               </label>
-              <button id="btn-saves-list" class="btn btn-ghost">保存一覧</button>
+              <button id="btn-saves-list" class="btn">保存一覧</button>
             </div>
           </div>
         </details>
 
-        <details class="agp-accordion" id="acc-story-workflow" data-accordion-id="story-workflow">
-          <summary data-has-hint>
-            <span class="summary-label">ストーリー作成フロー</span>
+        <!-- Story Workflow Section -->
+        <details class="sidebar-section" id="acc-story-workflow" data-accordion-id="story-workflow">
+          <summary class="section-header" data-has-hint>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 19.5A2.5 2.5 0 016.5 17H20"/>
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/>
+            </svg>
+            <span class="section-title">ストーリー作成フロー</span>
             <button
-              class="accordion-hint-toggle"
+              class="hint-btn"
               type="button"
               aria-expanded="false"
               aria-label="ストーリー作成フローのヒント"
               data-accordion-hint="story-workflow"
-            >
-              ?
-            </button>
+            >?</button>
           </summary>
-          <div class="accordion-content">
+          <div class="section-content">
             <div class="accordion-hint" data-hint-for="story-workflow" hidden></div>
-            <section id="story-workflow-panel" class="card">
-              <h3>ストーリー作成の手順</h3>
-              <ol class="story-workflow-steps">
+            <div id="story-workflow-panel" class="workflow-panel">
+              <h4>作成手順</h4>
+              <ol class="workflow-steps">
                 <li>
-                  <button id="story-step-write" class="btn btn-ghost btn-sm">1. テキストを書く</button>
+                  <button id="story-step-write" class="workflow-btn">1. テキストを書く</button>
                 </li>
                 <li>
-                  <button id="story-step-nodes" class="btn btn-ghost btn-sm">2. ノード構造を編集</button>
+                  <button id="story-step-nodes" class="workflow-btn">2. ノード構造を編集</button>
                 </li>
                 <li>
-                  <button id="story-step-branches" class="btn btn-ghost btn-sm">3. 分岐を確認（Mermaid）</button>
+                  <button id="story-step-branches" class="workflow-btn">3. 分岐を確認</button>
                 </li>
                 <li>
-                  <button id="story-step-playtest" class="btn btn-ghost btn-sm">4. プレイテスト</button>
+                  <button id="story-step-playtest" class="workflow-btn">4. プレイテスト</button>
                 </li>
                 <li>
-                  <button id="story-step-ai" class="btn btn-ghost btn-sm">5. AIで改善点を確認</button>
+                  <button id="story-step-ai" class="workflow-btn">5. AIで改善点を確認</button>
                 </li>
                 <li>
-                  <button id="story-step-sample" class="btn btn-ghost btn-sm">サンプルから始める</button>
+                  <button id="story-step-sample" class="workflow-btn btn-accent">サンプルから始める</button>
                 </li>
               </ol>
-            </section>
+            </div>
           </div>
         </details>
 
