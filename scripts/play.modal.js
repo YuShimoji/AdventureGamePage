@@ -204,7 +204,12 @@
               hideSaveSlotsPanel();
               alert('セーブデータを読み込みました');
             } else {
-              alert('読み込みに失敗しました');
+              if(window.ErrorHandler){
+                const error = new Error('読み込みに失敗しました');
+                window.ErrorHandler.showError(error, { details: 'セーブデータの読み込みに失敗しました' });
+              } else {
+                alert('読み込みに失敗しました');
+              }
             }
           }
         });
@@ -217,7 +222,12 @@
             updateSaveSlotsList();
             alert('上書き保存しました');
           } else {
-            alert('保存に失敗しました');
+            if(window.ErrorHandler){
+              const error = new Error('保存に失敗しました');
+              window.ErrorHandler.showError(error, { details: 'セーブデータの保存に失敗しました' });
+            } else {
+              alert('保存に失敗しました');
+            }
           }
         });
 
@@ -230,7 +240,12 @@
             if (engineRef.renameSlot(slot.id, newName.trim())) {
               updateSaveSlotsList();
             } else {
-              alert('名前変更に失敗しました');
+              if(window.ErrorHandler){
+                const error = new Error('名前変更に失敗しました');
+                window.ErrorHandler.showError(error, { details: 'セーブスロットの名前変更に失敗しました' });
+              } else {
+                alert('名前変更に失敗しました');
+              }
             }
           }
         });
@@ -243,7 +258,12 @@
             if (engineRef.deleteSlot(slot.id)) {
               updateSaveSlotsList();
             } else {
-              alert('削除に失敗しました');
+              if(window.ErrorHandler){
+                const error = new Error('削除に失敗しました');
+                window.ErrorHandler.showError(error, { details: 'セーブスロットの削除に失敗しました' });
+              } else {
+                alert('削除に失敗しました');
+              }
             }
           }
         });
@@ -296,7 +316,12 @@
             updateSaveSlotsList();
             alert('スロット "' + slotName.trim() + '" を作成しました');
           } else {
-            alert('スロット作成に失敗しました');
+            if(window.ErrorHandler){
+              const error = new Error('スロット作成に失敗しました');
+              window.ErrorHandler.showError(error, { details: '新しいセーブスロットの作成に失敗しました' });
+            } else {
+              alert('スロット作成に失敗しました');
+            }
           }
         }
       });
