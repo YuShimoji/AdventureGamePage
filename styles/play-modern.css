@@ -1,0 +1,532 @@
+/* Play Screen - Modern Styles */
+
+/* ========================================
+   Play Layout
+   ======================================== */
+.play-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.play-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--space-xl) var(--space-md);
+}
+
+.play-container {
+  width: 100%;
+  max-width: var(--content-max-width);
+}
+
+/* ========================================
+   Play Header - Simplified
+   ======================================== */
+.play-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: 0 var(--space-md);
+  height: var(--header-height);
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.play-header .header-brand {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+.play-header .game-title {
+  flex: 1;
+  font-size: var(--text-base);
+  font-weight: 500;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.play-header .header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+/* Compact toolbar buttons */
+.toolbar-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  padding: var(--space-xs) var(--space-sm);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.toolbar-btn:hover {
+  color: var(--text-primary);
+  background: var(--bg-tertiary);
+}
+
+.toolbar-btn.active {
+  color: var(--accent);
+  background: var(--accent-subtle);
+}
+
+.toolbar-divider {
+  width: 1px;
+  height: 24px;
+  background: var(--border-default);
+  margin: 0 var(--space-xs);
+}
+
+/* ========================================
+   Scene Display
+   ======================================== */
+.scene-container {
+  margin-bottom: var(--space-xl);
+}
+
+.scene-image {
+  width: 100%;
+  max-height: 320px;
+  margin-bottom: var(--space-lg);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--bg-tertiary);
+}
+
+.scene-image img {
+  width: 100%;
+  height: auto;
+  max-height: 320px;
+  object-fit: cover;
+  display: block;
+}
+
+.scene-image[hidden] {
+  display: none;
+}
+
+.scene-title {
+  font-size: var(--text-2xl);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--space-md);
+}
+
+.scene-text {
+  font-size: var(--text-lg);
+  line-height: var(--line-height-relaxed);
+  color: var(--text-primary);
+  white-space: pre-wrap;
+}
+
+/* ========================================
+   Choices
+   ======================================== */
+.choices {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  margin-top: var(--space-lg);
+}
+
+.choice-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+  font-size: var(--text-base);
+  font-weight: 400;
+  text-align: left;
+  color: var(--text-primary);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.choice-btn:hover {
+  background: var(--bg-tertiary);
+  border-color: var(--accent);
+}
+
+.choice-btn:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-subtle);
+}
+
+.choice-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+}
+
+/* ========================================
+   Empty State - No Game Data
+   ======================================== */
+.play-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  text-align: center;
+  padding: var(--space-xl);
+}
+
+.play-empty-state .empty-icon {
+  width: 80px;
+  height: 80px;
+  margin-bottom: var(--space-lg);
+  opacity: 0.4;
+}
+
+.play-empty-state h2 {
+  font-size: var(--text-xl);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--space-sm);
+}
+
+.play-empty-state p {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  margin-bottom: var(--space-lg);
+  max-width: 360px;
+}
+
+.play-empty-state .actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  justify-content: center;
+}
+
+/* ========================================
+   Inventory Panel
+   ======================================== */
+.inventory-panel {
+  position: fixed;
+  top: calc(var(--header-height) + var(--space-md));
+  right: var(--space-md);
+  width: 320px;
+  max-height: calc(100vh - var(--header-height) - var(--space-xl));
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.inventory-panel[hidden] {
+  display: none;
+}
+
+.inventory-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-md);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.inventory-header h3 {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  margin: 0;
+}
+
+.inventory-count {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+.inventory-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-sm);
+}
+
+.inventory-empty {
+  text-align: center;
+  color: var(--text-muted);
+  padding: var(--space-xl);
+  font-size: var(--text-sm);
+}
+
+.inventory-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-sm) var(--space-md);
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-xs);
+  transition: background var(--transition-fast);
+}
+
+.inventory-item:hover {
+  background: var(--bg-elevated);
+}
+
+.inventory-item-icon {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--accent-subtle);
+  color: var(--accent);
+  border-radius: var(--radius-md);
+  font-size: var(--text-lg);
+  flex-shrink: 0;
+}
+
+.inventory-item-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.inventory-item-name {
+  font-size: var(--text-sm);
+  font-weight: 500;
+  margin: 0;
+}
+
+.inventory-item-desc {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.inventory-item-quantity {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--accent);
+  padding: 2px 6px;
+  background: var(--accent-subtle);
+  border-radius: var(--radius-sm);
+}
+
+/* ========================================
+   Save Slots Panel
+   ======================================== */
+.save-slots-panel {
+  position: fixed;
+  top: calc(var(--header-height) + var(--space-md));
+  right: var(--space-md);
+  width: 360px;
+  max-height: calc(100vh - var(--header-height) - var(--space-xl));
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.save-slots-panel[hidden] {
+  display: none;
+}
+
+.save-slots-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-md);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.save-slots-header h3 {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  margin: 0;
+}
+
+.save-slots-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-sm);
+}
+
+.save-slots-actions {
+  padding: var(--space-md);
+  border-top: 1px solid var(--border-subtle);
+}
+
+.save-slot-item {
+  padding: var(--space-md);
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-sm);
+}
+
+.save-slot-info {
+  margin-bottom: var(--space-sm);
+}
+
+.save-slot-name {
+  font-size: var(--text-sm);
+  font-weight: 500;
+  margin: 0 0 var(--space-xs);
+}
+
+.save-slot-meta {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+.save-slot-actions {
+  display: flex;
+  gap: var(--space-xs);
+  flex-wrap: wrap;
+}
+
+.save-slot-actions .btn {
+  padding: var(--space-xs) var(--space-sm);
+  font-size: var(--text-xs);
+}
+
+/* ========================================
+   Theme Panel
+   ======================================== */
+.theme-panel {
+  position: fixed;
+  top: calc(var(--header-height) + var(--space-md));
+  right: var(--space-md);
+  width: 280px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  z-index: 60;
+  padding: var(--space-md);
+}
+
+.theme-panel[hidden] {
+  display: none;
+}
+
+.theme-panel h3 {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  margin: 0 0 var(--space-md);
+}
+
+.theme-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+}
+
+.theme-row label {
+  flex: 1;
+  font-size: var(--text-sm);
+  margin: 0;
+}
+
+.swatch {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-default);
+  cursor: pointer;
+}
+
+.preset-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+}
+
+.preset-btn {
+  padding: var(--space-xs) var(--space-sm);
+  font-size: var(--text-xs);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.preset-btn:hover {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+}
+
+/* ========================================
+   Responsive
+   ======================================== */
+@media (max-width: 768px) {
+  .play-main {
+    padding: var(--space-lg) var(--space-md);
+  }
+  
+  .scene-text {
+    font-size: var(--text-base);
+  }
+  
+  .choice-btn {
+    padding: var(--space-md);
+  }
+  
+  .inventory-panel,
+  .save-slots-panel,
+  .theme-panel {
+    top: var(--header-height);
+    right: 0;
+    left: 0;
+    width: 100%;
+    max-width: 100%;
+    border-radius: 0;
+    max-height: calc(100vh - var(--header-height));
+  }
+  
+  .toolbar-btn span {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .play-header .game-title {
+    font-size: var(--text-sm);
+  }
+  
+  .scene-title {
+    font-size: var(--text-xl);
+  }
+  
+  .scene-text {
+    font-size: var(--text-base);
+  }
+}

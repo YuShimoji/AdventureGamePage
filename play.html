@@ -9,45 +9,124 @@
       type="image/x-icon"
       href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E📚%3C/text%3E%3C/svg%3E"
     />
+    <!-- Modern UI Theme -->
+    <link rel="stylesheet" href="styles/modern.css?v=1" />
+    <link rel="stylesheet" href="styles/play-modern.css?v=1" />
+    <!-- Legacy styles for compatibility -->
     <link rel="stylesheet" href="styles/common.css?v=4" />
     <link rel="stylesheet" href="styles/play.css?v=4" />
   </head>
   <body class="play-page">
-    <header class="app-header">
-      <a class="btn" href="index.html">← トップ</a>
-      <h1 id="game-title">サンプルアドベンチャー</h1>
-      <div class="header-actions">
-        <button id="btn-back" class="btn" aria-label="前のノードに戻る">戻る</button>
-        <button id="btn-forward" class="btn" aria-label="次のノードに進む">進む</button>
-        <button id="btn-save" class="btn" aria-label="保存モーダルを開く">保存</button>
-        <button id="btn-load" class="btn" aria-label="読込モーダルを開く">読込</button>
-        <button id="btn-save-slots" class="btn" title="セーブスロット" aria-label="セーブスロットを開く">
-          スロット
+    <!-- Simplified Header -->
+    <header class="app-header play-header">
+      <a class="header-brand" href="index.html">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M15 18l-6-6 6-6"/>
+        </svg>
+        <span>トップ</span>
+      </a>
+      
+      <h1 id="game-title" class="header-title game-title">サンプルアドベンチャー</h1>
+      
+      <nav class="header-actions">
+        <!-- Navigation buttons -->
+        <button id="btn-back" class="toolbar-btn" aria-label="前のノードに戻る" title="戻る (←)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
         </button>
-        <button
-          id="btn-inventory"
-          class="btn"
-          title="インベントリ"
-          aria-label="インベントリを開く"
-          aria-expanded="false"
-        >
-          インベントリ
+        <button id="btn-forward" class="toolbar-btn" aria-label="次のノードに進む" title="進む (→)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
         </button>
-        <button id="btn-restart" class="btn" aria-label="ゲームを最初からやり直す">リスタート</button>
-        <button id="btn-theme" class="icon-btn" title="テーマ設定" aria-label="テーマ設定を開く">テーマ</button>
-        <label class="btn file-label" aria-label="ゲームデータを読み込む">
-          ゲームJSON読込
+        
+        <span class="toolbar-divider"></span>
+        
+        <!-- Save/Load -->
+        <button id="btn-save" class="toolbar-btn" aria-label="保存モーダルを開く" title="保存">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/>
+            <polyline points="17,21 17,13 7,13 7,21"/>
+            <polyline points="7,3 7,8 15,8"/>
+          </svg>
+        </button>
+        <button id="btn-load" class="toolbar-btn" aria-label="読込モーダルを開く" title="読込">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+            <polyline points="7,10 12,15 17,10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+        </button>
+        <button id="btn-save-slots" class="toolbar-btn" title="セーブスロット" aria-label="セーブスロットを開く">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+            <line x1="8" y1="21" x2="16" y2="21"/>
+            <line x1="12" y1="17" x2="12" y2="21"/>
+          </svg>
+        </button>
+        
+        <span class="toolbar-divider"></span>
+        
+        <!-- Inventory -->
+        <button id="btn-inventory" class="toolbar-btn" title="インベントリ" aria-label="インベントリを開く" aria-expanded="false">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/>
+          </svg>
+        </button>
+        
+        <!-- Restart -->
+        <button id="btn-restart" class="toolbar-btn" aria-label="ゲームを最初からやり直す" title="リスタート">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="1,4 1,10 7,10"/>
+            <path d="M3.51 15a9 9 0 102.13-9.36L1 10"/>
+          </svg>
+        </button>
+        
+        <span class="toolbar-divider"></span>
+        
+        <!-- Theme -->
+        <button id="btn-theme" class="toolbar-btn" title="テーマ設定" aria-label="テーマ設定を開く">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="5"/>
+            <line x1="12" y1="1" x2="12" y2="3"/>
+            <line x1="12" y1="21" x2="12" y2="23"/>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+            <line x1="1" y1="12" x2="3" y2="12"/>
+            <line x1="21" y1="12" x2="23" y2="12"/>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+          </svg>
+        </button>
+        
+        <!-- Import JSON -->
+        <label class="toolbar-btn" aria-label="ゲームデータを読み込む" title="JSONインポート">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+            <polyline points="14,2 14,8 20,8"/>
+            <line x1="12" y1="18" x2="12" y2="12"/>
+            <line x1="9" y1="15" x2="15" y2="15"/>
+          </svg>
           <input id="play-file-import" type="file" accept="application/json" hidden />
         </label>
-      </div>
+      </nav>
     </header>
 
-    <main class="container play-container">
-      <!-- Scene Image -->
-      <div id="scene-image" class="scene-image" hidden></div>
-
-      <article id="scene" class="scene" aria-live="polite" aria-atomic="true"></article>
-      <div id="choices" class="choices" role="radiogroup" aria-label="選択肢"></div>
+    <!-- Main Content -->
+    <main class="play-main">
+      <div class="play-container">
+        <!-- Scene Image -->
+        <div id="scene-image" class="scene-image" hidden></div>
+        
+        <!-- Scene Content -->
+        <div class="scene-container">
+          <article id="scene" class="scene scene-text" aria-live="polite" aria-atomic="true"></article>
+        </div>
+        
+        <!-- Choices -->
+        <div id="choices" class="choices" role="radiogroup" aria-label="選択肢"></div>
+      </div>
     </main>
 
     <!-- Inventory Panel -->

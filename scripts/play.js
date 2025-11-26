@@ -14,18 +14,20 @@
     }
 
     sceneEl.innerHTML = `
-      <div class="card">
-        <h2 style="margin-top: 0;">ゲームデータがまだ登録されていません</h2>
-        <p class="muted">
-          管理画面でゲームを作成して保存するか、ゲームJSONファイルを読み込んでください。
+      <div class="play-empty-state">
+        <svg class="empty-icon" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M4 19.5A2.5 2.5 0 016.5 17H20"/>
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/>
+        </svg>
+        <h2>ゲームデータがありません</h2>
+        <p>
+          管理画面でゲームを作成するか、<br>
+          JSONファイルをインポートしてください。
         </p>
-        <div style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 16px;">
-          <a href="admin.html" class="btn">管理画面を開く</a>
-          <button id="empty-load-json" class="btn btn-ghost">ゲームJSONを読み込む</button>
+        <div class="actions">
+          <a href="admin.html" class="btn btn-primary">管理画面を開く</a>
+          <button id="empty-load-json" class="btn">JSONをインポート</button>
         </div>
-        <p class="muted" style="margin-top: 12px;">
-          既にJSONファイルがある場合は、上部の「ゲームJSON読込」ボタンからインポートできます。
-        </p>
       </div>
     `;
 
