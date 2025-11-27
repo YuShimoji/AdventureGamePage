@@ -129,49 +129,53 @@
       </div>
     </main>
 
-    <!-- Inventory Panel -->
+    <!-- Inventory Panel (Modern) -->
     <aside
       id="inventory-panel"
-      class="inventory-panel"
+      class="inventory-panel panel"
       hidden
       role="dialog"
       aria-modal="true"
       aria-labelledby="inventory-title"
     >
-      <header class="inventory-header">
-        <h3 id="inventory-title">インベントリ</h3>
-        <span id="inventory-count" class="inventory-count" aria-live="polite"></span>
-        <button id="inventory-close" class="btn btn-ghost btn-sm" title="閉じる" aria-label="インベントリを閉じる">
-          閉じる
+      <header class="panel-header">
+        <h3 id="inventory-title" class="panel-title">インベントリ</h3>
+        <span id="inventory-count" class="text-muted text-sm" aria-live="polite"></span>
+        <button id="inventory-close" class="btn-icon" title="閉じる" aria-label="インベントリを閉じる">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
         </button>
       </header>
-      <div id="inventory-list" class="inventory-list" role="list" aria-label="所持アイテム"></div>
+      <div id="inventory-list" class="panel-body inventory-list" role="list" aria-label="所持アイテム"></div>
     </aside>
 
     <div id="theme-panel" class="theme-panel" hidden></div>
 
-    <!-- Save Slots Panel -->
+    <!-- Save Slots Panel (Modern) -->
     <aside
       id="save-slots-panel"
-      class="save-slots-panel overlay-panel"
+      class="save-slots-panel panel overlay-panel"
       hidden
       role="dialog"
       aria-modal="true"
       aria-labelledby="save-slots-header"
     >
-      <header class="save-slots-header" id="save-slots-header">
-        <h3>セーブスロット</h3>
-        <button id="save-slots-close" class="btn btn-ghost btn-sm" title="閉じる" aria-label="セーブスロットを閉じる">
-          閉じる
+      <header class="panel-header" id="save-slots-header">
+        <h3 class="panel-title">セーブスロット</h3>
+        <button id="save-slots-close" class="btn-icon" title="閉じる" aria-label="セーブスロットを閉じる">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
         </button>
       </header>
-      <div id="save-slots-list" class="save-slots-list"></div>
-      <div class="save-slots-actions">
-        <button id="create-new-slot" class="btn btn-primary">新規スロット作成</button>
+      <div id="save-slots-list" class="panel-body save-slots-list"></div>
+      <div class="panel-footer">
+        <button id="create-new-slot" class="btn btn-primary w-full">新規スロット作成</button>
       </div>
     </aside>
 
-    <!-- Save/Load Modal -->
+    <!-- Save/Load Modal (Modern) -->
     <div
       id="save-load-modal"
       class="modal-overlay"
@@ -182,51 +186,65 @@
     >
       <div class="modal" role="document">
         <header class="modal-header">
-          <h2 id="modal-title">ゲームデータを保存</h2>
-          <button id="modal-close" class="modal-close" aria-label="閉じる">閉じる</button>
+          <h2 id="modal-title" class="modal-title">ゲームデータを保存</h2>
+          <button id="modal-close" class="btn-icon modal-close" aria-label="閉じる">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
         </header>
         <section class="modal-body">
           <div id="save-panel">
-            <label class="modal-label" for="save-name">セーブ名</label>
-            <input
-              id="save-name"
-              type="text"
-              class="modal-input"
-              placeholder="セーブ名を入力"
-              aria-describedby="save-hint"
-            />
-            <p id="save-hint" class="modal-hint">現在の進行状態を保存します。</p>
-            <div class="modal-actions">
-              <button id="btn-save-confirm" class="btn btn-accent">保存する</button>
+            <div class="form-group">
+              <label class="form-label" for="save-name">セーブ名</label>
+              <input
+                id="save-name"
+                type="text"
+                class="form-input"
+                placeholder="セーブ名を入力"
+                aria-describedby="save-hint"
+              />
+              <p id="save-hint" class="form-hint">現在の進行状態を保存します。</p>
+            </div>
+            <div class="modal-footer">
+              <button id="btn-save-confirm" class="btn btn-primary">保存する</button>
             </div>
           </div>
           <div id="load-panel" hidden>
             <div class="modal-toolbar">
-              <button id="btn-import-save" class="btn btn-ghost">インポート</button>
+              <button id="btn-import-save" class="btn">インポート</button>
             </div>
-            <div id="saved-games-list" class="saved-games-list" role="list" aria-live="polite"></div>
+            <div id="saved-games-list" class="saved-games-list list" role="list" aria-live="polite"></div>
           </div>
         </section>
       </div>
     </div>
 
-    <!-- Mobile Menu -->
-    <button id="mobile-menu-btn" class="mobile-menu-btn" aria-label="メニューを開く">メニュー</button>
-    <div id="mobile-menu-overlay" class="mobile-menu-overlay" hidden>
-      <div class="mobile-menu" role="dialog" aria-modal="true">
-        <header class="mobile-menu-header">
-          <h3>メニュー</h3>
-          <button id="mobile-menu-close" class="mobile-menu-close" aria-label="閉じる">閉じる</button>
+    <!-- Mobile Menu (Modern) -->
+    <button id="mobile-menu-btn" class="mobile-menu-btn btn-icon" aria-label="メニューを開く">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </button>
+    <div id="mobile-menu-overlay" class="mobile-menu-overlay modal-overlay" hidden>
+      <div class="mobile-menu modal" role="dialog" aria-modal="true">
+        <header class="modal-header">
+          <h3 class="modal-title">メニュー</h3>
+          <button id="mobile-menu-close" class="btn-icon" aria-label="閉じる">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
         </header>
-        <div class="mobile-menu-body">
-          <button id="mobile-btn-save" class="btn">保存</button>
-          <button id="mobile-btn-load" class="btn">読込</button>
-          <button id="mobile-btn-inventory" class="btn">インベントリ</button>
-          <button id="mobile-btn-back" class="btn">戻る</button>
-          <button id="mobile-btn-forward" class="btn">進む</button>
-          <button id="mobile-btn-restart" class="btn">リスタート</button>
-          <button id="mobile-btn-theme" class="btn">テーマ</button>
-          <label class="btn file-label">
+        <div class="modal-body mobile-menu-body">
+          <button id="mobile-btn-save" class="btn w-full">保存</button>
+          <button id="mobile-btn-load" class="btn w-full">読込</button>
+          <button id="mobile-btn-inventory" class="btn w-full">インベントリ</button>
+          <button id="mobile-btn-back" class="btn w-full">戻る</button>
+          <button id="mobile-btn-forward" class="btn w-full">進む</button>
+          <button id="mobile-btn-restart" class="btn w-full">リスタート</button>
+          <button id="mobile-btn-theme" class="btn w-full">テーマ</button>
+          <label class="btn w-full file-label">
             ゲームJSON読込
             <input id="mobile-play-file-import" type="file" accept="application/json" hidden />
           </label>
