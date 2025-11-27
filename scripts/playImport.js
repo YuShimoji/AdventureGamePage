@@ -1,4 +1,6 @@
 (function () {
+  const GAME_DATA_KEY = window.APP_CONFIG?.storage?.keys?.gameData || "agp_game_data";
+
   function getJSONErrorPosition(message) {
     const match = message.match(/position (\d+)/);
     return match ? parseInt(match[1]) : null;
@@ -58,7 +60,7 @@
             alert("対応していない形式です");
             return;
           }
-          StorageUtil.saveJSON("agp_game_data", engine);
+          StorageUtil.saveJSON(GAME_DATA_KEY, engine);
           alert("ゲームJSONを読み込みました。ページを再読み込みします。");
           location.reload();
         } catch (e) {

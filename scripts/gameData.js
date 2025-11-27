@@ -1,4 +1,6 @@
 (function () {
+  const GAME_DATA_KEY = window.APP_CONFIG?.storage?.keys?.gameData || "agp_game_data";
+
   function download(obj, filename) {
     const blob = new Blob([JSON.stringify(obj, null, 2)], { type: "application/json" });
     const a = document.createElement("a");
@@ -74,7 +76,7 @@
     const btnCurrent = document.getElementById("btn-export-game-current");
     if (btnCurrent)
       btnCurrent.addEventListener("click", () => {
-        const engine = StorageUtil.loadJSON("agp_game_data");
+        const engine = StorageUtil.loadJSON(GAME_DATA_KEY);
         const spec = engineToSpec(engine || window.SAMPLE_GAME);
         if (!spec) {
           alert("エクスポート可能なゲームデータがありません");

@@ -1,12 +1,13 @@
 (function(){
   // Node Editor Logic Manager - Handles business logic operations
   // Validation logic has been extracted to nodeEditorValidation.js
+  const GAME_DATA_KEY = window.APP_CONFIG?.storage?.keys?.gameData || 'agp_game_data';
 
   async function loadFromStorage(){
     try {
       if(window.NodeEditorUIManager.isDirty() && !confirm('未保存の変更があります。破棄して取り込みますか？')) return;
-      const raw = window.StorageUtil?.loadJSON?.('agp_game_data', null) || null;
-      if(!raw){ alert('agp_game_data が見つかりません。プレイ用JSONをインポートしてください。'); return; }
+      const raw = window.StorageUtil?.loadJSON?.(GAME_DATA_KEY, null) || null;
+      if(!raw){ alert('ゲームデータが見つかりません。プレイ用JSONをインポートしてください。'); return; }
       let spec = null;
       if(Array.isArray(raw.nodes)){
         spec = window.NodeEditorUtils.normalizeSpec(raw);

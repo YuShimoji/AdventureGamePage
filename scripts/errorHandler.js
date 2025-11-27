@@ -200,11 +200,12 @@
         const progress = this.showProgress("データ修復中...");
 
         // Attempt to repair game data
-        const gameData = window.StorageUtil?.loadJSON("agp_game_data");
+        const gameDataKey = window.APP_CONFIG?.storage?.keys?.gameData || "agp_game_data";
+        const gameData = window.StorageUtil?.loadJSON(gameDataKey);
         if (gameData) {
           const result = window.DataValidator.repairData(gameData, "game");
           if (result.success) {
-            window.StorageUtil?.saveJSON("agp_game_data", result.data);
+            window.StorageUtil?.saveJSON(gameDataKey, result.data);
             progress.remove();
             alert(`データ修復が完了しました。\n\n修復内容:\n- ${result.repairs.join("\n- ")}`);
           } else {
