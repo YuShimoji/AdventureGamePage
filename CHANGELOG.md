@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2025-11-27]
+
+- refactor(storage): ストレージキー一元管理（ハードコーディング解消第1弾）
+  - `APP_CONFIG.storage.keys.gameData` を導入し、`"agp_game_data"` のハードコーディングを解消
+  - 対象ファイル: `playImport.js`, `gameData.js`, `nodeEditorLogicManager.js`, `errorHandler.js`
+  - ユーザーメッセージ改善: 内部キー名を隠蔽し、より親和的な表現に統一
+- docs: HANDOVER.md更新 - UI/UX完了・リファクタリング開始状況を記録
+
 ## [2025-11-26]
 
 - feat(ui): Typora風モダンUI/UXへの総改修
