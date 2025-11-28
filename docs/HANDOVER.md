@@ -8,14 +8,42 @@
 
 ---
 
-## 現在状況 (2025-11-27)
+## 現在状況 (2025-11-28)
 
-### プロジェクトフェーズ: フェーズ3 リファクタリング開始 (進行中)
+### プロジェクトフェーズ: フェーズ3 リファクタリング (進行中)
 
 **前フェーズ**: フェーズ2 UI/UX改善 ✅ **完了**  
-**現在の位置**: フェーズ3 リファクタリング開始 (第1弾完了)
+**現在の位置**: フェーズ3 リファクタリング (第2弾完了)
 
 ### 今回のセッションで完了した作業
+
+#### リファクタリング第2弾 - ストレージキー完全一元化 ✅ (2025-11-28)
+
+**APP_CONFIG.storage.keys の完全活用**:
+- 全ストレージキーをAPP_CONFIG経由に統一
+- ハードコーディングされたキーを一掃
+- 対象: saveSlots, theme, floatingPanel, memos, gameProgress
+
+**対象ファイル更新**:
+- `scripts/play.save.js`: SAVE_SLOTS_KEY_PREFIX 定数導入
+- `scripts/theme-manager.js`: THEME_PREFERENCES_KEY 定数導入
+- `scripts/themeUtils.js`: THEME_KEY, CUSTOM_PRESETS_KEY 定数導入
+- `scripts/floatingPanelManager.js`: FLOATING_PANEL_KEY 定数導入
+- `scripts/memos.js`: KEY_MEMOS 定数導入
+- `scripts/gameEngineLogicManager.js`: SAVE_SLOTS_KEY, GAME_PROGRESS_KEY 定数導入
+
+#### savePreview.js モジュール分割 ✅ (2025-11-28)
+
+**4つの専門モジュールへの分割**:
+- `scripts/savePreviewOverlay.js`: オーバーレイ制御（キーボード/マウスイベント）
+- `scripts/savePreviewRenderer.js`: UIレンダリング（リスト表示）
+- `scripts/savePreviewControls.js`: コントロールイベント管理
+- `scripts/savePreviewPanelManager.js`: 統合マネージャー（状態管理・初期化）
+
+**レガシー互換維持**:
+- 元 `savePreview.js` は分割モジュール優先のフォールバック実装に変更
+- `admin.html` のスクリプト読み込み順序調整
+- 既存機能完全保持
 
 #### UI/UX総改修 - Typora風モダンデザイン ✅ (2025-11-27)
 
@@ -175,9 +203,10 @@ scripts/
 ```
 
 ### ストレージキー管理
-- `APP_CONFIG.storage.keys` で一元管理（進行中）
+- `APP_CONFIG.storage.keys` で一元管理 ✅ **第2弾完了**
 - 第1弾: `gameData` キー統一完了
-- 次ターゲット: `saveSlots`, `theme`, `snapshots` キーなど
+- 第2弾: 全キー（saveSlots, theme, floatingPanel, memos, gameProgress）統一完了
+- 次ターゲット: 残存ハードコーディングの確認・解消
 
 ### テスト環境
 - 自動テスト: `tests/` ディレクトリ（23ファイル）
@@ -223,16 +252,17 @@ scripts/
 
 ## 次の担当者へのアドバイス
 
-1. **最初に**: `docs/TEST_MANUAL.md` の手動テストを実施（UI/UX改修確認）
-2. **優先**: ストレージキー一元化の続き（セーブスロット・テーマキーなど）
-3. **注意**: 長大スクリプト分割時は依存関係を慎重に確認（windowオブジェクト経由）
-4. **目標**: リファクタリング完了後、UI/UX後追い改善へ移行
+1. **最初に**: `docs/TEST_MANUAL.md` の手動テストを実施（UI/UX改修・リファクタリング確認）
+2. **優先**: 残存ハードコーディングの解消（その他ストレージキーなど）
+3. **次点**: 長大スクリプト分割の続き（mermaidPreviewUIManager.js, play.modal.js, admin-boot.js）
+4. **目標**: リファクタリング完了後、UI/UX後追い改善へ移行（アニメーション、キーボード操作、ダークテーマ）
 5. **緊急**: `npm test` の404エラー原因を調査（テスト環境の安定化）
+6. **完了**: ストレージキー一元化・savePreview.js分割済み
 
 ---
 
 ## 連絡先・問い合わせ
 
 **プロジェクトリポジトリ**: https://github.com/YuShimoji/AdventureGamePage  
-**最終更新**: 2025-11-27  
+**最終更新**: 2025-11-28  
 **担当者**: AI Assistant (Cascade)

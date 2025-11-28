@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2025-11-28]
+
+- refactor(storage): ストレージキー完全一元化完了
+  - APP_CONFIG.storage.keys の全キー（saveSlots, theme, floatingPanel, memos, gameProgress）を使用するよう全ファイル更新
+  - ハードコーディングされたストレージキーをAPP_CONFIG経由に置換
+  - 対象ファイル: play.save.js, theme-manager.js, themeUtils.js, floatingPanelManager.js, memos.js, gameEngineLogicManager.js
+  - savePreview.jsモジュール分割完了（Overlay, Renderer, Controls, PanelManager）
+
 ## [2025-11-27]
 
 - refactor(storage): ストレージキー一元管理（ハードコーディング解消第1弾）
