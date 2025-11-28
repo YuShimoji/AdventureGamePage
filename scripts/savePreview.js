@@ -1,8 +1,17 @@
 (function () {
-  // SavePreviewPanelManager - セーブプレビューパネルの状態管理を分離
-  // 根本的な安定化のため、シングルトンクラスでパネル管理を統一
+  // SavePreview - レガシーモード（分割モジュール優先）
+  // 新しい分割モジュールが利用可能な場合はそちらを使用
 
-  class SavePreviewPanelManager {
+  // 新しい分割モジュールが読み込まれているかチェック
+  if (window.SavePreviewPanelManager && window.SavePreviewOverlay && window.SavePreviewRenderer && window.SavePreviewControls) {
+    console.log('[DEBUG] Using new modular SavePreview system');
+    // 新しいモジュールシステムが使用されるため、このファイルはレガシーAPIのみを提供
+    return;
+  }
+
+  console.log('[DEBUG] Using legacy SavePreview system (modular system not loaded)');
+
+  // 以下は元のレガシーコード（変更なし）
     constructor() {
       this.panelId = 'preview-panel';
       this.listId = 'preview-list';
