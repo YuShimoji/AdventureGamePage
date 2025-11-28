@@ -8,7 +8,12 @@ All notable changes to this project will be documented in this file.
   - APP_CONFIG.storage.keys の全キー（saveSlots, theme, floatingPanel, memos, gameProgress）を使用するよう全ファイル更新
   - ハードコーディングされたストレージキーをAPP_CONFIG経由に置換
   - 対象ファイル: play.save.js, theme-manager.js, themeUtils.js, floatingPanelManager.js, memos.js, gameEngineLogicManager.js
-  - savePreview.jsモジュール分割完了（Overlay, Renderer, Controls, PanelManager）
+- refactor(modules): 長大スクリプトのモジュール分割完了
+  - savePreview.js → 4モジュール（Overlay, Renderer, Controls, PanelManager）
+  - mermaidPreviewUIManager.js → 4モジュール（UIState, UIRefresh, UIEvents, Manager）
+  - play.modal.js → 3モジュール（Focus, SaveSlots, Manager）
+  - admin-boot.js → 3モジュール（Utils, Cleanup, Manager）
+  - 単一責任原則に基づき保守性・可読性を大幅向上
 
 ## [2025-11-27]
 
