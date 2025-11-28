@@ -4,6 +4,8 @@
   // Audio Manager - Web Audio APIベースのサウンドシステム
   // BGM・効果音の再生制御、ボリューム管理、クロスフェード対応
 
+  const AUDIO_SETTINGS_KEY = window.APP_CONFIG?.storage?.keys?.audioSettings || 'agp_audio_settings';
+
   const AudioManager = {
     // 設定
     config: {
@@ -85,7 +87,7 @@
     // 設定の読み込み・保存
     loadSettings() {
       try {
-        const saved = StorageUtil?.loadJSON?.('agp_audio_settings');
+        const saved = StorageUtil?.loadJSON?.(AUDIO_SETTINGS_KEY);
         if (saved) {
           Object.assign(this.config, saved);
           this.updateVolumes();
@@ -97,7 +99,7 @@
 
     saveSettings() {
       try {
-        StorageUtil?.saveJSON?.('agp_audio_settings', this.config);
+        StorageUtil?.saveJSON?.(AUDIO_SETTINGS_KEY, this.config);
       } catch (e) {
         log('warn', 'Failed to save audio settings', { error: e.message });
       }

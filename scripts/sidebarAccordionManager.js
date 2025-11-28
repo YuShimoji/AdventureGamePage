@@ -1,9 +1,9 @@
 (function () {
   // Sidebar Accordion Manager - Handles sidebar accordion functionality
-  const KEY_ACCORDION_LAST = 'agp_sidebar_open';
-  const KEY_ACCORDION_MULTI = 'agp_sidebar_multi_open';
-  const KEY_ACCORDION_MULTI_LIST = 'agp_sidebar_open_multi';
-  const KEY_ACCORDION_HINT = 'agp_sidebar_hint_state';
+  const KEY_ACCORDION_LAST = window.APP_CONFIG?.storage?.keys?.sidebarOpen || 'agp_sidebar_open';
+  const KEY_ACCORDION_MULTI = window.APP_CONFIG?.storage?.keys?.sidebarMultiOpen || 'agp_sidebar_multi_open';
+  const KEY_ACCORDION_MULTI_LIST = window.APP_CONFIG?.storage?.keys?.sidebarOpenMulti || 'agp_sidebar_open_multi';
+  const KEY_ACCORDION_HINT = window.APP_CONFIG?.storage?.keys?.sidebarHintState || 'agp_sidebar_hint_state';
 
   const ACCORDION_HINTS = {
     tools: {
