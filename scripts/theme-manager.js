@@ -2,6 +2,8 @@
 (function () {
   'use strict';
 
+  const THEME_PREFERENCES_KEY = window.APP_CONFIG?.storage?.keys?.theme || "agp_theme";
+
   window.ThemeManager = {
     themes: {},
     currentTheme: 'default',
@@ -61,7 +63,7 @@
 
     // ユーザーの設定を読み込み
     loadUserPreferences: function () {
-      const saved = localStorage.getItem('agp_theme_preferences');
+      const saved = localStorage.getItem(THEME_PREFERENCES_KEY + '_preferences');
       if (saved) {
         try {
           const prefs = JSON.parse(saved);
@@ -145,7 +147,7 @@
         darkMode: this.isDarkMode,
         timestamp: Date.now()
       };
-      localStorage.setItem('agp_theme_preferences', JSON.stringify(prefs));
+      localStorage.setItem(THEME_PREFERENCES_KEY + '_preferences', JSON.stringify(prefs));
     },
 
     // カスタムテーマ作成

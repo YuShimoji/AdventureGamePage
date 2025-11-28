@@ -2,6 +2,9 @@
   // GameEngineLogicManager - コアゲームロジック
   // ステート管理、ナビゲーション、インベントリ管理、セーブ/ロード
 
+  const SAVE_SLOTS_KEY = window.APP_CONFIG?.storage?.keys?.saveSlots || "agp_save_slots";
+  const GAME_PROGRESS_KEY = window.APP_CONFIG?.storage?.keys?.gameProgress || "agp_game_progress";
+
   class GameEngineLogicManager {
     constructor(gameData, state, itemsData) {
       this.gameData = gameData;
@@ -116,12 +119,12 @@
         forward: fwd,
         playerState: JSON.parse(JSON.stringify(this.state.playerState)) // Deep copy
       };
-      StorageUtil.saveJSON('agp_progress', progressData);
+      StorageUtil.saveJSON(GAME_PROGRESS_KEY, progressData);
     }
 
     // プログレスのロード
     loadProgress() {
-      const p = StorageUtil.loadJSON('agp_progress');
+      const p = StorageUtil.loadJSON(GAME_PROGRESS_KEY);
       if (p && p.title === this.gameData.title) {
         if (p.nodeId && this.gameData.nodes[p.nodeId]) {
           this.state.nodeId = p.nodeId;
@@ -297,25 +300,25 @@
           version: '1.0'
         }
       };
-      window.StorageUtil.saveJSON('agp_save_slots', existing);
+      window.StorageUtil.saveJSON(SAVE_SLOTS_KEY, existing);
       return true;
     }
 
     deleteSlot(slotId) {
-      const existing = window.StorageUtil.loadJSON('agp_save_slots') || {};
+      const existing = window.StorageUtil.loadJSON(SAVE_SLOTS_KEY) || {};
       if (!existing[slotId]) return false;
       delete existing[slotId];
-      window.StorageUtil.saveJSON('agp_save_slots', existing);
+      window.StorageUtil.saveJSON(SAVE_SLOTS_KEY, existing);
       return true;
     }
 
     listSlots() {
-      const existing = window.StorageUtil.loadJSON('agp_save_slots') || {};
+      const existing = window.StorageUtil.loadJSON(SAVE_SLOTS_KEY) || {};
       return Object.values(existing);
     }
 
     saveToSlot(slotId) {
-      const existing = window.StorageUtil.loadJSON('agp_save_slots') || {};
+      const existing = window.StorageUtil.loadJSON(SAVE_SLOTS_KEY) || {};
       if (!existing[slotId]) {
         console.warn(`Slot ${slotId} does not exist`);
         return false;
@@ -328,12 +331,12 @@
       existing[slotId].meta.currentLocation = this.getNode()?.title || 'Unknown';
       existing[slotId].meta.progress = Math.round((saveData.metadata?.nodesVisited || 0) / Object.keys(this.gameData.nodes).length * 100);
 
-      window.StorageUtil.saveJSON('agp_save_slots', existing);
+      window.StorageUtil.saveJSON(SAVE_SLOTS_KEY, existing);
       return true;
     }
 
     loadFromSlot(slotId) {
-      const existing = window.StorageUtil.loadJSON('agp_save_slots') || {};
+      const existing = window.StorageUtil.loadJSON(SAVE_SLOTS_KEY) || {};
       if (!existing[slotId]) return false;
 
       const saveData = existing[slotId].gameState;
@@ -341,21 +344,21 @@
     }
 
     renameSlot(slotId, newName) {
-      const existing = window.StorageUtil.loadJSON('agp_save_slots') || {};
+      const existing = window.StorageUtil.loadJSON(SAVE_SLOTS_KEY) || {};
       if (!existing[slotId]) return false;
       existing[slotId].name = newName;
       existing[slotId].meta.modified = new Date().toISOString();
-      window.StorageUtil.saveJSON('agp_save_slots', existing);
+      window.StorageUtil.saveJSON(SAVE_SLOTS_KEY, existing);
       return true;
     }
 
     getSlotInfo(slotId) {
-      const existing = window.StorageUtil.loadJSON('agp_save_slots') || {};
+      const existing = window.StorageUtil.loadJSON(SAVE_SLOTS_KEY) || {};
       return existing[slotId] || null;
     }
 
     copySlot(fromId, toId, newName = '') {
-      const existing = window.StorageUtil.loadJSON('agp_save_slots') || {};
+      const existing = window.StorageUtil.loadJSON(SAVE_SLOTS_KEY) || {};
       if (!existing[fromId]) return false;
       if (existing[toId]) {
         console.warn(`Slot ${toId} already exists`);
@@ -372,7 +375,7 @@
           modified: new Date().toISOString()
         }
       };
-      window.StorageUtil.saveJSON('agp_save_slots', existing);
+      window.StorageUtil.saveJSON(SAVE_SLOTS_KEY, existing);
       return true;
     }
   }

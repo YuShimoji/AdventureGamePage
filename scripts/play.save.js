@@ -1,5 +1,6 @@
 (function () {
   // Play Save/Load Module - Save slot management and auto-save
+  const SAVE_SLOTS_KEY_PREFIX = window.APP_CONFIG?.storage?.keys?.saveSlots || "agp_save_slots";
   window.PlaySave = {
     init: function(engine, gameTitle) {
       this.engine = engine;
@@ -136,7 +137,7 @@
     },
 
     saveGameToStorage: function(saveData) {
-      const key = `agp_save_slots_${this.currentGameTitle}`;
+      const key = `${SAVE_SLOTS_KEY_PREFIX}_${this.currentGameTitle}`;
       const existing = StorageUtil.loadJSON(key) || [];
       // Remove existing save with same name if exists
       const filtered = existing.filter(s => s.slotName !== saveData.slotName);
@@ -147,7 +148,7 @@
     },
 
     loadSavedGames: function(container) {
-      const key = `agp_save_slots_${this.currentGameTitle}`;
+      const key = `${SAVE_SLOTS_KEY_PREFIX}_${this.currentGameTitle}`;
       const saves = StorageUtil.loadJSON(key) || [];
       container.innerHTML = '';
 
@@ -301,7 +302,7 @@
             }
 
             // Check if slot name already exists
-            const key = `agp_save_slots_${this.currentGameTitle}`;
+            const key = `${SAVE_SLOTS_KEY_PREFIX}_${this.currentGameTitle}`;
             const existing = StorageUtil.loadJSON(key) || [];
             const existingNames = existing.map(s => s.slotName);
 

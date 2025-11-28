@@ -1,5 +1,5 @@
 (function () {
-  const KEY_MEMOS = "agp_memos";
+  const KEY_MEMOS = window.APP_CONFIG?.storage?.keys?.memos || "agp_memos";
 
   function readMemos() {
     return StorageUtil.loadJSON(KEY_MEMOS, []);

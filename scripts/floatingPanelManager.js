@@ -1,5 +1,6 @@
 (function () {
   // Floating Panel Manager - Handles floating panel drag, minimize, close functionality
+  const FLOATING_PANEL_KEY = window.APP_CONFIG?.storage?.keys?.floatingPanel || "agp_floating_panel";
   window.FloatingPanelManager = {
     init: function() {
       this.initFloatingPanel();
@@ -20,7 +21,7 @@
       let startX, startY, startLeft, startTop;
 
       // Load saved position and state
-      const saved = localStorage.getItem('agp_floating_panel');
+      const saved = localStorage.getItem(FLOATING_PANEL_KEY);
       if(saved) {
         try {
           const state = JSON.parse(saved);

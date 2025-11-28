@@ -2,8 +2,8 @@
   // ThemeUtils - テーマ関連のユーティリティ関数
   // カラーヘルパー、プリセット管理、ストレージ操作
 
-  const THEME_KEY = "agp_theme";
-  const CUSTOM_PRESETS_KEY = "agp_custom_presets";
+  const THEME_KEY = window.APP_CONFIG?.storage?.keys?.theme || "agp_theme";
+  const CUSTOM_PRESETS_KEY = window.APP_CONFIG?.storage?.keys?.theme + "_custom_presets" || "agp_custom_presets";
   const PRESETS = {
     zenLight: { name: "Zen Light", bg: "#fdfdfc", text: "#111111", accent: "#4a90e2" },
     zenDark: { name: "Zen Dark", bg: "#0f1115", text: "#e6e6e6", accent: "#6aa0ff" },
