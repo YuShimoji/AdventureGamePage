@@ -73,14 +73,19 @@
           throw invalidError;
         }
         if (!game) {
-          const noDataError = new Error('ゲームデータが保存されていません。管理画面でゲームを作成してください。');
+          const noDataError = new Error(
+            'ゲームデータが保存されていません。管理画面でゲームを作成してください。'
+          );
           noDataError.code = 'NO_GAME_DATA';
           throw noDataError;
         }
       } catch (e) {
         if (e && e.code === 'NO_GAME_DATA') {
           if (window.APP_CONFIG?.debug?.showConsoleLogs) {
-            console.info('[PLAY] No game data found in storage (expected for first-time users).', e);
+            console.info(
+              '[PLAY] No game data found in storage (expected for first-time users).',
+              e
+            );
           }
         } else {
           console.error('ゲームデータの読み込みエラー:', e);
