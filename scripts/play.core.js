@@ -33,6 +33,7 @@
     },
 
     loadGameData: function () {
+      const GAME_DATA_KEY = window.APP_CONFIG?.storage?.keys?.gameData || 'agp_game_data';
       function normalizeSpecToEngine(data) {
         if (!data) return null;
         if (Array.isArray(data.nodes)) {
@@ -59,7 +60,7 @@
         return data;
       }
 
-      const loaded = StorageUtil.loadJSON('agp_game_data');
+      const loaded = StorageUtil.loadJSON(GAME_DATA_KEY);
       console.log('Loaded game data from storage:', loaded);
       const normalize = window.Converters?.normalizeSpecToEngine || normalizeSpecToEngine;
       console.log('Using normalize function:', normalize);

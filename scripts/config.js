@@ -69,5 +69,15 @@
         delayMs: 100, // 連続遷移時の負荷軽減
       },
     },
+    gameplay: {
+      keyboardShortcuts: {
+        // プレイ画面全体のキーボードショートカット有効/無効
+        enabled: true,
+        // ヘッダー系ショートカット（S=保存, L=読込, I=インベントリ）の有効/無効
+        headerShortcuts: true,
+        // 選択肢リスト内でのキーボードナビゲーション（矢印キー/数字キー）
+        choiceNavigation: true,
+      },
+    },
   };
 })();

@@ -3,6 +3,7 @@
 目的: 管理画面で作成したコンテンツをプレイ画面で解釈できる、最小限の分岐ゲームデータ形式を定義する。
 
 ## 1. 基本構造
+
 ```json
 {
   "version": "1.0",
@@ -18,17 +19,13 @@
       "id": "scene:start",
       "title": "はじまり",
       "text": "テキスト本文…",
-      "choices": [
-        { "id": "c1", "label": "次へ", "target": "scene:next" }
-      ]
+      "choices": [{ "id": "c1", "label": "次へ", "target": "scene:next" }]
     },
     {
       "id": "scene:next",
       "title": "つづき",
       "text": "テキスト本文…",
-      "choices": [
-        { "id": "back", "label": "戻る", "target": "scene:start" }
-      ]
+      "choices": [{ "id": "back", "label": "戻る", "target": "scene:start" }]
     }
   ]
 }
@@ -36,9 +33,11 @@
 
 - `meta.start`: 最初に表示するノードID
 - `nodes[*].text`: プレーンテキスト。将来、マークアップや装飾を拡張可能
-- `choices[*]`: 分岐先を指す。将来 `conditions` や `effects` を導入
+- `nodes[*].actions`: ノード到達時に実行されるアクション配列（インベントリ操作/変数操作/オーディオ制御など）
+- `choices[*]`: 分岐先を指す。任意で `conditions` や `effects` を付与可能
 
 ## 2. ドメイン拡張（所持品・キャラクター・Wiki）
+
 ゲーム内で参照頻度の高い情報を一元管理するため、以下のモジュールを追加します。
 
 ```json
@@ -58,9 +57,7 @@
       "name": "導師セレス",
       "roles": ["ガイド"],
       "summary": "主人公を導く老賢者。",
-      "relationships": [
-        { "target": "char:hero", "type": "mentor" }
-      ]
+      "relationships": [{ "target": "char:hero", "type": "mentor" }]
     }
   ],
   "lore": {
@@ -80,6 +77,7 @@
 ```
 
 ## 3. プレイヤー状態とセーブデータ
+
 - `state.inventory`: 所持品のID配列（`items[*].id`と対応）
 - `state.flags`: 条件分岐に用いるフラグ辞書（`{ "metMentor": true }` など）
 - `state.variables`: 数値/文字列の汎用ステータス
@@ -97,7 +95,9 @@
 ```
 
 ## 4. JSON Schema（拡張版）
+
 （バリデーション用ラフ案）
+
 ```json
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
@@ -140,6 +140,10 @@
                 "effects": { "type": "array" }
               }
             }
+          },
+          "actions": {
+            "type": "array",
+            "items": { "type": "object" }
           }
         }
       }
@@ -207,7 +211,10 @@
       "type": "object",
       "properties": {
         "inventory": { "type": "array", "items": { "type": "string" } },
-        "flags": { "type": "object", "additionalProperties": { "type": ["boolean", "number", "string"] } },
+        "flags": {
+          "type": "object",
+          "additionalProperties": { "type": ["boolean", "number", "string"] }
+        },
         "variables": { "type": "object", "additionalProperties": { "type": ["number", "string"] } },
         "history": { "type": "array", "items": { "type": "string" } }
       }
@@ -217,6 +224,7 @@
 ```
 
 ## 5. フロー（Mermaid）
+
 ```mermaid
 flowchart LR
   S[meta.start] --> N1[scene:start]
@@ -225,10 +233,12 @@ flowchart LR
 ```
 
 ## 6. 実装メモ
+
 - `scripts/play.js` は既存の `sampleData.js` を読む設計。今後、`game-data-schema` に準拠したJSONをインポートできるよう拡張する。
 - 保存はローカル（localStorage/IndexedDB）。プレビューやスナップショットは `StorageProvider`/`StorageBridge` を共通利用。
 
 ## 7. サンプルデータ
+
 拡張スキーマに対応したサンプルデータは `samples/` 配下に配置されています。`scripts/generate-samples.js` を実行して生成してください。
 
 - `samples/items.json`: アイテム（武器、消耗品）の例
@@ -237,9 +247,11 @@ flowchart LR
 - `samples/state.json`: プレイヤー状態（所持品、フラグ、変数、履歴）の例
 
 ## 8. データマイグレーション
+
 既存のレガシーデータ（`agp_manuscript_full`）を新しい拡張スキーマに移行する `scripts/dataMigration.js` が用意されています。ページ読み込み時に自動実行され、古いデータをアイテム・キャラクター・Wiki・状態に変換します。
 
 ### マイグレーションウィザード
+
 `scripts/migrationWizard.js` はユーザーが制御できる移行インターフェースを提供します。古いデータが存在する場合、ページ読み込み時にモーダルウィザードが表示され、以下の機能を提供します：
 
 - **データプレビュー**: 移行されるデータの種類と件数を事前に確認
@@ -247,6 +259,7 @@ flowchart LR
 - **進捗フィードバック**: 移行完了/失敗の通知
 
 ### 移行処理の詳細
+
 1. テキスト解析によりアイテム・キャラクター・Wikiを自動抽出
 2. 既存の履歴データを新しい状態モデルに移行
 3. 移行フラグを付与（再実行防止）

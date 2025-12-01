@@ -121,6 +121,10 @@ const myGame = {
 - `scripts/config.js` で各種設定変更可能
 - `APP_CONFIG.debug.enabled = true` でデバッグUI有効化
 - `APP_CONFIG.game.autoSave.enabled = true` で自動セーブ有効化
+- `APP_CONFIG.gameplay.keyboardShortcuts` でプレイ画面のキーボード操作を制御
+  - `enabled`: 矢印キーや R キーなどのショートカット全体のON/OFF
+  - `headerShortcuts`: S/L/I キーによるヘッダーボタン（保存/読込/インベントリ）操作のON/OFF
+  - `choiceNavigation`: 選択肢リスト内でのキーボードナビゲーション（矢印キー/数字キー）のON/OFF
 
 ### テスト
 
@@ -294,7 +298,7 @@ flowchart LR
 - →（ArrowRight）: 進む（`goForward()`）
 - R: リスタート（`reset()`）
 
-注: `APP_CONFIG.ui.shortcutsEnabled` が true の場合のみ有効。入力中（`input`/`textarea`/`contenteditable`）では無効化されます。
+注: `APP_CONFIG.gameplay.keyboardShortcuts.enabled` が true の場合のみ有効。入力中（`input`/`textarea`/`contenteditable`）では無効化されます。
 
 ## 設定
 
