@@ -15,9 +15,39 @@
 **前フェーズ**: フェーズ3 リファクタリング ✅ **完了**  
 **現在の位置**: フェーズ4 UI/UX改善・アクセシビリティ強化 **進行中**
 
-### 直近の変更 (2025-12-02 リモート同期)
+### 直近の変更 (2025-12-02 最新セッション)
 
-#### Game Data Integration & A11y Improvements ✅ (2025-12-02)
+#### アニメーション強化 ✅ (2025-12-02)
+
+- **modern.css拡張**: 包括的なアニメーションキーフレーム追加
+  - モーダル開閉アニメーション（scale + fade）
+  - パネルスライドアニメーション（左右）
+  - トースト通知スライドイン/アウト
+  - ボタン押下フィードバック
+  - フォーカス時のパルスアニメーション
+
+- **ToastManagerモジュール新規作成** (`scripts/toastManager.js`)
+  - Success/Warning/Error/Info タイプ対応
+  - 自動消去（設定可能な表示時間）
+  - 手動消去とdismissAll対応
+  - ARIA属性によるアクセシビリティ対応
+  - 使用例: `ToastManager.success('保存しました')`
+
+#### ダーク/ライトテーマ切り替え ✅ (2025-12-02)
+
+- **ライトテーマCSS変数追加** (`styles/modern.css`)
+  - `[data-theme="light"]` セレクタ対応
+  - OS設定連動（`prefers-color-scheme`）
+
+- **ThemeToggleモジュール新規作成** (`scripts/themeToggle.js`)
+  - setTheme/getTheme/toggle API
+  - ユーザー設定の永続化（localStorage）
+  - OS設定変更の自動検知
+  - モバイル向けmeta theme-color自動更新
+  - 使用例: `ThemeToggle.toggle()`, `ThemeToggle.setTheme('light')`
+
+#### Game Data Integration & A11y Improvements ✅ (2025-12-02 リモート)
+
 - ゲームデータ統合（admin/playモジュール間のストレージキー統一）
 - converters.js拡張（ノード画像/アクション/選択肢条件の保持）
 - gameplay.keyboardShortcuts設定追加（プレイ画面向け）
@@ -84,14 +114,15 @@
 | 1 | キーボードショートカット | ✅ 完了 | gameplay.keyboardShortcuts設定追加済み |
 | 2 | スクリーンリーダー対応 | 🔄 進行中 | シーンレンダリングとの連携実装済み |
 | 3 | フォーカス管理改善 | 🔄 進行中 | モーダルフォーカストラップ実装済み |
-| 4 | アニメーション強化 | 📋 未着手 | モーダル/パネル開閉、トースト通知 |
-| 5 | ダークテーマ導入 | 📋 未着手 | CSSカスタムプロパティ、OS設定連動 |
+| 4 | アニメーション強化 | ✅ 完了 | ToastManager、モーダル/パネルアニメーション |
+| 5 | ダークテーマ導入 | ✅ 完了 | ThemeToggle、OS設定連動対応 |
 
 ### 🔧 技術的負債対応
 
 | タスク | 状態 | 備考 |
 |--------|------|------|
-| npm test 404エラー修正 | 🔥 優先 | テストランナーのパス問題 |
+| npm test 404エラー修正 | 🔥 優先 | curlでHTML取得のみ→Puppeteer導入検討 |
+| 既存alertのToast置換 | 📋 次点 | ToastManager活用 |
 | 依存関係の最新化 | 📋 未着手 | npm update検討 |
 | パフォーマンス最適化 | 📋 未着手 | ローディング改善 |
 
@@ -117,7 +148,56 @@
 ---
 
 ## 最終更新日時
-**2025-12-02 15:40 JST** - フェーズ4 UI/UX改善進行中
+
+**2025-12-02 17:30 JST** - フェーズ4 アニメーション強化・ダークテーマ導入完了
+
+---
+
+## 次の担当者への引き継ぎ事項
+
+### 🚀 即時着手可能なタスク
+
+1. **npm test 404エラー修正**
+   - 問題: `run-tests.js`がcurlでHTMLを取得するだけでMochaテスト結果を判定できない
+   - 解決策: Puppeteerなどのヘッドレスブラウザ導入
+   - 関連ファイル: `scripts/run-tests.js`, `scripts/dev-server.js`, `tests/test.html`
+
+2. **既存alertのToast置換**
+   - 新しいToastManagerを活用してユーザー通知を改善
+   - `window.alert()` → `ToastManager.info()` など
+
+3. **ARIA属性の拡充**
+   - 残りのインタラクティブ要素にARIA属性を追加
+   - フォーカス順序の最適化
+
+### 📦 新規追加モジュールの使用方法
+
+```javascript
+// ToastManager - トースト通知
+ToastManager.success('保存しました');
+ToastManager.error('エラーが発生しました');
+ToastManager.warning('注意してください');
+ToastManager.info('情報メッセージ');
+ToastManager.dismiss(toastId);  // 手動消去
+ToastManager.dismissAll();       // 全消去
+
+// ThemeToggle - テーマ切り替え
+ThemeToggle.toggle();            // ダーク⇔ライト切り替え
+ThemeToggle.setTheme('dark');    // 'dark', 'light', 'auto'
+ThemeToggle.getTheme();          // 現在の設定を取得
+ThemeToggle.isDark();            // ダークテーマかどうか
+```
+
+### 📂 今回のセッションで変更/追加されたファイル
+
+- `styles/modern.css` - アニメーション強化、ライトテーマ追加
+- `scripts/toastManager.js` - **新規** トースト通知
+- `scripts/themeToggle.js` - **新規** テーマ切り替え
+- `scripts/config.js` - themeMode キー追加
+- `admin.html` - スクリプト読み込み追加
+- `play.html` - スクリプト読み込み追加
+- `CHANGELOG.md` - 変更履歴更新
+- `docs/HANDOVER.md` - 本ファイル
 
 #### UI/UX総改修 - Typora風モダンデザイン ✅ (2025-11-27)
 
