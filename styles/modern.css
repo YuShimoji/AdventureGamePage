@@ -844,9 +844,49 @@ th {
   to { opacity: 1; }
 }
 
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
 @keyframes slideIn {
   from { transform: translateY(10px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes slideOut {
+  from { transform: translateY(0); opacity: 1; }
+  to { transform: translateY(10px); opacity: 0; }
+}
+
+@keyframes slideInFromRight {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideOutToRight {
+  from { transform: translateX(0); opacity: 1; }
+  to { transform: translateX(100%); opacity: 0; }
+}
+
+@keyframes slideInFromBottom {
+  from { transform: translateY(100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes slideOutToBottom {
+  from { transform: translateY(0); opacity: 1; }
+  to { transform: translateY(100%); opacity: 0; }
+}
+
+@keyframes scaleIn {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+@keyframes scaleOut {
+  from { transform: scale(1); opacity: 1; }
+  to { transform: scale(0.95); opacity: 0; }
 }
 
 @keyframes pulse {
@@ -854,9 +894,167 @@ th {
   50% { opacity: 0.5; }
 }
 
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
+  20%, 40%, 60%, 80% { transform: translateX(4px); }
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+/* Animation utility classes */
 .animate-fadeIn { animation: fadeIn var(--transition-normal); }
+.animate-fadeOut { animation: fadeOut var(--transition-normal); }
 .animate-slideIn { animation: slideIn var(--transition-normal); }
+.animate-slideOut { animation: slideOut var(--transition-normal); }
+.animate-scaleIn { animation: scaleIn var(--transition-normal); }
+.animate-scaleOut { animation: scaleOut var(--transition-normal); }
 .animate-pulse { animation: pulse 2s infinite; }
+.animate-shake { animation: shake 0.5s ease; }
+.animate-bounce { animation: bounce 0.3s ease; }
+
+/* Modal overlay animation */
+.modal-overlay {
+  transition: opacity var(--transition-normal);
+}
+
+.modal-overlay[hidden] {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.modal-overlay:not([hidden]) {
+  opacity: 1;
+}
+
+/* Modal content animation */
+.modal-overlay .modal {
+  transition: transform var(--transition-normal), opacity var(--transition-normal);
+}
+
+.modal-overlay[hidden] .modal {
+  transform: scale(0.95) translateY(10px);
+  opacity: 0;
+}
+
+.modal-overlay:not([hidden]) .modal {
+  transform: scale(1) translateY(0);
+  opacity: 1;
+}
+
+/* Panel slide animation */
+.panel {
+  transition: transform var(--transition-slow), opacity var(--transition-slow);
+}
+
+.panel.collapsed,
+.panel[hidden] {
+  transform: translateX(-100%);
+  opacity: 0;
+}
+
+.panel:not(.collapsed):not([hidden]) {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+/* Right panel animation */
+.panel-right.collapsed,
+.panel-right[hidden] {
+  transform: translateX(100%);
+}
+
+.panel-right:not(.collapsed):not([hidden]) {
+  transform: translateX(0);
+}
+
+/* Toast notification styles */
+.toast-container {
+  position: fixed;
+  top: var(--space-lg);
+  right: var(--space-lg);
+  z-index: 10001;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  pointer-events: none;
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+  pointer-events: auto;
+  animation: slideInFromRight var(--transition-normal) ease-out;
+}
+
+.toast.toast-exiting {
+  animation: slideOutToRight var(--transition-normal) ease-in forwards;
+}
+
+.toast-success {
+  border-left: 3px solid var(--success);
+}
+
+.toast-warning {
+  border-left: 3px solid var(--warning);
+}
+
+.toast-error {
+  border-left: 3px solid var(--error);
+}
+
+.toast-info {
+  border-left: 3px solid var(--accent);
+}
+
+.toast-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.toast-message {
+  flex: 1;
+}
+
+.toast-close {
+  padding: var(--space-xs);
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: color var(--transition-fast), background var(--transition-fast);
+}
+
+.toast-close:hover {
+  color: var(--text-primary);
+  background: var(--bg-tertiary);
+}
+
+/* Button press feedback */
+.btn:active:not(:disabled) {
+  transform: scale(0.98);
+  transition: transform 0.05s ease;
+}
+
+/* Focus visible animation */
+.btn:focus-visible,
+.form-input:focus-visible,
+.form-select:focus-visible {
+  animation: pulse 0.3s ease;
+}
 
 /* ========================================
    15. Scrollbar Styling
