@@ -20,6 +20,12 @@ All notable changes to this project will be documented in this file.
   - converters.js拡張（ノード画像/アクション/選択肢条件の保持）
   - gameplay.keyboardShortcuts設定追加
   - スクリーンリーダーステータス更新の連携
+- feat(ui): ダーク/ライトテーマ切り替え機能追加
+  - ライトテーマ用CSS変数をmodern.cssに追加
+  - OS設定連動（prefers-color-scheme）対応
+  - ThemeToggleモジュール（setTheme/getTheme/toggle API）
+  - ユーザー設定の永続化とOS設定変更の検知
+  - モバイル向けmeta theme-color自動更新
 
 ## [2025-11-28]
 
