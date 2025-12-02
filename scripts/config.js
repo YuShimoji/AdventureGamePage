@@ -41,6 +41,7 @@
         gameProgress: 'agp_game_progress',
         saveSlots: 'agp_save_slots',
         theme: 'agp_theme',
+        themeMode: 'agp_theme_mode',
         sidebarState: 'agp_sidebar_state',
         sidebarOpen: 'agp_sidebar_open',
         sidebarMultiOpen: 'agp_sidebar_multi_open',

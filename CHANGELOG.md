@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2025-12-02]
+
+- feat(ui): アニメーション強化とトースト通知システム追加
+  - モーダル開閉アニメーション（スケール＋フェード）
+  - パネルスライドアニメーション（左右）
+  - トースト通知スライドイン/アウトアニメーション
+  - ボタン押下フィードバック
+  - フォーカス時のパルスアニメーション
+- feat(ui): ToastManagerモジュール追加
+  - Success/Warning/Error/Info タイプ対応
+  - 自動消去（設定可能な表示時間）
+  - 手動消去とdismissAll対応
+  - ARIA属性によるアクセシビリティ対応
+- feat(a11y): ゲームデータ統合とアクセシビリティ改善
+  - admin/playモジュール間のストレージキー統一
+  - converters.js拡張（ノード画像/アクション/選択肢条件の保持）
+  - gameplay.keyboardShortcuts設定追加
+  - スクリーンリーダーステータス更新の連携
+
 ## [2025-11-28]
 
 - refactor(storage): ストレージキー完全一元化完了
