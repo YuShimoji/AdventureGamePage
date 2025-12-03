@@ -149,42 +149,93 @@ function waitForServer(startPort, maxRetries = 10) {
 // Run tests
 function runTests() {
   return new Promise((resolve, reject) => {
-    const testProcess = spawn('curl', ['-f', TEST_URL], {
-      stdio: ['pipe', 'pipe', 'pipe'],
-      shell: true
-    });
+    const url = TEST_URL;
+    let finished = false;
 
-    let stdout = '';
-    let stderr = '';
+    log(`Running smoke test against ${url} ...`);
 
-    testProcess.stdout.on('data', (data) => {
-      stdout += data.toString();
-    });
+    const req = http.get(url, (res) => {
+      const { statusCode } = res;
+      log(`Test URL responded with status ${statusCode}`);
 
-    testProcess.stderr.on('data', (data) => {
-      stderr += data.toString();
-    });
+      // We don't need the full body for a smoke test; just drain it.
+      res.resume();
 
-    testProcess.on('close', (code) => {
-      if (code === 0) {
-        log('Tests passed');
+      if (finished) return;
+      finished = true;
+
+      if (statusCode === 200) {
+        log('Smoke test passed (HTTP 200)');
         resolve();
       } else {
-        error(`Tests failed with exit code ${code}`);
-        if (stderr) error(stderr);
-        reject(new Error('Tests failed'));
+        error(`Smoke test failed with status ${statusCode}`);
+        reject(new Error(`Smoke test failed with status ${statusCode}`));
       }
     });
 
-    testProcess.on('error', (err) => {
+    req.on('error', (err) => {
+      if (finished) return;
+      finished = true;
+      error(`Error requesting test URL: ${err.message}`);
       reject(err);
     });
 
     // Timeout
     setTimeout(() => {
-      testProcess.kill();
+      if (finished) return;
+      finished = true;
+      try {
+        req.destroy();
+      } catch {}
       reject(new Error('Test timeout'));
     }, TEST_TIMEOUT);
+  });
+}
+
+// Wait for server to be ready and get actual port
+function waitForServerFromOutput(serverProcess) {
+  return new Promise((resolve, reject) => {
+    let resolved = false;
+    let buffer = '';
+    const timeout = setTimeout(() => {
+      if (!resolved) {
+        reject(new Error('Dev server did not report ready state in time'));
+      }
+    }, SERVER_START_TIMEOUT);
+
+    const handleLine = (line) => {
+      const trimmed = line.trim();
+      if (trimmed) {
+        console.log(`[dev-server] ${trimmed}`);
+        const match = trimmed.match(/http:\/\/127\.0\.0\.1:(\d+)\//);
+        if (match && !resolved) {
+          resolved = true;
+          clearTimeout(timeout);
+          resolve(parseInt(match[1], 10));
+        }
+      }
+    };
+
+    serverProcess.stdout.on('data', (chunk) => {
+      buffer += chunk.toString();
+      const lines = buffer.split(/\r?\n/);
+      buffer = lines.pop();
+      lines.forEach(handleLine);
+    });
+
+    serverProcess.stdout.on('error', (err) => {
+      if (!resolved) {
+        clearTimeout(timeout);
+        reject(err);
+      }
+    });
+
+    serverProcess.on('exit', (code) => {
+      if (!resolved) {
+        clearTimeout(timeout);
+        reject(new Error(`Dev server exited with code ${code} before reporting ready state`));
+      }
+    });
   });
 }
 
