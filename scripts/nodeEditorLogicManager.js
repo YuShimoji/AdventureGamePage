@@ -12,7 +12,11 @@
         return;
       const raw = window.StorageUtil?.loadJSON?.(GAME_DATA_KEY, null) || null;
       if (!raw) {
-        alert('ゲームデータが見つかりません。プレイ用JSONをインポートしてください。');
+        if (window.ToastManager) {
+          ToastManager.warning('ゲームデータが見つかりません。プレイ用JSONをインポートしてください。');
+        } else {
+          alert('ゲームデータが見つかりません。プレイ用JSONをインポートしてください。');
+        }
         return;
       }
       let spec = null;
@@ -31,11 +35,19 @@
       window.NodeEditorUIManager.refreshNodeIdDatalist();
       window.NodeEditorUIManager.refreshUnresolvedPanel();
       window.NodeEditorUIManager.setDirty(false);
-      alert('ノード編集に取込みました');
+      if (window.ToastManager) {
+        ToastManager.success('ノード編集に取込みました');
+      } else {
+        alert('ノード編集に取込みました');
+      }
       window.NodeEditorUIManager.notifySpecUpdated();
     } catch (e) {
       console.error('NodeEditor.load', e);
-      alert('取込に失敗しました');
+      if (window.ToastManager) {
+        ToastManager.error('取込に失敗しました');
+      } else {
+        alert('取込に失敗しました');
+      }
     }
   }
 
@@ -74,13 +86,21 @@
       if (!engine) throw new Error('normalizeSpecToEngine 変換に失敗');
       window.StorageUtil?.saveJSON?.(GAME_DATA_KEY, engine);
       window.NodeEditorUIManager.setDirty(false);
-      alert('適用保存しました（play.html で反映）');
+      if (window.ToastManager) {
+        ToastManager.success('適用保存しました（play.html で反映）');
+      } else {
+        alert('適用保存しました（play.html で反映）');
+      }
     } catch (e) {
       console.error('NodeEditor.save', e);
       if (window.ErrorHandler) {
         window.ErrorHandler.showError(e, { details: 'ゲームデータの保存に失敗しました' });
       } else {
-        alert('適用保存に失敗しました');
+        if (window.ToastManager) {
+          ToastManager.error('適用保存に失敗しました');
+        } else {
+          alert('適用保存に失敗しました');
+        }
       }
     }
   }
@@ -99,7 +119,11 @@
       if (window.ErrorHandler) {
         window.ErrorHandler.showError(e, { details: 'JSONファイルのエクスポートに失敗しました' });
       } else {
-        alert('JSON出力に失敗しました');
+        if (window.ToastManager) {
+          ToastManager.error('JSON出力に失敗しました');
+        } else {
+          alert('JSON出力に失敗しました');
+        }
       }
     }
   }
@@ -138,9 +162,8 @@
             // 入力イベントをトリガーして保存処理を実行
             imageInput.dispatchEvent(new Event('input'));
             // Success notification
-            if (window.ErrorHandler) {
-              // For success messages, we can use a simple alert or create a success notification
-              alert('画像を挿入しました。保存してください。');
+            if (window.ToastManager) {
+              ToastManager.success('画像を挿入しました。保存してください。');
             } else {
               alert('画像を挿入しました。保存してください。');
             }
@@ -153,7 +176,11 @@
               details: '対応していないファイル形式がドロップされました',
             });
           } else {
-            alert('画像ファイルのみドロップ可能です。');
+            if (window.ToastManager) {
+              ToastManager.error('画像ファイルのみドロップ可能です。');
+            } else {
+              alert('画像ファイルのみドロップ可能です。');
+            }
           }
         }
       }
@@ -172,8 +199,8 @@
             imageInput.value = e.target.result;
             imageInput.dispatchEvent(new Event('input'));
             // Success notification
-            if (window.ErrorHandler) {
-              alert('画像を挿入しました。保存してください。');
+            if (window.ToastManager) {
+              ToastManager.success('画像を挿入しました。保存してください。');
             } else {
               alert('画像を挿入しました。保存してください。');
             }
@@ -439,7 +466,11 @@
               details: '部分エクスポートにはノードの選択が必要です',
             });
           } else {
-            alert('少なくとも1つノードを選択してください');
+            if (window.ToastManager) {
+              ToastManager.warning('少なくとも1つノードを選択してください');
+            } else {
+              alert('少なくとも1つノードを選択してください');
+            }
           }
           return;
         }
@@ -457,7 +488,11 @@
           if (window.ErrorHandler) {
             window.ErrorHandler.showError(e, { details: '部分エクスポートに失敗しました' });
           } else {
-            alert('部分エクスポートに失敗しました');
+            if (window.ToastManager) {
+              ToastManager.error('部分エクスポートに失敗しました');
+            } else {
+              alert('部分エクスポートに失敗しました');
+            }
           }
         }
       });

@@ -155,9 +155,12 @@
       switch (effect.type) {
         case 'show_text':
           if (effect.text) {
-            // Show text as an alert for now, could be enhanced to show in-game message
             setTimeout(() => {
-              alert(effect.text);
+              if (window.ToastManager) {
+                ToastManager.info(effect.text);
+              } else {
+                alert(effect.text);
+              }
             }, 500);
           }
           break;

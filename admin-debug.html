@@ -334,7 +334,14 @@
       </div>
     </main>
 
-    <div id="theme-panel" class="theme-panel" hidden></div>
+    <aside
+      id="theme-panel"
+      class="theme-panel"
+      hidden
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="theme-panel-title"
+    ></aside>
 
     <!-- フローティング：書式ツールバー -->
     <div id="formatbar" class="formatbar-floating">
@@ -374,9 +381,16 @@
     <button id="floating-panel-handle" class="floating-panel-handle" hidden>ツールを表示</button>
 
     <!-- メモパネル -->
-    <section id="memos-panel" class="memos-panel" hidden>
+    <section
+      id="memos-panel"
+      class="memos-panel"
+      hidden
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="memos-panel-title"
+    >
       <header class="memos-header">
-        <h3>メモ</h3>
+        <h3 id="memos-panel-title">メモ</h3>
         <select id="memos-sort">
           <option value="createdAt_desc">作成日時(新→旧)</option>
           <option value="createdAt_asc">作成日時(旧→新)</option>
@@ -395,10 +409,17 @@
     </section>
 
     <!-- 保存プレビューパネル -->
-    <section id="preview-panel" class="preview-panel overlay-panel" hidden>
+    <section
+      id="preview-panel"
+      class="preview-panel overlay-panel"
+      hidden
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="preview-panel-title"
+    >
       <header class="preview-header" style="flex-direction: column; align-items: stretch; gap: 12px;">
         <div style="display: flex; align-items: center; gap: 12px;">
-          <h3 style="margin: 0;">保存プレビュー</h3>
+          <h3 id="preview-panel-title" style="margin: 0;">保存プレビュー</h3>
           <div class="spacer"></div>
           <button id="snapshot-compare-btn" class="btn" disabled>比較 (0/2)</button>
           <button id="preview-delete-selected" class="btn" disabled>選択削除</button>

@@ -127,15 +127,65 @@
 
     if (!panel) return;
 
-    function toggle() {
-      panel.hidden = !panel.hidden;
-      if (!panel.hidden) refresh();
+    let lastFocused = null;
+
+    function openPanel() {
+      if (!panel.hidden) return;
+      lastFocused = document.activeElement;
+      panel.hidden = false;
+      panel.removeAttribute("aria-hidden");
+      panel.removeAttribute("inert");
+      if (openBtn) {
+        openBtn.setAttribute("aria-expanded", "true");
+      }
+      refresh();
+
+      // 初期フォーカス: ラベル入力か最初のフォーカス可能要素
+      const firstFocusable =
+        (labelIn && typeof labelIn.focus === "function" && labelIn) ||
+        panel.querySelector(
+          'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        );
+      if (firstFocusable && typeof firstFocusable.focus === "function") {
+        try {
+          firstFocusable.focus();
+        } catch {}
+      }
     }
 
-    if (openBtn) openBtn.addEventListener("click", toggle);
+    function closePanel() {
+      if (panel.hidden) return;
+      panel.hidden = true;
+      panel.setAttribute("aria-hidden", "true");
+      panel.setAttribute("inert", "");
+      if (openBtn) {
+        openBtn.setAttribute("aria-expanded", "false");
+      }
+      const target =
+        (lastFocused && typeof lastFocused.focus === "function" && lastFocused) ||
+        openBtn;
+      if (target && typeof target.focus === "function") {
+        try {
+          target.focus();
+        } catch {}
+      }
+    }
+
+    function toggle() {
+      if (panel.hidden) {
+        openPanel();
+      } else {
+        closePanel();
+      }
+    }
+
+    if (openBtn) {
+      openBtn.setAttribute("aria-expanded", "false");
+      openBtn.addEventListener("click", toggle);
+    }
     if (closeBtn)
       closeBtn.addEventListener("click", () => {
-        panel.hidden = true;
+        closePanel();
       });
     if (addBtn)
       addBtn.addEventListener("click", () => {

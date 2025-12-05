@@ -79,7 +79,7 @@
         const engine = StorageUtil.loadJSON(GAME_DATA_KEY);
         const spec = engineToSpec(engine || window.SAMPLE_GAME);
         if (!spec) {
-          alert("エクスポート可能なゲームデータがありません");
+          ToastManager.warning("エクスポート可能なゲームデータがありません");
           return;
         }
         const title = spec?.meta?.title || "Adventure";

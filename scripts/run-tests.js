@@ -146,10 +146,13 @@ function waitForServer(startPort, maxRetries = 10) {
   });
 }
 
-// Run tests
-function runTests() {
+function wait(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+// Single smoke test attempt
+function runSmokeTestOnce(url) {
   return new Promise((resolve, reject) => {
-    const url = TEST_URL;
     let finished = false;
 
     log(`Running smoke test against ${url} ...`);
@@ -168,7 +171,6 @@ function runTests() {
         log('Smoke test passed (HTTP 200)');
         resolve();
       } else {
-        error(`Smoke test failed with status ${statusCode}`);
         reject(new Error(`Smoke test failed with status ${statusCode}`));
       }
     });
@@ -176,8 +178,7 @@ function runTests() {
     req.on('error', (err) => {
       if (finished) return;
       finished = true;
-      error(`Error requesting test URL: ${err.message}`);
-      reject(err);
+      reject(new Error(`Error requesting test URL: ${err.message}`));
     });
 
     // Timeout
@@ -190,6 +191,26 @@ function runTests() {
       reject(new Error('Test timeout'));
     }, TEST_TIMEOUT);
   });
+}
+
+// Run tests with a couple of retries to avoid transient 404/connection issues
+async function runTests(retries = 3, delayMs = 500) {
+  const url = TEST_URL;
+  let lastError = null;
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      await runSmokeTestOnce(url);
+      return;
+    } catch (err) {
+      lastError = err;
+      error(`${err.message} (attempt ${attempt}/${retries})`);
+      if (attempt < retries) {
+        log(`Retrying in ${delayMs}ms...`);
+        await wait(delayMs);
+      }
+    }
+  }
+  throw lastError || new Error('Smoke test failed');
 }
 
 // Wait for server to be ready and get actual port
@@ -250,7 +271,8 @@ async function main() {
     // Check if port is in use
     const isPortInUse = await checkPort(PORT);
     if (isPortInUse) {
-      log(`Port ${PORT} is in use, but dev-server will find an available port automatically...`);
+      log(`Port ${PORT} is in use, attempting to free it before starting dev-server...`);
+      await killPortProcess(PORT);
     }
 
     log('Starting development server...');

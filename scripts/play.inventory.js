@@ -100,7 +100,7 @@
               if (item.effect && typeof item.effect === 'object') {
                 this.executeItemEffect(item);
               }
-              alert(`"${item.name}" を使用しました`);
+              ToastManager.success(`"${item.name}" を使用しました`);
               // Remove one from inventory (consume)
               this.engine.removeItem(item.id, 1);
               this.updateInventoryList(container);
@@ -203,7 +203,7 @@
         case 'show_text':
           // Show text message
           if (effect.text) {
-            alert(effect.text);
+            ToastManager.info(effect.text);
           }
           break;
         default:

@@ -49,7 +49,7 @@
           if (window.Validator?.validateGameSpec && Array.isArray(obj?.nodes)) {
             const v = window.Validator.validateGameSpec(obj);
             if (!v.ok) {
-              alert("ゲームJSONの検証に失敗しました:\n- " + v.errors.join("\n- "));
+              ToastManager.error("ゲームJSONの検証に失敗しました:\n- " + v.errors.join("\n- "));
               return;
             }
           }
@@ -57,11 +57,11 @@
             ? window.Converters.normalizeSpecToEngine(obj)
             : normalizeSpecToEngine(obj);
           if (!engine) {
-            alert("対応していない形式です");
+            ToastManager.error("対応していない形式です");
             return;
           }
           StorageUtil.saveJSON(GAME_DATA_KEY, engine);
-          alert("ゲームJSONを読み込みました。ページを再読み込みします。");
+          ToastManager.success("ゲームJSONを読み込みました。ページを再読み込みします。");
           location.reload();
         } catch (e) {
           console.error(e);
@@ -78,7 +78,7 @@
           } else {
             errorMsg += `\nエラー: ${e.message}`;
           }
-          alert(errorMsg);
+          ToastManager.error(errorMsg);
         }
       };
       reader.readAsText(file);

@@ -120,7 +120,7 @@
           if (slotName) {
             this.saveGameToStorage(this.engine.saveGame(slotName));
             playSave.hideModal();
-            alert('ゲームデータを保存しました');
+            ToastManager.success('ゲームデータを保存しました');
           }
         });
       }
@@ -195,9 +195,9 @@
         loadBtn.addEventListener('click', () => {
           if (this.engine.loadGame(save)) {
             playSave.hideModal();
-            alert('ゲームデータを読み込みました');
+            ToastManager.success('ゲームデータを読み込みました');
           } else {
-            alert('ゲームデータの読み込みに失敗しました');
+            ToastManager.error('ゲームデータの読み込みに失敗しました');
           }
         });
 
@@ -276,10 +276,10 @@
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
 
-        alert('セーブデータをエクスポートしました');
+        ToastManager.success('セーブデータをエクスポートしました');
       } catch (error) {
         console.error('Export failed:', error);
-        alert('エクスポートに失敗しました');
+        ToastManager.error('エクスポートに失敗しました');
       }
     },
 
@@ -323,10 +323,10 @@
 
             existing.push(saveData);
             StorageUtil.saveJSON(key, existing);
-            alert(`セーブデータをインポートしました: ${finalSlotName}`);
+            ToastManager.success(`セーブデータをインポートしました: ${finalSlotName}`);
           } catch (error) {
             console.error('Import failed:', error);
-            alert('インポートに失敗しました。ファイル形式が正しいか確認してください。');
+            ToastManager.error('インポートに失敗しました。ファイル形式が正しいか確認してください。');
           }
         };
         reader.readAsText(file);

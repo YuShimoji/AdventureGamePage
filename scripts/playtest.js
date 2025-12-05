@@ -9,6 +9,8 @@
 
     if (!modal || !iframe || !closeBtn || !inlineBtn || !windowBtn) return;
 
+    let lastFocused = null;
+
     // Ensure modal starts hidden even if inline styles persisted
     modal.hidden = true;
     modal.style.display = "none";
@@ -19,6 +21,11 @@
       iframe.src = "play.html";
       modal.hidden = false;
       modal.style.display = "flex";
+      modal.setAttribute("aria-hidden", "false");
+      lastFocused = document.activeElement;
+      try {
+        closeBtn.focus();
+      } catch {}
       if (statusEl) statusEl.textContent = "プレイテストを開始しました。";
     }
 
@@ -27,7 +34,16 @@
       iframe.src = "about:blank";
       modal.hidden = true;
       modal.style.display = "none";
+      modal.setAttribute("aria-hidden", "true");
       if (statusEl) statusEl.textContent = "";
+      const target =
+        (lastFocused && typeof lastFocused.focus === "function" && lastFocused) ||
+        inlineBtn;
+      if (target && typeof target.focus === "function") {
+        try {
+          target.focus();
+        } catch {}
+      }
     }
 
     function openInNewWindow() {

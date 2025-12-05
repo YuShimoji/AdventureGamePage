@@ -38,7 +38,7 @@
         if (fileInput && typeof fileInput.click === 'function') {
           fileInput.click();
         } else {
-          alert('ゲームJSON読込用の入力が見つかりませんでした。');
+          ToastManager.error('ゲームJSON読込用の入力が見つかりませんでした。');
         }
       });
     }
@@ -70,7 +70,7 @@
         // Add rusty key when entering the key node
         engine.addItem('rusty_key');
         setTimeout(() => {
-          alert('錆びた鍵を手に入れた！');
+          ToastManager.success('錆びた鍵を手に入れた！');
         }, 500);
       }
     });
@@ -79,6 +79,8 @@
     const btnTheme = document.getElementById('btn-theme');
     if (btnTheme) {
       btnTheme.addEventListener('click', () => {
+      });
+    }
 
     // Additional UI/event hooks below require engine context
     document.addEventListener('agp-auto-save', () => {
@@ -345,9 +347,9 @@
           if (confirm(`"${slot.name}" を読み込みますか？現在の進行状況は失われます。`)) {
             if (engine.loadFromSlot(slot.id)) {
               hideSaveSlotsPanel();
-              alert('セーブデータを読み込みました');
+              ToastManager.success('セーブデータを読み込みました');
             } else {
-              alert('読み込みに失敗しました');
+              ToastManager.error('読み込みに失敗しました');
             }
           }
         });
@@ -358,9 +360,9 @@
         saveBtn.addEventListener('click', () => {
           if (engine.saveToSlot(slot.id)) {
             updateSaveSlotsList();
-            alert('上書き保存しました');
+            ToastManager.success('上書き保存しました');
           } else {
-            alert('保存に失敗しました');
+            ToastManager.error('保存に失敗しました');
           }
         });
 
@@ -373,7 +375,7 @@
             if (engine.renameSlot(slot.id, newName.trim())) {
               updateSaveSlotsList();
             } else {
-              alert('名前変更に失敗しました');
+              ToastManager.error('名前変更に失敗しました');
             }
           }
         });
@@ -386,7 +388,7 @@
             if (engine.deleteSlot(slot.id)) {
               updateSaveSlotsList();
             } else {
-              alert('削除に失敗しました');
+              ToastManager.error('削除に失敗しました');
             }
           }
         });
@@ -425,9 +427,9 @@
           const slotId = `slot_${Date.now()}`;
           if (engine.createSlot(slotId, slotName.trim())) {
             updateSaveSlotsList();
-            alert(`スロット "${slotName.trim()}" を作成しました`);
+            ToastManager.success(`スロット "${slotName.trim()}" を作成しました`);
           } else {
-            alert('スロット作成に失敗しました');
+            ToastManager.error('スロット作成に失敗しました');
           }
         }
       });
@@ -462,7 +464,7 @@
         return;
       }
       console.error('Play initialization failed:', error);
-      alert(`プレイヤー初期化に失敗しました: ${error.message}`);
+      ToastManager.error(`プレイヤー初期化に失敗しました: ${error.message}`);
     }
   });
 

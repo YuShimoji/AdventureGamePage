@@ -49,7 +49,7 @@
         if(data) {
           itemId.value = data;
           updateAction();
-          alert('アイテムIDを挿入しました。');
+          ToastManager.info('アイテムIDを挿入しました。');
         }
       });
 

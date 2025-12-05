@@ -351,7 +351,7 @@
         // Apply some automatic improvements
         applyAutomaticImprovements(spec);
         modal.remove();
-        alert('自動改善を適用しました');
+        ToastManager.success('自動改善を適用しました');
       });
     }
 

@@ -11,7 +11,11 @@
         engine.loadProgress();
       } catch (e) {
         console.error('進行データの読み込みエラー:', e);
-        alert('進行データの読み込みに失敗しました。最初から開始します。');
+        if (window.ToastManager) {
+          ToastManager.error('進行データの読み込みに失敗しました。最初から開始します。');
+        } else {
+          alert('進行データの読み込みに失敗しました。最初から開始します。');
+        }
         engine.reset();
       }
 

@@ -113,7 +113,11 @@ function showMigrationWizard() {
       if (backupCreated) {
         document.getElementById('migration-restore').addEventListener('click', () => {
           restoreFromBackup();
-          alert('バックアップから復元しました。');
+          if (window.ToastManager) {
+            ToastManager.success('バックアップから復元しました。');
+          } else {
+            alert('バックアップから復元しました。');
+          }
           overlay.remove();
         });
       }

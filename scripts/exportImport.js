@@ -191,7 +191,7 @@
         downloadBlob(blob, filename);
         dialog.remove();
       } catch (e) {
-        alert("エクスポート失敗: " + e.message);
+        ToastManager.error("エクスポート失敗: " + e.message);
       }
     });
 
@@ -259,10 +259,16 @@
         if (results.conflicts.length) message += `, ${results.conflicts.length}件競合`;
         if (results.errors.length) message += `, ${results.errors.length}件エラー`;
 
-        alert(message);
+        if (results.errors.length) {
+          ToastManager.error(message);
+        } else if (results.conflicts.length) {
+          ToastManager.warning(message);
+        } else {
+          ToastManager.success(message);
+        }
         dialog.remove();
       } catch (e) {
-        alert("インポート失敗: " + e.message);
+        ToastManager.error("インポート失敗: " + e.message);
       }
     });
 

@@ -18,10 +18,12 @@
       const header = document.createElement('div');
       header.className = 'theme-panel-header';
       const title = document.createElement('h3');
+      title.id = 'theme-panel-title';
       title.textContent = 'テーマ設定';
       const closeBtn = document.createElement('button');
       closeBtn.className = 'btn btn-ghost btn-sm';
       closeBtn.textContent = '✕';
+      closeBtn.setAttribute('aria-label', 'テーマ設定を閉じる');
       closeBtn.onclick = () => { themePanel.hidden = true; };
       header.appendChild(title);
       header.appendChild(closeBtn);

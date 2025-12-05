@@ -118,10 +118,18 @@
       try {
         window.gameEngine.executeAction(action);
         console.log(`変数操作: ${key} ${operation} ${value}`);
-        alert(`変数を設定しました: ${key} = ${value}`);
+        if (window.ToastManager) {
+          ToastManager.success(`変数を設定しました: ${key} = ${value}`);
+        } else {
+          alert(`変数を設定しました: ${key} = ${value}`);
+        }
       } catch (e) {
         console.error('変数設定エラー:', e);
-        alert('変数設定に失敗しました');
+        if (window.ToastManager) {
+          ToastManager.error('変数設定に失敗しました');
+        } else {
+          alert('変数設定に失敗しました');
+        }
       }
     }
   }
@@ -132,10 +140,18 @@
         const state = window.gameEngine.getState ? window.gameEngine.getState() : {};
         const vars = state.variables || {};
         console.log('現在の変数:', vars);
-        alert(`現在の変数:\n${JSON.stringify(vars, null, 2)}`);
+        if (window.ToastManager) {
+          ToastManager.info(`現在の変数:\n${JSON.stringify(vars, null, 2)}`);
+        } else {
+          alert(`現在の変数:\n${JSON.stringify(vars, null, 2)}`);
+        }
       } catch (e) {
         console.error('変数取得エラー:', e);
-        alert('変数取得に失敗しました');
+        if (window.ToastManager) {
+          ToastManager.error('変数取得に失敗しました');
+        } else {
+          alert('変数取得に失敗しました');
+        }
       }
     }
   }

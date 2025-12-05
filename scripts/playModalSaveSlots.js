@@ -125,7 +125,7 @@
       if (confirm('"' + slot.name + '" を読み込みますか？現在の進行状況は失われます。')) {
         if (engineRef.loadFromSlot(slot.id)) {
           this.hideSaveSlotsPanel();
-          alert('セーブデータを読み込みました');
+          ToastManager.success('セーブデータを読み込みました');
         } else {
           this.showError('読み込みに失敗しました', 'セーブデータの読み込みに失敗しました');
         }
@@ -135,7 +135,7 @@
     saveToSlot(slot) {
       if (engineRef.saveToSlot(slot.id)) {
         this.updateSaveSlotsList();
-        alert('上書き保存しました');
+        ToastManager.success('上書き保存しました');
       } else {
         this.showError('保存に失敗しました', 'セーブデータの保存に失敗しました');
       }
@@ -168,7 +168,7 @@
         const slotId = 'slot_' + Date.now();
         if (engineRef.createSlot(slotId, slotName.trim())) {
           this.updateSaveSlotsList();
-          alert('スロット "' + slotName.trim() + '" を作成しました');
+          ToastManager.success('スロット "' + slotName.trim() + '" を作成しました');
         } else {
           this.showError('スロット作成に失敗しました', '新しいセーブスロットの作成に失敗しました');
         }
@@ -180,7 +180,7 @@
         const error = new Error(message);
         window.ErrorHandler.showError(error, { details });
       } else {
-        alert(message);
+        ToastManager.error(message);
       }
     },
 

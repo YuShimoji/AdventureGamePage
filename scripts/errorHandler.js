@@ -191,7 +191,11 @@
 
     async attemptDataRepair() {
       if (!window.DataValidator) {
-        alert("データ修復機能が利用できません");
+        if (window.ToastManager) {
+          ToastManager.error("データ修復機能が利用できません");
+        } else {
+          alert("データ修復機能が利用できません");
+        }
         return;
       }
 
@@ -207,15 +211,27 @@
           if (result.success) {
             window.StorageUtil?.saveJSON(gameDataKey, result.data);
             progress.remove();
-            alert(`データ修復が完了しました。\n\n修復内容:\n- ${result.repairs.join("\n- ")}`);
+            if (window.ToastManager) {
+              ToastManager.success(`データ修復が完了しました。\n\n修復内容:\n- ${result.repairs.join("\n- ")}`);
+            } else {
+              alert(`データ修復が完了しました。\n\n修復内容:\n- ${result.repairs.join("\n- ")}`);
+            }
           } else {
             progress.remove();
-            alert("修復可能な問題が見つかりませんでした");
+            if (window.ToastManager) {
+              ToastManager.info("修復可能な問題が見つかりませんでした");
+            } else {
+              alert("修復可能な問題が見つかりませんでした");
+            }
           }
         }
       } catch (e) {
         console.error("Repair failed:", e);
-        alert("データ修復に失敗しました: " + e.message);
+        if (window.ToastManager) {
+          ToastManager.error("データ修復に失敗しました: " + e.message);
+        } else {
+          alert("データ修復に失敗しました: " + e.message);
+        }
       }
     },
 

@@ -33,8 +33,10 @@
                 if (window.AdminEditor && window.AdminEditor.updateCharCount) {
                   window.AdminEditor.updateCharCount(document.getElementById('editor'), document.getElementById('char-count'));
                 }
-                alert('インポートしました');
-              } catch (e) { alert('JSON の読み込みに失敗しました'); }
+                ToastManager.success('インポートしました');
+              } catch (e) {
+                ToastManager.error('JSON の読み込みに失敗しました');
+              }
             };
             reader.readAsText(file);
             ev.target.value = '';
@@ -138,7 +140,7 @@
                     panel.hidden = !( (v.errors&&v.errors.length) || (v.warnings&&v.warnings.length) );
                   }
                 } catch(e){ /* non-blocking */ }
-                if(!v.ok){ alert('ゲームJSONの検証に失敗しました:\n- ' + v.errors.join('\n- ')); return; }
+                if(!v.ok){ ToastManager.error('ゲームJSONの検証に失敗しました:\n- ' + v.errors.join('\n- ')); return; }
                 if(v.warnings && v.warnings.length){ console.warn('GameSpec warnings:', v.warnings); }
               }
               // Convert to engine format
@@ -154,8 +156,8 @@
                   })();
               StorageUtil.saveJSON('agp_game_data', engineData);
               try { document.getElementById('ne-load')?.click(); } catch{}
-              alert('ゲームJSONをインポートしました（プレイ画面/NodeEditorで使用されます）');
-            } catch(e){ console.error(e); alert('ゲームJSON の読み込み/変換に失敗しました'); }
+              ToastManager.success('ゲームJSONをインポートしました（プレイ画面/NodeEditorで使用されます）');
+            } catch(e){ console.error(e); ToastManager.error('ゲームJSON の読み込み/変換に失敗しました'); }
           };
           reader.readAsText(file);
           ev.target.value = '';
