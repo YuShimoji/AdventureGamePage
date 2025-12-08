@@ -174,7 +174,7 @@
 
 ## 最終更新日時
 
-**2025-12-05 17:30 JST** - フェーズ4 UI/UX改善（Toast統合・テスト安定化・A11y強化）反映
+**2025-12-08 17:30 JST** - フェーズ4 UI/UX改善（Toast統合・テスト安定化・A11y強化）反映
 
 ---
 
@@ -411,7 +411,7 @@ scripts/
 - **サーバー起動**: Live Serverまたは`python -m http.server 5500`
 - **ブラウザ**: Chrome/Firefox/Edge対応
 - **デバッグ**: DevToolsのConsoleでエラー確認
-- **テスト**: `npm test`（現在404エラー中）
+- **テスト**: `npm test`（dev-server + `/tests/test.html` スモークテスト）
 
 ### データ管理
 - **LocalStorage**: `agp_*` 接頭辞
@@ -438,5 +438,5 @@ scripts/
 ## 連絡先・問い合わせ
 
 **プロジェクトリポジトリ**: https://github.com/YuShimoji/AdventureGamePage  
-**最終更新**: 2025-12-05  
+**最終更新**: 2025-12-08  
 **担当者**: AI Assistant (Cascade)
