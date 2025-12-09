@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2025-12-09]
+
+- feat(a11y): Admin Mermaidフルスクリーンモーダルのアクセシビリティ改善
+  - `admin.html` の `#mermaid-fullscreen-modal` に ARIA属性（`role="dialog"`, `aria-modal`, `aria-labelledby`, `aria-hidden`）を追加
+  - `scripts/mermaidPreviewUIEvents.js` のフルスクリーン表示処理でフォーカス退避・復帰、Escキー/バックドロップでのクローズを実装
+- test: `npm test` で dev-server + `/tests/test.html` スモークテストが成功することを再確認
+
 ## [2025-12-02]
 
 - feat(ui): アニメーション強化とトースト通知システム追加

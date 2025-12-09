@@ -683,9 +683,17 @@
     </section>
 
     <!-- Mermaid Fullscreen Modal -->
-    <div id="mermaid-fullscreen-modal" class="mermaid-fullscreen-modal" hidden>
+    <div
+      id="mermaid-fullscreen-modal"
+      class="mermaid-fullscreen-modal"
+      hidden
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="mermaid-fullscreen-title"
+      aria-hidden="true"
+    >
       <div class="mermaid-fullscreen-header">
-        <h3>分岐プレビュー（フルスクリーン）</h3>
+        <h3 id="mermaid-fullscreen-title">分岐プレビュー（フルスクリーン）</h3>
         <button id="mermaid-fullscreen-close" class="btn btn-ghost btn-sm" title="閉じる">閉じる</button>
       </div>
       <div class="mermaid-fullscreen-content">

@@ -99,6 +99,32 @@
       const { fullscreenBtn } = window.MermaidPreviewUIState.getUIRefs();
       const { view } = window.MermaidPreviewUIState.getUIRefs();
 
+      let lastFocused = null;
+      let keydownHandler = null;
+
+      function closeModal() {
+        const modal = document.getElementById("mermaid-fullscreen-modal");
+        if (!modal) return;
+
+        modal.hidden = true;
+        modal.setAttribute("aria-hidden", "true");
+        modal.removeAttribute("tabindex");
+
+        if (keydownHandler) {
+          document.removeEventListener("keydown", keydownHandler, true);
+          keydownHandler = null;
+        }
+
+        const target =
+          (lastFocused && typeof lastFocused.focus === "function" && lastFocused) ||
+          fullscreenBtn;
+        if (target && typeof target.focus === "function") {
+          try {
+            target.focus();
+          } catch {}
+        }
+      }
+
       if (fullscreenBtn) {
         fullscreenBtn.addEventListener("click", () => {
           const { mainView } = window.MermaidPreviewUIState.getUIRefs();
@@ -114,7 +140,43 @@
           } else {
             modalView.innerHTML = mainView.innerHTML;
           }
+
+          lastFocused = document.activeElement;
+
+          if (!modal.hasAttribute("role")) modal.setAttribute("role", "dialog");
+          if (!modal.hasAttribute("aria-modal")) modal.setAttribute("aria-modal", "true");
+
           modal.hidden = false;
+          modal.setAttribute("aria-hidden", "false");
+          if (!modal.hasAttribute("tabindex")) modal.setAttribute("tabindex", "-1");
+
+          const closeBtn = document.getElementById("mermaid-fullscreen-close");
+          const focusTarget =
+            (closeBtn && typeof closeBtn.focus === "function" && closeBtn) || modal;
+          if (focusTarget && typeof focusTarget.focus === "function") {
+            try {
+              focusTarget.focus();
+            } catch {}
+          }
+
+          keydownHandler = (e) => {
+            if (e.key === "Escape") {
+              e.preventDefault();
+              closeModal();
+            }
+          };
+          document.addEventListener("keydown", keydownHandler, true);
+
+          // Close on backdrop click
+          modal.addEventListener(
+            "click",
+            (ev) => {
+              if (ev.target === modal) {
+                closeModal();
+              }
+            },
+            { once: true }
+          );
         });
       }
 
@@ -122,8 +184,7 @@
       const fullscreenCloseBtn = document.getElementById("mermaid-fullscreen-close");
       if (fullscreenCloseBtn) {
         fullscreenCloseBtn.addEventListener("click", () => {
-          const modal = document.getElementById("mermaid-fullscreen-modal");
-          if (modal) modal.hidden = true;
+          closeModal();
         });
       }
     },
