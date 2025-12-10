@@ -1,20 +1,30 @@
 (function () {
   // Play Inventory Module - Inventory UI and management
   window.PlayInventory = {
-    init: function(engine) {
+    init: function (engine) {
       this.engine = engine;
       this.setupInventoryPanel();
       this.setupInventoryListeners();
     },
 
-    setupInventoryPanel: function() {
+    setupInventoryPanel: function () {
       const inventoryPanel = document.getElementById('inventory-panel');
       const inventoryCloseBtn = document.getElementById('inventory-close');
       const inventoryList = document.getElementById('inventory-list');
 
+      const btnInventory = document.getElementById('btn-inventory');
+
       const showInventoryPanel = () => {
         this.updateInventoryList(inventoryList);
-        if (inventoryPanel) {
+        if (!inventoryPanel) return;
+
+        // Prefer centralized modal focus manager when available
+        if (
+          window.PlayModalFocus &&
+          typeof window.PlayModalFocus.openModalWithFocus === 'function'
+        ) {
+          window.PlayModalFocus.openModalWithFocus(inventoryPanel);
+        } else {
           inventoryPanel.hidden = false;
           inventoryPanel.style.display = 'block';
           // Prevent background scrolling on mobile
@@ -22,14 +32,30 @@
             document.body.style.overflow = 'hidden';
           }
         }
+
+        if (btnInventory) {
+          btnInventory.setAttribute('aria-expanded', 'true');
+        }
       };
 
       const hideInventoryPanel = () => {
-        if (inventoryPanel) {
+        if (!inventoryPanel) return;
+
+        // Prefer centralized modal focus manager when available
+        if (
+          window.PlayModalFocus &&
+          typeof window.PlayModalFocus.closeModalWithFocus === 'function'
+        ) {
+          window.PlayModalFocus.closeModalWithFocus(inventoryPanel);
+        } else {
           inventoryPanel.hidden = true;
           inventoryPanel.style.display = 'none';
           // Restore scrolling
           document.body.style.overflow = '';
+        }
+
+        if (btnInventory) {
+          btnInventory.setAttribute('aria-expanded', 'false');
         }
       };
 
@@ -38,7 +64,7 @@
       }
 
       if (inventoryPanel) {
-        inventoryPanel.addEventListener('click', (e) => {
+        inventoryPanel.addEventListener('click', e => {
           if (e.target === inventoryPanel) hideInventoryPanel();
         });
       }
@@ -48,7 +74,7 @@
       this.hideInventoryPanel = hideInventoryPanel;
     },
 
-    updateInventoryList: function(container) {
+    updateInventoryList: function (container) {
       if (!container) return;
 
       const inventory = this.engine.getInventory();
@@ -115,7 +141,10 @@
         dropBtn.textContent = '捨てる';
         dropBtn.addEventListener('click', () => {
           const maxDroppable = item.quantity;
-          const quantityToDrop = maxDroppable === 1 ? 1 : parseInt(prompt(`捨てる個数を入力してください (1-${maxDroppable}):`, '1')) || 0;
+          const quantityToDrop =
+            maxDroppable === 1
+              ? 1
+              : parseInt(prompt(`捨てる個数を入力してください (1-${maxDroppable}):`, '1')) || 0;
 
           if (quantityToDrop > 0 && quantityToDrop <= maxDroppable) {
             if (confirm(`${quantityToDrop}個の "${item.name}" を捨てますか？`)) {
@@ -142,7 +171,7 @@
       }
     },
 
-    setupInventoryListeners: function() {
+    setupInventoryListeners: function () {
       const btnInventory = document.getElementById('btn-inventory');
 
       if (btnInventory) {
@@ -169,7 +198,7 @@
     },
 
     // Execute item effect based on effect type
-    executeItemEffect: function(item) {
+    executeItemEffect: function (item) {
       if (!item.effect) return;
 
       const effect = item.effect;
@@ -178,7 +207,10 @@
           // Heal player (if health system exists)
           if (this.engine.setPlayerState) {
             const state = this.engine.getPlayerState();
-            const newHealth = Math.min((state.health || 0) + (effect.value || 10), effect.maxHealth || 100);
+            const newHealth = Math.min(
+              (state.health || 0) + (effect.value || 10),
+              effect.maxHealth || 100
+            );
             this.engine.setPlayerState({ ...state, health: newHealth });
           }
           break;
@@ -209,6 +241,6 @@
         default:
           console.warn('Unknown item effect type:', effect.type);
       }
-    }
+    },
   };
 })();
