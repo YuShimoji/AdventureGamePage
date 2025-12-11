@@ -4,7 +4,7 @@
 
 **プロジェクト名**: AdventureGamePage  
 **目的**: ストーリー・テキストエンジン（アドベンチャーゲーム生成エンジン）の開発  
-**ビジョン**: 分岐シナリオを設計・管理・検証するための内製クリエイティブワークスペース  
+**ビジョン**: 分岐シナリオを設計・管理・検証するための内製クリエイティブワークスペース
 
 ---
 
@@ -59,11 +59,13 @@
 #### リファクタリング第2弾 - ストレージキー完全一元化 ✅ (2025-11-28)
 
 **APP_CONFIG.storage.keys の完全活用**:
+
 - 全ストレージキーをAPP_CONFIG経由に統一
 - ハードコーディングされたキーを一掃
 - 対象: saveSlots, theme, floatingPanel, memos, gameProgress
 
 **対象ファイル更新**:
+
 - `scripts/play.save.js`: SAVE_SLOTS_KEY_PREFIX 定数導入
 - `scripts/theme-manager.js`: THEME_PREFERENCES_KEY 定数導入
 - `scripts/themeUtils.js`: THEME_KEY, CUSTOM_PRESETS_KEY 定数導入
@@ -98,6 +100,7 @@
    - `scripts/admin-boot.js`: 軽量統合マネージャー
 
 **設計原則**:
+
 - 単一責任原則に基づく分割
 - レガシー互換性の完全維持
 - グローバル名前空間でのモジュール公開
@@ -109,23 +112,23 @@
 
 ### 🎯 フェーズ4: UI/UX改善・アクセシビリティ強化
 
-| 順位 | タスク | 状態 | 備考 |
-|------|--------|------|------|
-| 1 | キーボードショートカット | ✅ 完了 | gameplay.keyboardShortcuts設定追加済み |
-| 2 | スクリーンリーダー対応 | 🔄 進行中 | シーンレンダリングとの連携実装済み |
-| 3 | フォーカス管理改善 | 🔄 進行中 | モーダルフォーカストラップ実装済み |
-| 4 | アニメーション強化 | ✅ 完了 | ToastManager、モーダル/パネルアニメーション |
-| 5 | ダークテーマ導入 | ✅ 完了 | ThemeToggle、OS設定連動対応 |
+| 順位 | タスク                   | 状態      | 備考                                        |
+| ---- | ------------------------ | --------- | ------------------------------------------- |
+| 1    | キーボードショートカット | ✅ 完了   | gameplay.keyboardShortcuts設定追加済み      |
+| 2    | スクリーンリーダー対応   | 🔄 進行中 | シーンレンダリングとの連携実装済み          |
+| 3    | フォーカス管理改善       | 🔄 進行中 | モーダルフォーカストラップ実装済み          |
+| 4    | アニメーション強化       | ✅ 完了   | ToastManager、モーダル/パネルアニメーション |
+| 5    | ダークテーマ導入         | ✅ 完了   | ThemeToggle、OS設定連動対応                 |
 
 ### 🔧 技術的負債対応
 
-| タスク | 状態 | 備考 |
-|--------|------|------|
-| npm test テストランナー安定化 | ✅ 完了 | dev-server + Node http による `/tests/test.html` スモークテストへ移行 |
-| ブラウザE2Eテスト導入（Puppeteer/Playwright検討） | 📋 未着手 | `/tests/test.html` のMocha結果取得・スクリーンショット撮影など |
-| 既存alertのToast置換 | ✅ 完了 | ToastManager でプレイ/管理両方の通知を統一 |
-| 依存関係の最新化 | 📋 未着手 | npm update検討 |
-| パフォーマンス最適化 | 📋 未着手 | ローディング改善 |
+| タスク                                            | 状態      | 備考                                                                  |
+| ------------------------------------------------- | --------- | --------------------------------------------------------------------- |
+| npm test テストランナー安定化                     | ✅ 完了   | dev-server + Node http による `/tests/test.html` スモークテストへ移行 |
+| ブラウザE2Eテスト導入（Puppeteer/Playwright検討） | 📋 未着手 | `/tests/test.html` のMocha結果取得・スクリーンショット撮影など        |
+| 既存alertのToast置換                              | ✅ 完了   | ToastManager でプレイ/管理両方の通知を統一                            |
+| 依存関係の最新化                                  | 📋 未着手 | npm update検討                                                        |
+| パフォーマンス最適化                              | 📋 未着手 | ローディング改善                                                      |
 
 ## 今回セッションの調査サマリ (2025-12-05)
 
@@ -162,21 +165,48 @@
 - **テスト**
   - `npm test` 実行により、dev-server + `/tests/test.html` スモークテストが HTTP 200 で成功することを再確認（今回のA11y変更によるリグレッションなし）。
 
+## 今回セッションの作業サマリ (2025-12-11)
+
+- **Play画面インベントリモーダルのA11y改善**
+  - `scripts/play.inventory.js` の `setupInventoryPanel()` を更新し、`#inventory-panel` を開閉する際に `PlayModalFocus.openModalWithFocus` / `PlayModalFocus.closeModalWithFocus` を優先的に使用するように変更。
+  - `PlayModalFocus` が存在しない環境では、従来どおり `hidden` / `display` と `document.body.style.overflow` でフォールバックし、後方互換性を維持。
+  - インベントリボタン `#btn-inventory` の `aria-expanded` を開閉に合わせて `true`/`false` に更新し、トグルボタンとしての状態をスクリーンリーダーに明示。
+
+- **ToastManager と A11y 実装状況の再確認**
+  - `scripts/toastManager.js` が `role="alert"` / `aria-live="polite"` / `aria-atomic="true"` を用いてトーストコンテナを定義し、各トーストに `role="status"` を付与していることを確認。
+  - Play画面/管理画面双方で、成功・失敗・警告・情報トーストが一貫した UI/アニメーションと ARIA セマンティクスで提示されていることを確認（追加コード変更は不要と判断）。
+
+- **テストランナーとGit状態の再確認**
+  - `node scripts/run-tests.js` を実行し、dev-server 起動 → `http://127.0.0.1:8080/tests/test.html` への HTTP 200 スモークテストが成功することを再度確認（今回のインベントリA11y変更によるリグレッションなし）。
+  - Git 状態を確認し、ローカル `main` ブランチの HEAD (`4de33f67 feat(a11y): use centralized modal focus for inventory panel`) が `origin/main` と一致していることを確認。ワーキングツリーもクリーンで、次担当者がそのまま作業再開可能な状態。
+
+- **バックログ/申し送りドキュメントの整合性確認**
+  - `docs/ISSUES.md` と本ファイル (`docs/HANDOVER.md`) を見直し、フェーズ4 UI/UX/A11y の進捗（ToastManager 導入、ThemeToggle、PlayModalFocus・Mermaidモーダル・インベントリ/セーブスロットパネルのA11y改善、npm test ランナー安定化など）が現状と齟齬なく反映されていることを確認。
+  - 既に記載済みの「アクセシビリティ向上継続中」「テストランナー404問題解消」等の記述は、今回の作業結果とも整合しているため、文言変更は行わず、今回分は本セクションに追記する方針とした。
+
+- **今後の推奨タスク（Play/A11y 周辺）**
+  - Play画面におけるモーダル管理ロジックの統一: `play.js` 内に残っている旧実装の `trapFocusInModal` / `openModalWithFocus` / `closeModalWithFocus` / `initModalManagement` と、`PlayModalFocus` / `PlayModalSaveSlots` / `PlayInventory` による新実装の責務を整理し、徐々にモジュール側へ集約していくことを推奨。
+  - 主要なモーダル/パネル（セーブ/ロードモーダル、セーブスロット、インベントリ、テーマパネル、モバイルメニューなど）について、フォーカス移動・`aria-expanded`・スクリーンリーダー読み上げメッセージを実際の利用シナリオで再度手動検証し、必要に応じて微調整を継続。
+  - A11y改善フェーズが十分に安定した段階で、ブラウザE2Eテスト基盤（Puppeteer/Playwright 等）と組み合わせた回帰テスト体制の検討を継続。
+
 ---
 
 ## 重要技術情報
 
 ### モジュールアーキテクチャ
+
 - **グローバル公開**: `window.ModuleName` で各モジュールにアクセス
 - **依存順序**: Utils → Components → Manager の順で読み込み
 - **レガシー互換**: 元スクリプトはフォールバックとして維持
 
 ### ストレージキー管理
+
 - **一元管理**: `APP_CONFIG.storage.keys` で全キー定義
 - **定数使用**: `const KEY = APP_CONFIG.storage.keys.xxx;` 形式
 - **将来的拡張**: 新規キーは必ずAPP_CONFIGに追加
 
 ### Git運用
+
 - **コミット形式**: `refactor(scope): description`
 - **プッシュ単位**: 機能単位での小まめなプッシュを推奨
 - **ブランチ戦略**: mainブランチでの直接作業（現状）
@@ -210,14 +240,14 @@ ToastManager.success('保存しました');
 ToastManager.error('エラーが発生しました');
 ToastManager.warning('注意してください');
 ToastManager.info('情報メッセージ');
-ToastManager.dismiss(toastId);  // 手動消去
-ToastManager.dismissAll();       // 全消去
+ToastManager.dismiss(toastId); // 手動消去
+ToastManager.dismissAll(); // 全消去
 
 // ThemeToggle - テーマ切り替え
-ThemeToggle.toggle();            // ダーク⇔ライト切り替え
-ThemeToggle.setTheme('dark');    // 'dark', 'light', 'auto'
-ThemeToggle.getTheme();          // 現在の設定を取得
-ThemeToggle.isDark();            // ダークテーマかどうか
+ThemeToggle.toggle(); // ダーク⇔ライト切り替え
+ThemeToggle.setTheme('dark'); // 'dark', 'light', 'auto'
+ThemeToggle.getTheme(); // 現在の設定を取得
+ThemeToggle.isDark(); // ダークテーマかどうか
 ```
 
 ### 📂 今回のセッションで変更/追加されたファイル
@@ -234,41 +264,49 @@ ThemeToggle.isDark();            // ダークテーマかどうか
 #### UI/UX総改修 - Typora風モダンデザイン ✅ (2025-11-27)
 
 **新規CSSテーマシステム導入**:
+
 - `styles/modern.css`: デザイントークン、カラーパレット、タイポグラフィ、コンポーネント基盤
 - `styles/play-modern.css`: Play画面専用のモダンスタイル
 - `styles/admin-modern.css`: Admin画面専用のモダンスタイル
 
 **全画面共通の改善**:
+
 - SVGアイコンを使用したツールバーボタン（テキストからアイコンへ）
 - タブスタイルのナビゲーション統一
 - クリーンでミニマルなヘッダーレイアウト
 
 **Play画面**:
+
 - モダンな空状態UI（ゲームデータ未登録時）
 - アイコン付きツールバー（戻る/進む/保存/読込など）
 - パネル・モーダルのデザイン統一
 
 **Admin画面**:
+
 - サイドバーアコーディオン改善（アイコン付きセクション）
 - フォームフィールド・アクショングリッドの整理
 - ワークフローパネルのUI改善
 
 **Learn画面**:
+
 - サンプルカードのグリッドレイアウト改善
 - コードプレビューエリアのスタイリング
 
 **Index画面**:
+
 - ヒーローセクションの改善
 - フィーチャーカードのグリッドレイアウト
 
 #### リファクタリング第1弾 - ハードコーディング解消 ✅ (2025-11-27)
 
 **ストレージキー一元管理**:
+
 - `APP_CONFIG.storage.keys.gameData` を導入し、`"agp_game_data"` のハードコーディングを解消
 - 対象ファイル: `playImport.js`, `gameData.js`, `nodeEditorLogicManager.js`, `errorHandler.js`
 - ユーザーメッセージの改善: 内部キー名を隠蔽し、より親和的な表現に統一
 
 **コミット履歴**:
+
 ```
 b683ea9 refactor: centralize game data storage key
 9336820 feat: UI総改修 Phase 4 - パネルモーダルデザイン統一
@@ -282,12 +320,14 @@ d9e885d feat: UI総改修 Phase 3 - Admin画面サイドバー改善
 ### 前回のセッションで完了した作業 (2025-11-26)
 
 #### Phase 1-1: 手動テスト実施 ✅
+
 - Play画面テスト: 10項目すべてパス
 - Admin画面テスト: 5項目すべてパス
 - ノードエディタテスト: 6項目すべてパス
 - 自動テスト: 21ファイル中19ファイルパス
 
 #### Phase 1-3: エラーハンドリング統一 ✅ (2025-11-26)
+
 - `nodeEditorLogicManager.js`: alertをErrorHandler.showError()に統一
 - `play.modal.js`: セーブスロット操作のエラーメッセージを統一
 - フォールバック対応: ErrorHandlerが無い場合はalertを使用
@@ -297,6 +337,7 @@ d9e885d feat: UI総改修 Phase 3 - Admin画面サイドバー改善
 ## 完了済み作業 (フェーズ0)
 
 ### 1. 不要ファイルのクリーンアップ ✅
+
 - **削除ファイル数**: 12ファイル、約70KB削減
 - **削除対象**:
   - 一時バックアップ: `temp_origin_play.js`, `temp_original_gameEngine.js`
@@ -304,6 +345,7 @@ d9e885d feat: UI総改修 Phase 3 - Admin画面サイドバー改善
   - 空スクリプト: `create-debug-page.js`, `test-lint.js`, `admin.js`
 
 ### 2. 長大スクリプトの分割 ✅
+
 - **wysiwygStoryEditor.js** (727行) → 4モジュールに分割:
   - `wysiwygStoryEditor.core.js`: 状態管理・初期化・公開API
   - `wysiwygStoryEditor.canvas.js`: Canvas描画・マウスイベント
@@ -313,17 +355,20 @@ d9e885d feat: UI総改修 Phase 3 - Admin画面サイドバー改善
   - `nodeEditorValidation.js`: バリデーションロジック分離
 
 ### 3. コード品質改善 ✅
+
 - `config.js`: ストレージキーを集約（ハードコーディング削減）
 - `play.inventory.js`: TODOコメントを実装に置換
   - `executeItemEffect()` メソッド追加
   - heal, set_flag, set_variable, show_text エフェクトをサポート
 
 ### 4. ドキュメント整備 ✅
+
 - `docs/PROGRESS.md`: 進捗レポート更新
 - `docs/TEST_MANUAL.md`: 手動テスト項目一覧作成
 - `docs/PROJECT_PLAN.md`: プロジェクト全体計画作成
 
 ### 5. リモート同期 ✅
+
 - **コミット履歴**:
   ```
   685005e docs: テスト項目一覧とプロジェクト計画を作成
@@ -343,17 +388,18 @@ d9e885d feat: UI総改修 Phase 3 - Admin画面サイドバー改善
 **現状**: 第1弾完了（ストレージキー一元管理）  
 **優先順位**: 単一責任原則 / 命名規則 / 長大スクリプト分割 / ハードコーディング解消
 
-| 順位 | タスク | 状態 | 工数見積 | 完了基準 |
-|------|--------|------|----------|----------|
-| 1 | ストレージキー完全一元化 | 進行中 | 2-3h | 全キー`APP_CONFIG`経由、Magic number化 |
-| 2 | 長大スクリプト分割 (`play.save.js`優先) | 未着手 | 4-5h | 単一責任モジュールに分割 |
-| 3 | 命名規則統一・改善 | 未着手 | 2-3h | camelCase統一、役割見える命名 |
-| 4 | TODOコメント・仮実装整理 | 未着手 | 1-2h | 実装 or 明確なdeprecated化 |
-| 5 | テストランナー404修正 | ✅ 完了 | 1h | `npm test` は dev-server + `/tests/test.html` スモークテストで安定動作 |
+| 順位 | タスク                                  | 状態    | 工数見積 | 完了基準                                                               |
+| ---- | --------------------------------------- | ------- | -------- | ---------------------------------------------------------------------- |
+| 1    | ストレージキー完全一元化                | 進行中  | 2-3h     | 全キー`APP_CONFIG`経由、Magic number化                                 |
+| 2    | 長大スクリプト分割 (`play.save.js`優先) | 未着手  | 4-5h     | 単一責任モジュールに分割                                               |
+| 3    | 命名規則統一・改善                      | 未着手  | 2-3h     | camelCase統一、役割見える命名                                          |
+| 4    | TODOコメント・仮実装整理                | 未着手  | 1-2h     | 実装 or 明確なdeprecated化                                             |
+| 5    | テストランナー404修正                   | ✅ 完了 | 1h       | `npm test` は dev-server + `/tests/test.html` スモークテストで安定動作 |
 
 ### フェーズ4: UI/UX後追い改善 (次フェーズ)
 
 **候補タスク**:
+
 - モーダル・トーストアニメーション強化
 - キーボード操作完全化
 - ダークテーマ導入検討
@@ -364,6 +410,7 @@ d9e885d feat: UI総改修 Phase 3 - Admin画面サイドバー改善
 ## 技術的現状
 
 ### モジュール構造
+
 ```
 scripts/
 ├── core modules (安定)
@@ -389,12 +436,14 @@ scripts/
 ```
 
 ### ストレージキー管理
+
 - `APP_CONFIG.storage.keys` で一元管理 ✅ **第2弾完了**
 - 第1弾: `gameData` キー統一完了
 - 第2弾: 全キー（saveSlots, theme, floatingPanel, memos, gameProgress）統一完了
 - 次ターゲット: 残存ハードコーディングの確認・解消
 
 ### テスト環境
+
 - 自動テスト: `tests/` ディレクトリ（23ファイル）
 - 手動テスト: `docs/TEST_MANUAL.md`（25項目）
 - 自動テストランナー: `npm test` で dev-server を起動し、`/tests/test.html` への HTTP 200 を確認するスモークテスト（404問題は解消済み）
@@ -404,12 +453,14 @@ scripts/
 ## 品質基準
 
 ### コード品質
+
 - 単一責任原則: 各モジュール1つの責務（長大スクリプト分割中）
 - 命名規則: camelCase統一（改善予定）
 - エラーハンドリング: ユーザー友好的（統一済み）
 - ハードコーディング削減: `APP_CONFIG`経由に寄せ中
 
 ### パフォーマンス
+
 - バンドル不要（Vanilla JS）
 - ローカルストレージ使用
 - モバイル対応考慮
@@ -419,17 +470,20 @@ scripts/
 ## 注意事項
 
 ### 開発環境
+
 - **サーバー起動**: Live Serverまたは`python -m http.server 5500`
 - **ブラウザ**: Chrome/Firefox/Edge対応
 - **デバッグ**: DevToolsのConsoleでエラー確認
 - **テスト**: `npm test`（dev-server + `/tests/test.html` スモークテスト）
 
 ### データ管理
+
 - **LocalStorage**: `agp_*` 接頭辞
 - **バックアップ**: エクスポート機能使用推奨
 - **キャッシュ**: 動作異常時はハードリロード(Ctrl+Shift+R)
 
 ### コミット運用
+
 - ブランチ: main直接作業
 - コミット: 細かく機能単位
 - プッシュ: 即時反映
