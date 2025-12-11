@@ -15,6 +15,13 @@
     modal.hidden = true;
     modal.style.display = "none";
 
+    function handleKeydown(e) {
+      if (e.key === "Escape" && modal && !modal.hidden) {
+        e.preventDefault();
+        closeModal();
+      }
+    }
+
     function openModal() {
       if (!modal || !iframe) return;
       // Load play.html in iframe
@@ -59,6 +66,8 @@
     modal.addEventListener("click", (e) => {
       if (e.target === modal) closeModal();
     });
+
+    document.addEventListener("keydown", handleKeydown);
 
     // NodeEditorの変更に追従してプレイテストを自動再読込（500msスロットル）
     let refreshTimer = null;

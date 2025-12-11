@@ -129,6 +129,13 @@
 
     let lastFocused = null;
 
+    function handleKeydown(e) {
+      if (e.key === "Escape" && !panel.hidden) {
+        e.preventDefault();
+        closePanel();
+      }
+    }
+
     function openPanel() {
       if (!panel.hidden) return;
       lastFocused = document.activeElement;
@@ -139,6 +146,8 @@
         openBtn.setAttribute("aria-expanded", "true");
       }
       refresh();
+
+      document.addEventListener("keydown", handleKeydown, true);
 
       // 初期フォーカス: ラベル入力か最初のフォーカス可能要素
       const firstFocusable =
@@ -161,6 +170,7 @@
       if (openBtn) {
         openBtn.setAttribute("aria-expanded", "false");
       }
+      document.removeEventListener("keydown", handleKeydown, true);
       const target =
         (lastFocused && typeof lastFocused.focus === "function" && lastFocused) ||
         openBtn;

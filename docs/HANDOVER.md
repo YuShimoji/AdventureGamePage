@@ -180,8 +180,14 @@
   - `node scripts/run-tests.js` を実行し、dev-server 起動 → `http://127.0.0.1:8080/tests/test.html` への HTTP 200 スモークテストが成功することを再度確認（今回のインベントリA11y変更によるリグレッションなし）。
   - Git 状態を確認し、ローカル `main` ブランチの HEAD (`4de33f67 feat(a11y): use centralized modal focus for inventory panel`) が `origin/main` と一致していることを確認。ワーキングツリーもクリーンで、次担当者がそのまま作業再開可能な状態。
 
+- **Admin: メモパネルとプレイテストモーダルのA11y仕上げ（Escキー閉じ）**
+  - `scripts/memos.js` に、メモパネル表示中のみ Escキーでパネルを閉じるキーダウンリスナを追加。パネルオープン時に `document.addEventListener("keydown", ...)` で登録し、クローズ時に `removeEventListener` で解除する形とし、既存の `aria-expanded` / `aria-hidden` / `inert` とフォーカス復帰ロジックは維持。
+  - `scripts/playtest.js` に、インラインプレイテストモーダル表示中のみ Escキーでクローズするキーダウンハンドラを追加。既存のクローズボタン/バックドロップクリックと同等の挙動で、`aria-hidden` の更新とフォーカス復帰を行うように統一。
+  - いずれもマウス操作とキーボード操作の両方で閉じられるようになり、Admin側モーダル/パネルにおけるEscキー挙動が他画面と一貫。
+  - `npm test` を実行し、今回のAdmin A11y変更後も dev-server + `/tests/test.html` スモークテストが HTTP 200 で成功することを確認（リグレッションなし）。
+
 - **バックログ/申し送りドキュメントの整合性確認**
-  - `docs/ISSUES.md` と本ファイル (`docs/HANDOVER.md`) を見直し、フェーズ4 UI/UX/A11y の進捗（ToastManager 導入、ThemeToggle、PlayModalFocus・Mermaidモーダル・インベントリ/セーブスロットパネルのA11y改善、npm test ランナー安定化など）が現状と齟齬なく反映されていることを確認。
+  - `docs/ISSUES.md` と本ファイル (`docs/HANDOVER.md`) を見直し、フェーズ4 UI/UX/A11y の進捗（ToastManager 導入、ThemeToggle、PlayModalFocus・Mermaidモーダル・インベントリ/セーブスロットパネル・Adminメモパネル/プレイテストモーダルのA11y改善、npm test ランナー安定化など）が現状と齟齬なく反映されていることを確認。
   - 既に記載済みの「アクセシビリティ向上継続中」「テストランナー404問題解消」等の記述は、今回の作業結果とも整合しているため、文言変更は行わず、今回分は本セクションに追記する方針とした。
 
 - **今後の推奨タスク（Play/A11y 周辺）**
@@ -215,7 +221,7 @@
 
 ## 最終更新日時
 
-**2025-12-09 13:48 JST** - フェーズ4 A11y仕上げ開始（Admin Mermaidフルスクリーンモーダル改善＋テスト再確認）反映
+**2025-12-11** - フェーズ4 A11y仕上げ継続（Playインベントリモーダル＋Adminメモパネル/プレイテストモーダル改善とテスト再確認）を反映
 
 ---
 
@@ -447,6 +453,7 @@ scripts/
 - 自動テスト: `tests/` ディレクトリ（23ファイル）
 - 手動テスト: `docs/TEST_MANUAL.md`（25項目）
 - 自動テストランナー: `npm test` で dev-server を起動し、`/tests/test.html` への HTTP 200 を確認するスモークテスト（404問題は解消済み）
+- ブラウザE2E PoC: `npm run test:e2e` で Playwright + Chromium により `/tests/test.html` を実ブラウザ実行（要 `npx playwright install chromium`）
 
 ---
 

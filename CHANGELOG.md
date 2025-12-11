@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2025-12-11]
+
+- feat(a11y): Admin メモパネルとプレイテストモーダルのEscキー閉じ対応
+  - `scripts/memos.js`: メモパネル表示中のみ Escキーで閉じるキーダウンリスナを追加し、パネルオープン時に登録・クローズ時に解除する形で既存の `aria-expanded` / `aria-hidden` / `inert` とフォーカス復帰ロジックを維持。
+  - `scripts/playtest.js`: インラインプレイテストモーダル表示中に Escキーで閉じられるキーダウンハンドラを追加し、既存のクローズボタン/バックドロップクリックと同等の挙動（`aria-hidden` 更新とフォーカス復帰）に統一。
+- test: `npm test` を実行し、今回のAdmin A11y変更後も dev-server + `/tests/test.html` スモークテストが HTTP 200 で成功することを確認（リグレッションなし）。
+- feat(test): Playwright ベースのブラウザE2Eテスト PoC を追加
+  - `scripts/e2e-tests.js`: dev-server を起動し、`/tests/test.html` を headless Chromium で開いて `window.mocha.stats` からテスト結果を取得する PoC ランナーを実装。
+  - `npm run test:e2e` で実行可能（初回は `npx playwright install chromium` によるブラウザバイナリのインストールが必要）。
+
 ## [2025-12-09]
 
 - feat(a11y): Admin Mermaidフルスクリーンモーダルのアクセシビリティ改善
