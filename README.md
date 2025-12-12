@@ -203,7 +203,7 @@ AdventureGamePage/
   docs/
     architecture.md
     workflow.md
-    issues.md
+    ISSUES.md
     test_plan.md
     design/
       storage-architecture.mmd
