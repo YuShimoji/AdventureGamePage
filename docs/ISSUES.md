@@ -146,7 +146,7 @@
 
 ### テスト・CI/CD
 
-- E2Eテスト導入：Playwright/Puppeteerでの統合テスト
+- E2Eテスト導入：Playwright/Puppeteerでの統合テスト（Playwright PoC: `npm run test:e2e` / 初回: `npx playwright install chromium`）
 - CI/CDパイプライン：GitHub Actionsで自動テスト・デプロイ
 
 ### アクセシビリティ拡張

@@ -1,6 +1,12 @@
-# 開発進捗レポート (2025-11-25 更新)
+# 開発進捗レポート (2025-12-12 更新)
 
 ## 現在の状況
+
+### 直近の更新 ✅ (2025-12-12)
+
+- UI/UX改善・アクセシビリティ強化の継続（ToastManager / ThemeToggle / 各モーダル/パネルのA11y改善など）
+- テスト基盤: `npm test` ランナー安定化、Playwright によるブラウザE2E PoC（`npm run test:e2e`、初回は `npx playwright install chromium`）
+- ドキュメント整合性: `docs/HANDOVER.md` / `docs/PROJECT_PLAN.md` / `docs/PROGRESS.md` / `docs/ISSUES.md` の最新化
 
 ### 完了済みタスク
 
@@ -70,7 +76,7 @@
 
 **完了基準**:
 - [x] 手動テスト全項目パス (25項目すべて○)
-- [ ] エラーハンドリング統一完了
+- [x] エラーハンドリング統一完了
 - [ ] 自動テスト80%以上パス
 - [ ] コンソールに不要なエラー/警告なし
 

@@ -8,14 +8,14 @@
 
 ---
 
-## 現在状況 (2025-12-02)
+## 現在状況 (2025-12-12)
 
 ### プロジェクトフェーズ: フェーズ4 UI/UX改善・アクセシビリティ強化 (進行中)
 
 **前フェーズ**: フェーズ3 リファクタリング ✅ **完了**  
 **現在の位置**: フェーズ4 UI/UX改善・アクセシビリティ強化 **進行中**
 
-### 直近の変更 (2025-12-02 / 2025-12-05 最新セッション)
+### 直近の変更 (2025-12-02 / 2025-12-05 / 2025-12-09 / 2025-12-11)
 
 #### アニメーション強化 ✅ (2025-12-02)
 
@@ -25,13 +25,6 @@
   - トースト通知スライドイン/アウト
   - ボタン押下フィードバック
   - フォーカス時のパルスアニメーション
-
-- **ToastManagerモジュール新規作成** (`scripts/toastManager.js`)
-  - Success/Warning/Error/Info タイプ対応
-  - 自動消去（設定可能な表示時間）
-  - 手動消去とdismissAll対応
-  - ARIA属性によるアクセシビリティ対応
-  - 使用例: `ToastManager.success('保存しました')`
 
 #### ダーク/ライトテーマ切り替え ✅ (2025-12-02)
 
@@ -125,7 +118,7 @@
 | タスク                                            | 状態      | 備考                                                                  |
 | ------------------------------------------------- | --------- | --------------------------------------------------------------------- |
 | npm test テストランナー安定化                     | ✅ 完了   | dev-server + Node http による `/tests/test.html` スモークテストへ移行 |
-| ブラウザE2Eテスト導入（Puppeteer/Playwright検討） | 📋 未着手 | `/tests/test.html` のMocha結果取得・スクリーンショット撮影など        |
+| ブラウザE2Eテスト導入（Puppeteer/Playwright検討） | 🔄 PoC構築済み | Playwright PoC: `npm run test:e2e`（`scripts/e2e-tests.js`）。初回のみ `npx playwright install chromium` |
 | 既存alertのToast置換                              | ✅ 完了   | ToastManager でプレイ/管理両方の通知を統一                            |
 | 依存関係の最新化                                  | 📋 未着手 | npm update検討                                                        |
 | パフォーマンス最適化                              | 📋 未着手 | ローディング改善                                                      |
@@ -134,7 +127,7 @@
 
 - **npm test 404 調査**
   - 症状: `npm test` 実行時に `/tests/test.html` への 404・ポート競合が発生することがあった
-  - 原因: 既存の dev-server プロセスがポートを専有しているケースと、サーバー起動前にHTTPチェックしてしまうタイミング問題が混在
+  - 原因: 既存の dev-server プロセスがポートを専有していて、サーバー起動前にHTTPチェックしてしまうタイミング問題が混在
   - 対応:
     - `scripts/run-tests.js` でポート占有プロセスの検出と解放（Windows向けに `netstat` + `taskkill` を使用）
     - dev-server 起動ログから実際のポートを検出し、Node `http.get` で `/tests/test.html` に対するスモークテストをリトライ付きで実行
@@ -178,7 +171,11 @@
 
 - **テストランナーとGit状態の再確認**
   - `node scripts/run-tests.js` を実行し、dev-server 起動 → `http://127.0.0.1:8080/tests/test.html` への HTTP 200 スモークテストが成功することを再度確認（今回のインベントリA11y変更によるリグレッションなし）。
-  - Git 状態を確認し、ローカル `main` ブランチの HEAD (`4de33f67 feat(a11y): use centralized modal focus for inventory panel`) が `origin/main` と一致していることを確認。ワーキングツリーもクリーンで、次担当者がそのまま作業再開可能な状態。
+  - Git 状態を確認し、ローカル `main` ブランチの HEAD が `origin/main` と一致していることを確認。ワーキングツリーもクリーンで、次担当者がそのまま作業再開可能な状態。
+
+- **E2Eテスト基盤 PoC（Playwright）**
+  - Playwright を devDependency に追加し、`npm run test:e2e`（`scripts/e2e-tests.js`）で dev-server 起動→`/tests/test.html` を headless Chromium で実行し、Mocha 結果（failures）を集計する PoC を追加。
+  - 初回のみ `npx playwright install chromium` が必要。
 
 - **Admin: メモパネルとプレイテストモーダルのA11y仕上げ（Escキー閉じ）**
   - `scripts/memos.js` に、メモパネル表示中のみ Escキーでパネルを閉じるキーダウンリスナを追加。パネルオープン時に `document.addEventListener("keydown", ...)` で登録し、クローズ時に `removeEventListener` で解除する形とし、既存の `aria-expanded` / `aria-hidden` / `inert` とフォーカス復帰ロジックは維持。
@@ -221,7 +218,7 @@
 
 ## 最終更新日時
 
-**2025-12-11** - フェーズ4 A11y仕上げ継続（Playインベントリモーダル＋Adminメモパネル/プレイテストモーダル改善とテスト再確認）を反映
+**2025-12-12** - ドキュメント整合性更新（E2E PoCの現状反映・参照パス修正など）を反映
 
 ---
 
@@ -229,10 +226,11 @@
 
 ### 🚀 即時着手可能なタスク
 
-1. **ブラウザE2Eテスト基盤の検討**
+1. **ブラウザE2Eテスト基盤（Playwright PoC）の実行/拡張**
    - 現状: `npm test` は dev-server + `/tests/test.html` への HTTP 200 スモークテストのみ
-   - 次ステップ: Puppeteer/Playwright などで Mocha 結果の取得・主要フローの自動テストを検討
-   - 関連ファイル: `scripts/run-tests.js`, `scripts/dev-server.js`, `tests/test.html`
+   - PoC: `npm run test:e2e`（`scripts/e2e-tests.js`）で `/tests/test.html` を実ブラウザ実行し、Mocha 結果（failures）を集計
+   - 初回セットアップ: `npx playwright install chromium`
+   - 関連ファイル: `scripts/run-tests.js`, `scripts/dev-server.js`, `scripts/e2e-tests.js`, `tests/test.html`
 
 2. **ARIA属性の拡充**
    - 主要モーダル/パネルの `role="dialog"` / `aria-modal` / 見出しラベルは整備済み
@@ -499,7 +497,7 @@ scripts/
 
 ## 次の担当者へのアドバイス
 
-1. **重要**: `npm test` の継続強化（ブラウザE2Eテスト・スクリーンショット基盤）
+1. **重要**: `npm run test:e2e` の継続強化（ブラウザE2Eテスト・スクリーンショット基盤）
 2. **継続**: アクセシビリティ改善（ARIA属性拡充、フォーカス順序最適化）
 3. **継続**: アニメーション/トランジションの微調整（細部のUXチューニング）
 4. **継続**: テーマシステム拡張（プリセット管理・要素別適用）
@@ -510,5 +508,5 @@ scripts/
 ## 連絡先・問い合わせ
 
 **プロジェクトリポジトリ**: https://github.com/YuShimoji/AdventureGamePage  
-**最終更新**: 2025-12-09  
+**最終更新**: 2025-12-12  
 **担当者**: AI Assistant (Cascade)
