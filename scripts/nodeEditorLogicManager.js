@@ -13,7 +13,9 @@
       const raw = window.StorageUtil?.loadJSON?.(GAME_DATA_KEY, null) || null;
       if (!raw) {
         if (window.ToastManager) {
-          ToastManager.warning('ゲームデータが見つかりません。プレイ用JSONをインポートしてください。');
+          ToastManager.warning(
+            'ゲームデータが見つかりません。プレイ用JSONをインポートしてください。'
+          );
         } else {
           alert('ゲームデータが見つかりません。プレイ用JSONをインポートしてください。');
         }
@@ -213,10 +215,6 @@
   }
 
   function bindUI() {
-    const btnLoad = document.getElementById('ne-load');
-    const btnSave = document.getElementById('ne-save');
-    const btnValidate = document.getElementById('ne-validate');
-    const btnExport = document.getElementById('ne-export');
     const btnAddNode = document.getElementById('ne-add-node');
     const btnRemoveNode = document.getElementById('ne-remove-node');
     const btnAddChoice = document.getElementById('ne-add-choice');
@@ -252,7 +250,7 @@
         actionMenu.value = '';
       });
 
-    const { sel, startSel, id, title, text, image } = window.NodeEditorUIManager.readUIRefs();
+    const { sel, startSel, id, text, image } = window.NodeEditorUIManager.readUIRefs();
 
     if (sel)
       sel.addEventListener('change', () => window.NodeEditorUIManager.renderNodeForm(sel.value));

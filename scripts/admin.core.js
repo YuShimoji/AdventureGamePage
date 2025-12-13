@@ -55,7 +55,7 @@
 
   // Initialize AdminCore when boot completes
   // Support both EventBus and legacy DOM events
-  function initializeAdminCore(event) {
+  function initializeAdminCore() {
     try {
       window.AdminCore.init();
     } catch (error) {

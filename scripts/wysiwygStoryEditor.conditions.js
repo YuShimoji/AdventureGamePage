@@ -123,14 +123,14 @@
     if (falseSelect) falseSelect.innerHTML = `<option value="">ノードを選択...</option>${nodeOptions}`;
 
     if (node.conditions && node.conditions.length > 0) {
-      loadConditionData(node);
+      loadConditionData();
     }
 
     modal._editingNode = node;
     modal.style.display = 'flex';
   }
 
-  function loadConditionData(node) {
+  function loadConditionData() {
     // Load existing condition data into the editor
     // Implementation for populating the condition editor with existing rules
   }

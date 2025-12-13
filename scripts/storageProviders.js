@@ -9,9 +9,6 @@
   //   remove(id): Promise<void>,
   //   clear(): Promise<void>
   // }
-
-  const ACTIVE_KEY = "agp_storage_provider_active";
-
   function uid() {
     return "ms_" + Date.now().toString(36) + "_" + Math.random().toString(36).slice(2, 8);
   }
@@ -141,7 +138,7 @@
     getActiveName() {
       return "idb"; // Always use IndexedDB
     },
-    setActiveName(name) {
+    setActiveName() {
       // No-op: only IndexedDB supported
     },
     getActive() {

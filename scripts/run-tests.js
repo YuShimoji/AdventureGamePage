@@ -223,6 +223,13 @@ async function main() {
   try {
     log('Starting test runner...');
 
+    if (process.env.AGP_TEST_KILL_PORT === '1') {
+      const inUse = await checkPort(PORT);
+      if (inUse) {
+        await killPortProcess(PORT);
+      }
+    }
+
     log('Starting development server...');
     serverProcess = spawn('node', ['scripts/dev-server.js'], {
       stdio: ['pipe', 'pipe', 'inherit'],

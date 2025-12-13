@@ -1,5 +1,4 @@
 (function () {
-  const isJson = (v) => typeof v === "object" && v !== null;
   const save = (k, v) => localStorage.setItem(k, v);
   const load = (k) => localStorage.getItem(k);
 

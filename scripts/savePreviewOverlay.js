@@ -26,7 +26,7 @@
     }
 
     // オーバーレイを開く
-    open(options = {}) {
+    open() {
       if (this.isOpen()) return false;
 
       // 現在のフォーカス要素を保存

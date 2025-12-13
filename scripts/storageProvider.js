@@ -7,15 +7,15 @@
       throw new Error("Not implemented");
     }
     // Gets raw data by id
-    get(id) {
+    get() {
       throw new Error("Not implemented");
     }
     // Saves data by id
-    set(id, data) {
+    set() {
       throw new Error("Not implemented");
     }
     // Removes data by id
-    remove(id) {
+    remove() {
       throw new Error("Not implemented");
     }
   }

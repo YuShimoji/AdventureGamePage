@@ -1,7 +1,5 @@
 (function () {
   // Save/Load Manager - Handles save/load functionality and UI interactions
-  const KEY_SIMPLE = 'agp_manuscript_simple';
-  const KEY_FULL = 'agp_manuscript_full';
 
   function closeDropdown() {
     const dropdown = document.getElementById('floating-controls-dropdown');
@@ -140,9 +138,7 @@
       const btnQuickTheme = document.getElementById('btn-quick-theme');
       const btnQuickPreview = document.getElementById('btn-quick-preview');
       const btnQuickMore = document.getElementById('btn-quick-more');
-      const btnQuickMemos = document.getElementById('btn-quick-memos');
       const dropdown = document.getElementById('floating-controls-dropdown');
-      const panelHandle = document.getElementById('floating-panel-handle');
 
       if (btnQuickZen)
         btnQuickZen.addEventListener('click', () => {

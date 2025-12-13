@@ -1,29 +1,29 @@
-(function(){
+(function () {
   // Mermaid Preview UI Events Manager - Handles event binding and interactions
 
   const MermaidPreviewUIEvents = {
     bindSvgInteractions() {
       const { view, mainView } = window.MermaidPreviewUIState.getUIRefs();
       const views = [view, mainView].filter(Boolean);
-      views.forEach((currentView) => {
+      views.forEach(currentView => {
         if (!currentView) return;
-        const svg = currentView.querySelector("svg");
+        const svg = currentView.querySelector('svg');
         if (!svg) return;
-        const nodeGroups = svg.querySelectorAll("g.node");
-        nodeGroups.forEach((g) => {
+        const nodeGroups = svg.querySelectorAll('g.node');
+        nodeGroups.forEach(g => {
           const sid = g.id;
           const lastBuildMeta = window.MermaidPreviewLogicManager.getLastBuildMeta();
           const originalId = lastBuildMeta?.sanitizeMap?.get(sid);
           if (!originalId) return;
-          g.style.cursor = "pointer";
-          g.setAttribute("tabindex", "0");
-          const handler = (ev) => {
+          g.style.cursor = 'pointer';
+          g.setAttribute('tabindex', '0');
+          const handler = ev => {
             ev.preventDefault();
             window.MermaidPreviewUIRefresh.focusNodeEditorNode(originalId);
           };
-          g.addEventListener("click", handler);
-          g.addEventListener("keydown", (ev) => {
-            if (ev.key === "Enter" || ev.key === " ") {
+          g.addEventListener('click', handler);
+          g.addEventListener('keydown', ev => {
+            if (ev.key === 'Enter' || ev.key === ' ') {
               ev.preventDefault();
               handler(ev);
             }
@@ -35,27 +35,7 @@
     // UI binding for buttons and controls
     bindButtons() {
       const refs = window.MermaidPreviewUIState.getUIRefs();
-      const {
-        genBtn,
-        renderBtn,
-        src,
-        view,
-        mainView,
-        openBtn,
-        scopeSel,
-        seedSel,
-        copyBtn,
-        dlBtn,
-        searchInput,
-        searchClear,
-        pathStartSel,
-        pathGoalSel,
-        pathApplyBtn,
-        fullscreenBtn,
-        toggleBtn,
-        inlinePanel,
-        inlineContent,
-      } = refs;
+      const { genBtn, renderBtn, src, view, scopeSel, seedSel } = refs;
 
       if (!genBtn || !renderBtn || !src || !view) return;
 
@@ -63,32 +43,33 @@
       if (scopeSel && seedSel) {
         const applySeedEnabled = () => {
           const v = window.MermaidPreviewUIState.getScope();
-          seedSel.disabled = v !== "from_selected";
+          seedSel.disabled = v !== 'from_selected';
         };
-        scopeSel.addEventListener("change", () => {
+        scopeSel.addEventListener('change', () => {
           applySeedEnabled();
-          if (window.MermaidPreviewUIState.getScope() === "from_selected") window.MermaidPreviewUIRefresh.refreshSeedOptions();
+          if (window.MermaidPreviewUIState.getScope() === 'from_selected')
+            window.MermaidPreviewUIRefresh.refreshSeedOptions();
           window.MermaidPreviewLogicManager.renderDiagram();
         });
         applySeedEnabled();
       }
 
       if (seedSel) {
-        seedSel.addEventListener("focus", window.MermaidPreviewUIRefresh.refreshSeedOptions);
-        seedSel.addEventListener("change", window.MermaidPreviewLogicManager.renderDiagram);
+        seedSel.addEventListener('focus', window.MermaidPreviewUIRefresh.refreshSeedOptions);
+        seedSel.addEventListener('change', window.MermaidPreviewLogicManager.renderDiagram);
       }
 
       // Generation and rendering buttons
-      genBtn.addEventListener("click", () => {
+      genBtn.addEventListener('click', () => {
         window.MermaidPreviewLogicManager.generateSource();
       });
-      renderBtn.addEventListener("click", () => {
+      renderBtn.addEventListener('click', () => {
         window.MermaidPreviewLogicManager.renderDiagram();
       });
 
       // Main area generation button also updates preview
       if (genBtn) {
-        genBtn.addEventListener("click", () => {
+        genBtn.addEventListener('click', () => {
           window.MermaidPreviewLogicManager.renderDiagram();
         });
       }
@@ -97,28 +78,26 @@
     // Fullscreen functionality
     bindFullscreen() {
       const { fullscreenBtn } = window.MermaidPreviewUIState.getUIRefs();
-      const { view } = window.MermaidPreviewUIState.getUIRefs();
 
       let lastFocused = null;
       let keydownHandler = null;
 
       function closeModal() {
-        const modal = document.getElementById("mermaid-fullscreen-modal");
+        const modal = document.getElementById('mermaid-fullscreen-modal');
         if (!modal) return;
 
         modal.hidden = true;
-        modal.setAttribute("aria-hidden", "true");
-        modal.removeAttribute("tabindex");
+        modal.setAttribute('aria-hidden', 'true');
+        modal.removeAttribute('tabindex');
 
         if (keydownHandler) {
-          document.removeEventListener("keydown", keydownHandler, true);
+          document.removeEventListener('keydown', keydownHandler, true);
           keydownHandler = null;
         }
 
         const target =
-          (lastFocused && typeof lastFocused.focus === "function" && lastFocused) ||
-          fullscreenBtn;
-        if (target && typeof target.focus === "function") {
+          (lastFocused && typeof lastFocused.focus === 'function' && lastFocused) || fullscreenBtn;
+        if (target && typeof target.focus === 'function') {
           try {
             target.focus();
           } catch {}
@@ -126,15 +105,15 @@
       }
 
       if (fullscreenBtn) {
-        fullscreenBtn.addEventListener("click", () => {
+        fullscreenBtn.addEventListener('click', () => {
           const { mainView } = window.MermaidPreviewUIState.getUIRefs();
           if (!mainView) return;
 
-          const modal = document.getElementById("mermaid-fullscreen-modal");
-          const modalView = document.getElementById("mermaid-fullscreen-view");
+          const modal = document.getElementById('mermaid-fullscreen-modal');
+          const modalView = document.getElementById('mermaid-fullscreen-view');
           if (!modal || !modalView) return;
 
-          const svg = mainView.querySelector("svg");
+          const svg = mainView.querySelector('svg');
           if (svg) {
             modalView.innerHTML = svg.outerHTML;
           } else {
@@ -143,34 +122,34 @@
 
           lastFocused = document.activeElement;
 
-          if (!modal.hasAttribute("role")) modal.setAttribute("role", "dialog");
-          if (!modal.hasAttribute("aria-modal")) modal.setAttribute("aria-modal", "true");
+          if (!modal.hasAttribute('role')) modal.setAttribute('role', 'dialog');
+          if (!modal.hasAttribute('aria-modal')) modal.setAttribute('aria-modal', 'true');
 
           modal.hidden = false;
-          modal.setAttribute("aria-hidden", "false");
-          if (!modal.hasAttribute("tabindex")) modal.setAttribute("tabindex", "-1");
+          modal.setAttribute('aria-hidden', 'false');
+          if (!modal.hasAttribute('tabindex')) modal.setAttribute('tabindex', '-1');
 
-          const closeBtn = document.getElementById("mermaid-fullscreen-close");
+          const closeBtn = document.getElementById('mermaid-fullscreen-close');
           const focusTarget =
-            (closeBtn && typeof closeBtn.focus === "function" && closeBtn) || modal;
-          if (focusTarget && typeof focusTarget.focus === "function") {
+            (closeBtn && typeof closeBtn.focus === 'function' && closeBtn) || modal;
+          if (focusTarget && typeof focusTarget.focus === 'function') {
             try {
               focusTarget.focus();
             } catch {}
           }
 
-          keydownHandler = (e) => {
-            if (e.key === "Escape") {
+          keydownHandler = e => {
+            if (e.key === 'Escape') {
               e.preventDefault();
               closeModal();
             }
           };
-          document.addEventListener("keydown", keydownHandler, true);
+          document.addEventListener('keydown', keydownHandler, true);
 
           // Close on backdrop click
           modal.addEventListener(
-            "click",
-            (ev) => {
+            'click',
+            ev => {
               if (ev.target === modal) {
                 closeModal();
               }
@@ -181,9 +160,9 @@
       }
 
       // Fullscreen modal close button
-      const fullscreenCloseBtn = document.getElementById("mermaid-fullscreen-close");
+      const fullscreenCloseBtn = document.getElementById('mermaid-fullscreen-close');
       if (fullscreenCloseBtn) {
-        fullscreenCloseBtn.addEventListener("click", () => {
+        fullscreenCloseBtn.addEventListener('click', () => {
           closeModal();
         });
       }
@@ -194,35 +173,35 @@
       const { toggleBtn, inlinePanel, inlineContent } = window.MermaidPreviewUIState.getUIRefs();
 
       if (toggleBtn && inlinePanel && inlineContent) {
-        toggleBtn.addEventListener("click", () => {
+        toggleBtn.addEventListener('click', () => {
           const isHidden = inlinePanel.hidden;
-          const isCollapsed = inlinePanel.classList.contains("collapsed");
+          const isCollapsed = inlinePanel.classList.contains('collapsed');
 
           if (isHidden) {
             // パネルを表示
             inlinePanel.hidden = false;
-            inlinePanel.classList.remove("collapsed");
-            inlinePanel.dataset.state = "expanded";
+            inlinePanel.classList.remove('collapsed');
+            inlinePanel.dataset.state = 'expanded';
             inlineContent.hidden = false;
-            toggleBtn.textContent = "閉じる";
-            toggleBtn.setAttribute("aria-expanded", "true");
-            toggleBtn.setAttribute("aria-label", "分岐プレビューを閉じる");
+            toggleBtn.textContent = '閉じる';
+            toggleBtn.setAttribute('aria-expanded', 'true');
+            toggleBtn.setAttribute('aria-label', '分岐プレビューを閉じる');
           } else if (isCollapsed) {
             // collapsed → 展開
-            inlinePanel.classList.remove("collapsed");
-            inlinePanel.dataset.state = "expanded";
+            inlinePanel.classList.remove('collapsed');
+            inlinePanel.dataset.state = 'expanded';
             inlineContent.hidden = false;
-            toggleBtn.textContent = "閉じる";
-            toggleBtn.setAttribute("aria-expanded", "true");
+            toggleBtn.textContent = '閉じる';
+            toggleBtn.setAttribute('aria-expanded', 'true');
           } else {
             // 展開 → 非表示
             inlinePanel.hidden = true;
-            inlinePanel.classList.add("collapsed");
-            inlinePanel.dataset.state = "collapsed";
+            inlinePanel.classList.add('collapsed');
+            inlinePanel.dataset.state = 'collapsed';
             inlineContent.hidden = true;
-            toggleBtn.textContent = "開く";
-            toggleBtn.setAttribute("aria-expanded", "false");
-            toggleBtn.setAttribute("aria-label", "分岐プレビューを開く");
+            toggleBtn.textContent = '開く';
+            toggleBtn.setAttribute('aria-expanded', 'false');
+            toggleBtn.setAttribute('aria-label', '分岐プレビューを開く');
           }
         });
       }
@@ -233,7 +212,7 @@
       const { copyBtn, dlBtn, view, src } = window.MermaidPreviewUIState.getUIRefs();
 
       if (copyBtn) {
-        copyBtn.addEventListener("click", async () => {
+        copyBtn.addEventListener('click', async () => {
           const code = window.MermaidPreviewLogicManager.generateSource();
           try {
             if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -241,33 +220,33 @@
             } else {
               if (src) {
                 src.select();
-                document.execCommand("copy");
+                document.execCommand('copy');
               }
             }
-            window.MermaidPreviewUIState.setStatus("Mermaidソースをコピーしました", "ok");
+            window.MermaidPreviewUIState.setStatus('Mermaidソースをコピーしました', 'ok');
           } catch {
-            window.MermaidPreviewUIState.setStatus("クリップボードコピーに失敗しました", "warn");
+            window.MermaidPreviewUIState.setStatus('クリップボードコピーに失敗しました', 'warn');
           }
         });
       }
 
       if (dlBtn) {
-        dlBtn.addEventListener("click", async () => {
-          if (!view.querySelector("svg")) await window.MermaidPreviewLogicManager.renderDiagram();
-          const svg = view.querySelector("svg");
+        dlBtn.addEventListener('click', async () => {
+          if (!view.querySelector('svg')) await window.MermaidPreviewLogicManager.renderDiagram();
+          const svg = view.querySelector('svg');
           if (!svg) {
-            window.MermaidPreviewUIState.setStatus("先に描画してください", "warn");
+            window.MermaidPreviewUIState.setStatus('先に描画してください', 'warn');
             return;
           }
-          const blob = new Blob([svg.outerHTML], { type: "image/svg+xml" });
-          const a = document.createElement("a");
+          const blob = new Blob([svg.outerHTML], { type: 'image/svg+xml' });
+          const a = document.createElement('a');
           a.href = URL.createObjectURL(blob);
-          a.download = "mermaid-preview.svg";
+          a.download = 'mermaid-preview.svg';
           document.body.appendChild(a);
           a.click();
           document.body.removeChild(a);
           setTimeout(() => URL.revokeObjectURL(a.href), 1000);
-          window.MermaidPreviewUIState.setStatus("SVGをダウンロードしました", "ok");
+          window.MermaidPreviewUIState.setStatus('SVGをダウンロードしました', 'ok');
         });
       }
     },
@@ -277,9 +256,9 @@
       const { openBtn } = window.MermaidPreviewUIState.getUIRefs();
 
       if (openBtn) {
-        openBtn.addEventListener("click", () => {
+        openBtn.addEventListener('click', () => {
           const code = window.MermaidPreviewLogicManager.generateSource();
-          const w = window.open("", "_blank");
+          const w = window.open('', '_blank');
           if (!w) return;
           const html = `<!doctype html>
 <html lang="ja"><head><meta charset="utf-8" />
@@ -313,13 +292,13 @@ render();</script>
       const { searchInput, searchClear } = window.MermaidPreviewUIState.getUIRefs();
 
       if (searchInput) {
-        searchInput.addEventListener("input", () => {
+        searchInput.addEventListener('input', () => {
           window.MermaidPreviewLogicManager.renderDiagram();
         });
       }
       if (searchClear) {
-        searchClear.addEventListener("click", () => {
-          if (searchInput) searchInput.value = "";
+        searchClear.addEventListener('click', () => {
+          if (searchInput) searchInput.value = '';
           window.MermaidPreviewLogicManager.renderDiagram();
         });
       }
@@ -330,21 +309,21 @@ render();</script>
       const { pathStartSel, pathGoalSel, pathApplyBtn } = window.MermaidPreviewUIState.getUIRefs();
 
       if (pathStartSel) {
-        pathStartSel.addEventListener("change", () => {
+        pathStartSel.addEventListener('change', () => {
           window.MermaidPreviewLogicManager.renderDiagram();
         });
       }
       if (pathGoalSel) {
-        pathGoalSel.addEventListener("change", () => {
+        pathGoalSel.addEventListener('change', () => {
           window.MermaidPreviewLogicManager.renderDiagram();
         });
       }
       if (pathApplyBtn) {
-        pathApplyBtn.addEventListener("click", () => {
+        pathApplyBtn.addEventListener('click', () => {
           window.MermaidPreviewLogicManager.renderDiagram();
         });
       }
-    }
+    },
   };
 
   // Global exposure
