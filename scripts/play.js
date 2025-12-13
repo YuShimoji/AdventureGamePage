@@ -1,5 +1,11 @@
 (function () {
   // Main play.js - UI rendering and coordination after modularization
+  function debugLog(...args) {
+    if (window.APP_CONFIG?.debug?.showConsoleLogs) {
+      console.log(...args);
+    }
+  }
+
   function renderEmptyStateForNoGameData() {
     const sceneEl = document.getElementById('scene');
     const choicesEl = document.getElementById('choices');
@@ -49,7 +55,7 @@
   function initPlayPage() {
     // Initialize core modules
     const { elements, engine, game } = window.PlayCore.init();
-    console.log('PlayCore.init returned:', { elements, engine, game });
+    debugLog('PlayCore.init returned:', { elements, engine, game });
 
     // Initialize feature modules
     window.PlaySave.init(engine, game.title);
@@ -123,14 +129,14 @@
       playElements.forEach(id => {
         const el = document.getElementById(id);
         if (el) {
-          el.style.display = 'none !important';
+          el.style.display = 'none';
           el.hidden = true;
           el.setAttribute('aria-hidden', 'true');
           el.setAttribute('inert', '');
         }
       });
 
-      console.log('[PLAY] Play elements hidden for non-play page');
+      debugLog('[PLAY] Play elements hidden for non-play page');
     }
   });
 })();

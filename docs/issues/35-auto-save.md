@@ -7,7 +7,9 @@
 
 ## 背景 / 文脈
 
-現在のセーブは手動のみ。ユーザーが忘れてセーブしない場合や、ブラウザクラッシュ時にデータが失われるリスクがある。ノード遷移ごとに自動保存することでデータ保護を強化する。
+ノード遷移や状態更新のタイミングで進行データ（progress）が保存されることで、クラッシュ時のデータ損失を防ぐ。
+
+現状は、ノード遷移（`setNode`/戻る/進む/リセット等）で `saveProgress()` が呼ばれる実装になっており、`APP_CONFIG.game.autoSave` は主に通知・負荷軽減（delay）用途として扱う。
 
 ## 要件（仕様）
 
@@ -29,6 +31,12 @@
 - `scripts/config.js`: 自動セーブ設定追加
 - `tests/gameEngine.spec.js`: 自動セーブテスト追加
 
+現状の主な実装箇所:
+
+- `scripts/gameEngineLogicManager.js`: ノード遷移/履歴操作/状態更新で `saveProgress()` を呼び出し
+- `scripts/config.js`: `APP_CONFIG.game.autoSave.enabled` / `delayMs`
+- `scripts/play.js`: `agp-auto-save` を受けてスクリーンリーダー通知
+
 ## 実装詳細
 
 ```javascript
@@ -40,17 +48,10 @@ game: {
   }
 }
 
-// gameEngine.js
-function setNode(id) {
-  // ... 既存処理 ...
-  executeNodeActions(gameData.nodes[id]);
-  render();
-  
-  // 自動セーブ
-  if (window.APP_CONFIG?.game?.autoSave?.enabled) {
-    setTimeout(() => saveProgress(), window.APP_CONFIG.game.autoSave.delayMs || 0);
-  }
-}
+// gameEngineLogicManager.js
+// ノード遷移後に saveProgress() を実行
+// 連続遷移時の読み上げ通知過多を避けるため、APP_CONFIG.game.autoSave.enabled のとき
+// delayMs を用いて debounced に 'agp-auto-save' を発火
 ```
 
 ## テスト計画

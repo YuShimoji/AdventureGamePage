@@ -234,7 +234,7 @@ flowchart LR
 
 ## 6. 実装メモ
 
-- `scripts/play.js` は既存の `sampleData.js` を読む設計。今後、`game-data-schema` に準拠したJSONをインポートできるよう拡張する。
+- `play.html` は `APP_CONFIG.storage.keys.gameData`（デフォルト: `agp_game_data`）からゲームデータを読み込む。未保存の場合は空状態UIを表示する。
 - 保存はローカル（localStorage/IndexedDB）。プレビューやスナップショットは `StorageProvider`/`StorageBridge` を共通利用。
 
 ## 7. サンプルデータ
@@ -248,7 +248,9 @@ flowchart LR
 
 ## 8. データマイグレーション
 
-既存のレガシーデータ（`agp_manuscript_full`）を新しい拡張スキーマに移行する `scripts/dataMigration.js` が用意されています。ページ読み込み時に自動実行され、古いデータをアイテム・キャラクター・Wiki・状態に変換します。
+既存のレガシーデータ（`agp_manuscript_full`）を新しい拡張スキーマに移行する仕組みとして、`scripts/dataMigration.js` / `scripts/migrationWizard.js` が用意されている。
+
+現状はユーザー操作で移行を実行する前提（migrationWizard）であり、ページ読み込み時に無条件で自動実行する前提ではない。
 
 ### マイグレーションウィザード
 

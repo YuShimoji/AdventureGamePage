@@ -9,6 +9,8 @@
 
 現在のインベントリは表示のみ。アイテムを使用することでストーリーが分岐したり、効果が発動したりするシステムが必要。ノードエディタでアイテム使用アクションを設定できるようにする。
 
+現状は、ノードアクションとして `use_item` が実装済みであり、ノード到達時アクションとして実行できる。
+
 ## 要件（仕様）
 
 - ノードアクションに `use_item` タイプを追加
@@ -28,6 +30,18 @@
 - `scripts/gameEngine.js`: `use_item` アクション実装
 - `scripts/nodeEditor.js`: アクションエディタ拡張
 - `tests/gameEngine.inventory.spec.js`: 使用テスト追加
+
+## 実装状況（現状）
+
+- `scripts/gameEngineUtils.js`: `use_item` を含むアクション実行が実装済み
+  - アイテム消費: `consume !== false` のとき 1 個消費
+  - 効果: `effect.type === 'show_text'` は Toast/alert 表示
+- `scripts/storyBuilder.js`: パレットから `use_item` ブロック追加の雛形が存在
+
+未反映/要確認:
+
+- `tests/` に `use_item` の専用テストが未追加
+- ノードエディタUIで `use_item` をどの程度編集できるか（入力UIの整備状況）を確認して docs に反映
 
 ## 実装詳細
 
