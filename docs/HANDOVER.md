@@ -115,13 +115,13 @@
 
 ### 🔧 技術的負債対応
 
-| タスク                                            | 状態      | 備考                                                                  |
-| ------------------------------------------------- | --------- | --------------------------------------------------------------------- |
-| npm test テストランナー安定化                     | ✅ 完了   | dev-server + Node http による `/tests/test.html` スモークテストへ移行 |
+| タスク                                            | 状態           | 備考                                                                                                     |
+| ------------------------------------------------- | -------------- | -------------------------------------------------------------------------------------------------------- |
+| npm test テストランナー安定化                     | ✅ 完了        | dev-server + Node http による `/tests/test.html` スモークテストへ移行                                    |
 | ブラウザE2Eテスト導入（Puppeteer/Playwright検討） | 🔄 PoC構築済み | Playwright PoC: `npm run test:e2e`（`scripts/e2e-tests.js`）。初回のみ `npx playwright install chromium` |
-| 既存alertのToast置換                              | ✅ 完了   | ToastManager でプレイ/管理両方の通知を統一                            |
-| 依存関係の最新化                                  | 📋 未着手 | npm update検討                                                        |
-| パフォーマンス最適化                              | 📋 未着手 | ローディング改善                                                      |
+| 既存alertのToast置換                              | ✅ 完了        | ToastManager でプレイ/管理両方の通知を統一                                                               |
+| 依存関係の最新化                                  | 📋 未着手      | npm update検討                                                                                           |
+| パフォーマンス最適化                              | 📋 未着手      | ローディング改善                                                                                         |
 
 ## 今回セッションの調査サマリ (2025-12-05)
 
@@ -192,6 +192,38 @@
   - 主要なモーダル/パネル（セーブ/ロードモーダル、セーブスロット、インベントリ、テーマパネル、モバイルメニューなど）について、フォーカス移動・`aria-expanded`・スクリーンリーダー読み上げメッセージを実際の利用シナリオで再度手動検証し、必要に応じて微調整を継続。
   - A11y改善フェーズが十分に安定した段階で、ブラウザE2Eテスト基盤（Puppeteer/Playwright 等）と組み合わせた回帰テスト体制の検討を継続。
 
+## 今回セッションの作業サマリ (2025-12-13)
+
+- **node_modules の Git 追跡解除（案B）**
+  - `node_modules` を Git 追跡から除外し、`package-lock.json` + `npm ci` 前提へ移行。
+  - 追跡解除は単独コミットとして分離し、履歴上の差分を明確化。
+
+- **Play: 未実装機能の実装（画像/条件/音声）**
+  - シーン画像の表示: `#scene-image` に `node.image` を描画。
+  - 条件付き選択肢: `choices[].conditions` を評価し、条件を満たす選択肢のみ表示。
+  - 音声アクション: `play_bgm` / `play_sfx` / `stop_bgm` を `AudioManager` に委譲して実装。
+
+- **GameEngine: 条件評価 API 追加**
+  - `GameEngineLogicManager.checkConditions()` を追加（`has_item` / `item_count` / `inventory_empty` / `inventory_full` / `variable_exists` / `variable_equals`）。
+
+- **テスト追加**
+  - `tests/gameEngine.spec.js` に、条件付き選択肢のフィルタリングと画像描画のテストを追加。
+
+- **品質ゲート**
+  - `npm test`: PASS
+  - `npm run test:ci`: PASS
+  - `npm run lint`: errors=0 を維持（warnings は段階的削減を継続）
+
+- **Play: モーダル/パネル管理の重複削減（追加整理）**
+  - `play.js` に残っていた旧モーダル管理（フォーカストラップ/パネル制御の重複）を削除し、`PlayModalFocus` / `PlayInventory` / `PlayModalSaveSlots` 側へ集約。
+  - lint warnings（no-unused-vars）を段階的に削減（直近: 47 → 37）。
+
+- **サンプルデータ: RPGサンプルの整合性修正**
+  - `sample-game-rpg.js` の重複キー解消に伴う導線の分断を解消し、`forest_entrance` に分岐を統合。
+
+- **Admin: SavePreview のレガシー互換 shim を最小化**
+  - `savePreview.js` を「モジュラーがあれば委譲、なければ no-op」で提供する shim に整理。
+
 ---
 
 ## 重要技術情報
@@ -218,7 +250,7 @@
 
 ## 最終更新日時
 
-**2025-12-12** - ドキュメント整合性更新（E2E PoCの現状反映・参照パス修正など）を反映
+**2025-12-13** - node_modules 追跡解除（案B）と Play 機能（画像/条件/音声）実装、関連テスト/ドキュメント整備を反映
 
 ---
 

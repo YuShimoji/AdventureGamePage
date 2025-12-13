@@ -1,7 +1,7 @@
 (function () {
   // Enhanced Export/Import functionality with batch operations and conflict resolution
 
-  const EXPORT_VERSION = "1.0";
+  const EXPORT_VERSION = '1.0';
 
   // Export multiple records with filtering and compression
   async function exportMultiple(options = {}) {
@@ -13,24 +13,24 @@
     } = options;
 
     const provider = window.StorageProviders?.Registry?.getActive();
-    if (!provider) throw new Error("No storage provider available");
+    if (!provider) throw new Error('No storage provider available');
 
     let records = await provider.list();
 
     // Apply filters
     if (ids) {
-      records = records.filter((r) => ids.includes(r.id));
+      records = records.filter(r => ids.includes(r.id));
     }
     if (filter.kind) {
-      records = records.filter((r) => r.kind === filter.kind);
+      records = records.filter(r => r.kind === filter.kind);
     }
     if (filter.dateFrom) {
       const from = new Date(filter.dateFrom);
-      records = records.filter((r) => new Date(r.savedAt) >= from);
+      records = records.filter(r => new Date(r.savedAt) >= from);
     }
     if (filter.dateTo) {
       const to = new Date(filter.dateTo);
-      records = records.filter((r) => new Date(r.savedAt) <= to);
+      records = records.filter(r => new Date(r.savedAt) <= to);
     }
 
     // Load full records
@@ -55,12 +55,12 @@
     }
 
     if (compress && window.JSZip) {
-      const zip = new JSZip();
-      zip.file("export.json", JSON.stringify(exportData, null, 2));
-      const blob = await zip.generateAsync({ type: "blob" });
+      const zip = new window.JSZip();
+      zip.file('export.json', JSON.stringify(exportData, null, 2));
+      const blob = await zip.generateAsync({ type: 'blob' });
       return { blob, filename: `agp-export-${Date.now()}.zip` };
     } else {
-      const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" });
+      const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
       return { blob, filename: `agp-export-${Date.now()}.json` };
     }
   }
@@ -69,12 +69,12 @@
   async function importBatch(files, options = {}) {
     const {
       onProgress = () => {},
-      onConflict = "skip", // 'skip', 'overwrite', 'rename'
+      onConflict = 'skip', // 'skip', 'overwrite', 'rename'
       dryRun = false,
     } = options;
 
     const provider = window.StorageProviders?.Registry?.getActive();
-    if (!provider) throw new Error("No storage provider available");
+    if (!provider) throw new Error('No storage provider available');
 
     const results = {
       success: [],
@@ -96,7 +96,7 @@
 
         for (const record of records) {
           if (!record.id) {
-            results.errors.push({ file: file.name, error: "Missing record ID" });
+            results.errors.push({ file: file.name, error: 'Missing record ID' });
             continue;
           }
 
@@ -110,9 +110,9 @@
               incoming: record,
             });
 
-            if (onConflict === "rename") {
-              finalRecord = { ...record, id: record.id + "_imported_" + Date.now() };
-            } else if (onConflict === "skip") {
+            if (onConflict === 'rename') {
+              finalRecord = { ...record, id: record.id + '_imported_' + Date.now() };
+            } else if (onConflict === 'skip') {
               continue;
             }
             // 'overwrite' falls through
@@ -134,7 +134,7 @@
   // Utility: Download blob
   function downloadBlob(blob, filename) {
     const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
+    const a = document.createElement('a');
     a.href = url;
     a.download = filename;
     document.body.appendChild(a);
@@ -145,8 +145,8 @@
 
   // UI Integration helpers
   function createExportDialog() {
-    const dialog = document.createElement("div");
-    dialog.className = "modal-overlay";
+    const dialog = document.createElement('div');
+    dialog.className = 'modal-overlay';
     dialog.innerHTML = `
       <div class="modal-content card">
         <h3>エクスポート設定</h3>
@@ -173,16 +173,16 @@
       </div>
     `;
 
-    dialog.querySelector("#export-form").addEventListener("submit", async (e) => {
+    dialog.querySelector('#export-form').addEventListener('submit', async e => {
       e.preventDefault();
       const formData = new FormData(e.target);
       const options = {
-        compress: formData.get("compress") === "on",
+        compress: formData.get('compress') === 'on',
       };
 
-      if (!formData.get("all")) {
+      if (!formData.get('all')) {
         options.filter = {
-          kind: formData.get("kind") || undefined,
+          kind: formData.get('kind') || undefined,
         };
       }
 
@@ -191,7 +191,7 @@
         downloadBlob(blob, filename);
         dialog.remove();
       } catch (e) {
-        ToastManager.error("エクスポート失敗: " + e.message);
+        ToastManager.error('エクスポート失敗: ' + e.message);
       }
     });
 
@@ -199,8 +199,8 @@
   }
 
   function createImportDialog() {
-    const dialog = document.createElement("div");
-    dialog.className = "modal-overlay";
+    const dialog = document.createElement('div');
+    dialog.className = 'modal-overlay';
     dialog.innerHTML = `
       <div class="modal-content card">
         <h3>インポート設定</h3>
@@ -232,18 +232,18 @@
       </div>
     `;
 
-    dialog.querySelector("#import-form").addEventListener("submit", async (e) => {
+    dialog.querySelector('#import-form').addEventListener('submit', async e => {
       e.preventDefault();
       const formData = new FormData(e.target);
-      const files = formData.getAll("files");
-      const conflict = formData.get("conflict");
-      const dryRun = formData.get("dryRun") === "on";
+      const files = formData.getAll('files');
+      const conflict = formData.get('conflict');
+      const dryRun = formData.get('dryRun') === 'on';
 
-      const progressEl = dialog.querySelector("#progress");
-      const progressBar = progressEl.querySelector("progress");
-      const progressText = dialog.querySelector("#progress-text");
+      const progressEl = dialog.querySelector('#progress');
+      const progressBar = progressEl.querySelector('progress');
+      const progressText = dialog.querySelector('#progress-text');
 
-      progressEl.style.display = "block";
+      progressEl.style.display = 'block';
 
       try {
         const results = await importBatch(files, {
@@ -268,7 +268,7 @@
         }
         dialog.remove();
       } catch (e) {
-        ToastManager.error("インポート失敗: " + e.message);
+        ToastManager.error('インポート失敗: ' + e.message);
       }
     });
 

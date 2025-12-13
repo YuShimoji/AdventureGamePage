@@ -42,10 +42,19 @@
       }
 
       function handleEscapeKey(e) {
-        if (e.key === 'Escape') {
-          e.preventDefault();
-          PlayModalFocus.closeModalWithFocus(modal);
+        if (e.key !== 'Escape') return;
+        e.preventDefault();
+
+        const closeBtn =
+          modal.querySelector('button.modal-close, button.modal-close-btn') ||
+          modal.querySelector('button[id$="-close"], button[aria-label*="閉じる"]');
+
+        if (closeBtn && typeof closeBtn.click === 'function') {
+          closeBtn.click();
+          return;
         }
+
+        PlayModalFocus.closeModalWithFocus(modal);
       }
 
       setTimeout(function () {
@@ -96,7 +105,7 @@
       }
 
       this.announce('モーダルを閉じました', 'assertive');
-    }
+    },
   };
 
   // Global exposure

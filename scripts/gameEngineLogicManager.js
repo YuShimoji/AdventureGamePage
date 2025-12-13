@@ -2,8 +2,8 @@
   // GameEngineLogicManager - コアゲームロジック
   // ステート管理、ナビゲーション、インベントリ管理、セーブ/ロード
 
-  const SAVE_SLOTS_KEY = window.APP_CONFIG?.storage?.keys?.saveSlots || "agp_save_slots";
-  const GAME_PROGRESS_KEY = window.APP_CONFIG?.storage?.keys?.gameProgress || "agp_game_progress";
+  const SAVE_SLOTS_KEY = window.APP_CONFIG?.storage?.keys?.saveSlots || 'agp_save_slots';
+  const GAME_PROGRESS_KEY = window.APP_CONFIG?.storage?.keys?.gameProgress || 'agp_game_progress';
 
   class GameEngineLogicManager {
     constructor(gameData, state, itemsData) {
@@ -12,10 +12,90 @@
       this.itemsData = itemsData;
     }
 
+    checkConditions(conditions) {
+      if (!Array.isArray(conditions) || conditions.length === 0) return true;
+      return conditions.every(cond => this._checkCondition(cond));
+    }
+
+    _checkCondition(cond) {
+      if (!cond || typeof cond !== 'object') return true;
+
+      switch (cond.type) {
+        case 'has_item': {
+          const itemId = cond.itemId;
+          const count = typeof cond.count === 'number' ? cond.count : 1;
+          return this.hasItem(itemId, count);
+        }
+
+        case 'item_count': {
+          const itemId = cond.itemId;
+          const count = typeof cond.count === 'number' ? cond.count : 0;
+          const op = cond.operator || '>=';
+          const actual = this.getItemCount(itemId);
+          return this._compare(actual, op, count);
+        }
+
+        case 'inventory_empty': {
+          return this.state.playerState?.inventory?.items?.length === 0;
+        }
+
+        case 'inventory_full': {
+          const inv = this.state.playerState?.inventory;
+          if (!inv) return false;
+          const itemsLen = Array.isArray(inv.items) ? inv.items.length : 0;
+          const maxSlots = typeof inv.maxSlots === 'number' ? inv.maxSlots : 0;
+          return maxSlots > 0 && itemsLen >= maxSlots;
+        }
+
+        case 'variable_exists': {
+          const key = cond.key;
+          if (!key) return false;
+          const vars = this.state.playerState?.variables || {};
+          return Object.prototype.hasOwnProperty.call(vars, key);
+        }
+
+        case 'variable_equals': {
+          const key = cond.key;
+          if (!key) return false;
+          const vars = this.state.playerState?.variables || {};
+          const actual = vars[key];
+          const op = cond.operator || '===';
+          const expected = cond.value;
+          return this._compare(actual, op, expected);
+        }
+
+        default:
+          return false;
+      }
+    }
+
+    _compare(actual, operator, expected) {
+      switch (operator) {
+        case '>=':
+          return actual >= expected;
+        case '>':
+          return actual > expected;
+        case '<=':
+          return actual <= expected;
+        case '<':
+          return actual < expected;
+        case '==':
+          return actual == expected;
+        case '!=':
+          return actual != expected;
+        case '===':
+          return actual === expected;
+        case '!==':
+          return actual !== expected;
+        default:
+          return false;
+      }
+    }
+
     // ノード設定
     setNode(id, executeAction, render, saveProgress) {
       if (!this.gameData.nodes[id]) {
-        console.warn("Unknown node:", id);
+        console.warn('Unknown node:', id);
         return;
       }
       // push current to history when moving to a different node
@@ -92,17 +172,17 @@
 
     // リセット
     reset(saveProgress, render) {
-      this.state.nodeId = this.gameData.start || "start";
+      this.state.nodeId = this.gameData.start || 'start';
       this.state.history = [];
       this.state.forward = [];
       this.state.playerState = {
         inventory: {
           items: [],
-          maxSlots: 20
+          maxSlots: 20,
         },
         flags: {},
         variables: {},
-        history: []
+        history: [],
       };
       saveProgress();
       render();
@@ -117,7 +197,7 @@
         nodeId: this.state.nodeId,
         history: hist,
         forward: fwd,
-        playerState: JSON.parse(JSON.stringify(this.state.playerState)) // Deep copy
+        playerState: JSON.parse(JSON.stringify(this.state.playerState)), // Deep copy
       };
       StorageUtil.saveJSON(GAME_PROGRESS_KEY, progressData);
     }
@@ -129,8 +209,12 @@
         if (p.nodeId && this.gameData.nodes[p.nodeId]) {
           this.state.nodeId = p.nodeId;
         }
-        const hist = Array.isArray(p.history) ? p.history.filter((id) => !!this.gameData.nodes[id]) : [];
-        const fwd = Array.isArray(p.forward) ? p.forward.filter((id) => !!this.gameData.nodes[id]) : [];
+        const hist = Array.isArray(p.history)
+          ? p.history.filter(id => !!this.gameData.nodes[id])
+          : [];
+        const fwd = Array.isArray(p.forward)
+          ? p.forward.filter(id => !!this.gameData.nodes[id])
+          : [];
         this.state.history = hist;
         this.state.forward = fwd;
 
@@ -140,7 +224,7 @@
             inventory: GameEngineUtils.migrateInventory(p.playerState.inventory, this.itemsData),
             flags: p.playerState.flags || {},
             variables: p.playerState.variables || {},
-            history: Array.isArray(p.playerState.history) ? p.playerState.history : []
+            history: Array.isArray(p.playerState.history) ? p.playerState.history : [],
           };
         }
       }
@@ -148,7 +232,13 @@
 
     // ゲームセーブ
     saveGame(slotName) {
-      return GameEngineUtils.createSaveData(this.gameData, this.state, () => this.getNode());
+      const saveData = GameEngineUtils.createSaveData(this.gameData, this.state, () =>
+        this.getNode()
+      );
+      if (saveData && slotName) {
+        saveData.slotName = slotName;
+      }
+      return saveData;
     }
 
     // ゲームロード
@@ -161,10 +251,13 @@
 
       if (saveData.playerState) {
         this.state.playerState = {
-          inventory: GameEngineUtils.migrateInventory(saveData.playerState.inventory, this.itemsData),
+          inventory: GameEngineUtils.migrateInventory(
+            saveData.playerState.inventory,
+            this.itemsData
+          ),
           flags: saveData.playerState.flags || {},
           variables: saveData.playerState.variables || {},
-          history: Array.isArray(saveData.playerState.history) ? saveData.playerState.history : []
+          history: Array.isArray(saveData.playerState.history) ? saveData.playerState.history : [],
         };
       }
 
@@ -190,7 +283,9 @@
         existingItem.quantity += quantity;
       } else {
         // Check slot limit
-        if (this.state.playerState.inventory.items.length >= this.state.playerState.inventory.maxSlots) {
+        if (
+          this.state.playerState.inventory.items.length >= this.state.playerState.inventory.maxSlots
+        ) {
           console.warn('Inventory is full');
           return false;
         }
@@ -199,23 +294,27 @@
         const newItem = {
           ...itemData,
           quantity: quantity,
-          icon: GameEngineUtils.getItemIcon(itemData)
+          icon: GameEngineUtils.getItemIcon(itemData),
         };
         this.state.playerState.inventory.items.push(newItem);
       }
 
       this.saveProgress();
       // Emit inventory change event
-      document.dispatchEvent(new CustomEvent('agp-inventory-changed', {
-        detail: { action: 'add', itemId, quantity }
-      }));
+      document.dispatchEvent(
+        new CustomEvent('agp-inventory-changed', {
+          detail: { action: 'add', itemId, quantity },
+        })
+      );
       return true;
     }
 
     removeItem(itemId, quantity = 1) {
       if (!itemId || quantity <= 0) return false;
 
-      const itemIndex = this.state.playerState.inventory.items.findIndex(item => item.id === itemId);
+      const itemIndex = this.state.playerState.inventory.items.findIndex(
+        item => item.id === itemId
+      );
       if (itemIndex === -1) return false;
 
       const item = this.state.playerState.inventory.items[itemIndex];
@@ -230,9 +329,11 @@
 
       this.saveProgress();
       // Emit inventory change event
-      document.dispatchEvent(new CustomEvent('agp-inventory-changed', {
-        detail: { action: 'remove', itemId, quantity }
-      }));
+      document.dispatchEvent(
+        new CustomEvent('agp-inventory-changed', {
+          detail: { action: 'remove', itemId, quantity },
+        })
+      );
       return true;
     }
 
@@ -252,7 +353,7 @@
       return {
         items: this.state.playerState.inventory.items.slice(), // Return copy
         maxSlots: this.state.playerState.inventory.maxSlots,
-        currentSlots: this.state.playerState.inventory.items.length
+        currentSlots: this.state.playerState.inventory.items.length,
       };
     }
 
@@ -271,7 +372,9 @@
           inventory: GameEngineUtils.migrateInventory(newState.inventory, this.itemsData),
           flags: newState.flags || this.state.playerState.flags,
           variables: newState.variables || this.state.playerState.variables,
-          history: Array.isArray(newState.history) ? newState.history : this.state.playerState.history
+          history: Array.isArray(newState.history)
+            ? newState.history
+            : this.state.playerState.history,
         };
         this.saveProgress();
       }
@@ -279,7 +382,7 @@
 
     // セーブスロット管理
     createSlot(slotId, name = '') {
-      const existing = window.StorageUtil.loadJSON('agp_save_slots') || {};
+      const existing = window.StorageUtil.loadJSON(SAVE_SLOTS_KEY) || {};
       if (existing[slotId]) {
         console.warn(`Slot ${slotId} already exists`);
         return false;
@@ -296,9 +399,11 @@
           modified: now,
           playTime: saveData.metadata?.gameDuration || 0,
           currentLocation: this.getNode()?.title || 'Unknown',
-          progress: Math.round((saveData.metadata?.nodesVisited || 0) / Object.keys(this.gameData.nodes).length * 100),
-          version: '1.0'
-        }
+          progress: Math.round(
+            ((saveData.metadata?.nodesVisited || 0) / Object.keys(this.gameData.nodes).length) * 100
+          ),
+          version: '1.0',
+        },
       };
       window.StorageUtil.saveJSON(SAVE_SLOTS_KEY, existing);
       return true;
@@ -329,7 +434,9 @@
       existing[slotId].meta.modified = new Date().toISOString();
       existing[slotId].meta.playTime = saveData.metadata?.gameDuration || 0;
       existing[slotId].meta.currentLocation = this.getNode()?.title || 'Unknown';
-      existing[slotId].meta.progress = Math.round((saveData.metadata?.nodesVisited || 0) / Object.keys(this.gameData.nodes).length * 100);
+      existing[slotId].meta.progress = Math.round(
+        ((saveData.metadata?.nodesVisited || 0) / Object.keys(this.gameData.nodes).length) * 100
+      );
 
       window.StorageUtil.saveJSON(SAVE_SLOTS_KEY, existing);
       return true;
@@ -372,8 +479,8 @@
         meta: {
           ...existing[fromId].meta,
           created: new Date().toISOString(),
-          modified: new Date().toISOString()
-        }
+          modified: new Date().toISOString(),
+        },
       };
       window.StorageUtil.saveJSON(SAVE_SLOTS_KEY, existing);
       return true;

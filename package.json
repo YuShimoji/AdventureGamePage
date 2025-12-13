@@ -15,21 +15,14 @@
     "test:manual": "node scripts/dev-server.js",
     "test:e2e": "node scripts/e2e-tests.js",
     "check": "npm run lint && npm run test",
-    "lint": "eslint \"scripts/*.js\" --fix || echo 'ESLint not installed, run npm install'",
+    "lint": "eslint \"scripts/*.js\"",
+    "lint:fix": "eslint \"scripts/*.js\" --fix",
     "format": "prettier --write \"scripts/*.js\" \"*.html\" \"docs/**/*.md\" || echo 'Prettier not installed, run npm install'",
     "smoke": "node scripts/dev-check.js",
     "docs": "echo 'Documentation generation not configured yet'",
     "build": "echo 'No build process configured yet'"
   },
-  "keywords": [
-    "adventure-game",
-    "browser-game",
-    "javascript",
-    "html5",
-    "game-engine",
-    "visual-novel",
-    "text-adventure"
-  ],
+  "keywords": ["adventure-game", "browser-game", "javascript", "html5", "game-engine", "visual-novel", "text-adventure"],
   "author": "Yu Shimoji",
   "license": "MIT",
   "repository": {
@@ -48,10 +41,5 @@
   "engines": {
     "node": ">=14.0.0"
   },
-  "browserslist": [
-    "Chrome >= 80",
-    "Firefox >= 75",
-    "Safari >= 13",
-    "Edge >= 80"
-  ]
+  "browserslist": ["Chrome >= 80", "Firefox >= 75", "Safari >= 13", "Edge >= 80"]
 }

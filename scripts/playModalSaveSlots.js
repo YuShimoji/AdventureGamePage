@@ -12,7 +12,6 @@
     setupSaveSlotsPanel() {
       const saveSlotsPanel = document.getElementById('save-slots-panel');
       const saveSlotsCloseBtn = document.getElementById('save-slots-close');
-      const saveSlotsList = document.getElementById('save-slots-list');
       const createNewSlotBtn = document.getElementById('create-new-slot');
       const btnSaveSlots = document.getElementById('btn-save-slots');
 
@@ -20,7 +19,7 @@
 
       saveSlotsPanel.setAttribute('role', 'dialog');
       saveSlotsPanel.setAttribute('aria-modal', 'true');
-      saveSlotsPanel.setAttribute('aria-labelledby', 'save-slots-title');
+      saveSlotsPanel.setAttribute('aria-labelledby', 'save-slots-header');
 
       const self = this;
 
@@ -187,7 +186,7 @@
     showSaveSlotsPanel() {
       const saveSlotsPanel = document.getElementById('save-slots-panel');
       const btnSaveSlots = document.getElementById('btn-save-slots');
-      
+
       this.updateSaveSlotsList();
       window.PlayModalFocus.openModalWithFocus(saveSlotsPanel);
       if (btnSaveSlots) {
@@ -198,12 +197,12 @@
     hideSaveSlotsPanel() {
       const saveSlotsPanel = document.getElementById('save-slots-panel');
       const btnSaveSlots = document.getElementById('btn-save-slots');
-      
+
       window.PlayModalFocus.closeModalWithFocus(saveSlotsPanel);
       if (btnSaveSlots) {
         btnSaveSlots.setAttribute('aria-expanded', 'false');
       }
-    }
+    },
   };
 
   // Global exposure

@@ -4,9 +4,10 @@
   let engineRef = null;
 
   function setupSaveModal() {
-    const saveLoadModal = window.PlaySave && typeof window.PlaySave.getModalElement === 'function'
-      ? window.PlaySave.getModalElement()
-      : document.getElementById('save-load-modal');
+    const saveLoadModal =
+      window.PlaySave && typeof window.PlaySave.getModalElement === 'function'
+        ? window.PlaySave.getModalElement()
+        : document.getElementById('save-load-modal');
 
     const originalShowModal = window.showModal || function () {};
     window.showModal = function (type) {
@@ -33,9 +34,17 @@
     const themeCloseBtn = document.querySelector('#theme-panel .modal-close-btn');
     const btnTheme = document.getElementById('btn-theme');
 
+    if (btnTheme) {
+      btnTheme.setAttribute('aria-expanded', 'false');
+    }
+
     if (themeCloseBtn && themePanel) {
       themeCloseBtn.addEventListener('click', function () {
         window.PlayModalFocus.closeModalWithFocus(themePanel);
+
+        if (btnTheme) {
+          btnTheme.setAttribute('aria-expanded', 'false');
+        }
       });
     }
 
@@ -44,11 +53,13 @@
         const willOpen = themePanel.hidden || themePanel.style.display === 'none';
         if (willOpen) {
           window.PlayModalFocus.openModalWithFocus(themePanel);
+          btnTheme.setAttribute('aria-expanded', 'true');
           if (window.PlayInput && typeof window.PlayInput.announceGameAction === 'function') {
             window.PlayInput.announceGameAction('themeChanged');
           }
         } else {
           window.PlayModalFocus.closeModalWithFocus(themePanel);
+          btnTheme.setAttribute('aria-expanded', 'false');
         }
       });
     }
@@ -57,22 +68,22 @@
   window.PlayModal = {
     init: function (options) {
       engineRef = options && options.engine ? options.engine : null;
-      
+
       setupSaveModal();
       setupThemePanel();
-      
+
       // Initialize save slots module
       if (engineRef && window.PlayModalSaveSlots) {
         window.PlayModalSaveSlots.init(engineRef);
       }
     },
-    
+
     // Delegate to focus manager
-    openModalWithFocus: function(modal) {
+    openModalWithFocus: function (modal) {
       return window.PlayModalFocus.openModalWithFocus(modal);
     },
-    closeModalWithFocus: function(modal) {
+    closeModalWithFocus: function (modal) {
       return window.PlayModalFocus.closeModalWithFocus(modal);
-    }
+    },
   };
 })();

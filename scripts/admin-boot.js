@@ -3,7 +3,14 @@
 
   // Admin Boot Script - Integrated manager using modular components
 
-  const { log, ensureEditorElements, initializeEditor, loadAndApplyConfig, showBootError, initNodeEditorModal } = window.AdminBootUtils || {};
+  const {
+    log,
+    ensureEditorElements,
+    initializeEditor,
+    loadAndApplyConfig,
+    showBootError,
+    initNodeEditorModal,
+  } = window.AdminBootUtils || {};
 
   // 初期化のメイン関数
   async function boot() {
@@ -106,13 +113,13 @@
   // 自動起動（adminコンテキストでのみ実行）
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
-      if (typeof isAdminContext === 'function' && isAdminContext()) {
+      if (typeof window.isAdminContext === 'function' && window.isAdminContext()) {
         boot();
       }
     });
   } else {
     setTimeout(() => {
-      if (typeof isAdminContext === 'function' && isAdminContext()) {
+      if (typeof window.isAdminContext === 'function' && window.isAdminContext()) {
         boot();
       }
     }, 10);

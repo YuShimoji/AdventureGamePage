@@ -12,7 +12,7 @@
         key: '🗝️',
         tool: '🔧',
         book: '📖',
-        treasure: '💎'
+        treasure: '💎',
       };
       return icons[type] || '📦';
     }
@@ -37,6 +37,29 @@
           case 'set_variable':
             this.executeSetVariableAction(action, state, saveProgress);
             break;
+          case 'play_bgm':
+            if (window.AudioManager && typeof window.AudioManager.playBGM === 'function') {
+              window.AudioManager.playBGM(action.url, {
+                volume: action.volume,
+                loop: action.loop,
+                fadeIn: action.fadeIn,
+                crossfade: action.crossfade,
+              });
+            }
+            break;
+          case 'stop_bgm':
+            if (window.AudioManager && typeof window.AudioManager.stopBGM === 'function') {
+              window.AudioManager.stopBGM(action.fadeOut !== false);
+            }
+            break;
+          case 'play_sfx':
+            if (window.AudioManager && typeof window.AudioManager.playSFX === 'function') {
+              window.AudioManager.playSFX(action.url, {
+                volume: action.volume,
+                loop: action.loop,
+              });
+            }
+            break;
           default:
             console.warn(`Unknown action type: ${action.type}`);
         }
@@ -55,25 +78,31 @@
           state.playerState.inventory.items.push({
             ...itemData,
             quantity: addQuantity,
-            icon: this.getItemIcon(itemData)
+            icon: this.getItemIcon(itemData),
           });
         }
       } else {
         // Increase quantity if exists
-        const existingItem = state.playerState.inventory.items.find(item => item.id === action.itemId);
+        const existingItem = state.playerState.inventory.items.find(
+          item => item.id === action.itemId
+        );
         if (existingItem) {
           existingItem.quantity += addQuantity;
         }
       }
       saveProgress();
-      document.dispatchEvent(new CustomEvent('agp-inventory-changed', {
-        detail: { action: 'add', itemId: action.itemId, quantity: addQuantity }
-      }));
+      document.dispatchEvent(
+        new CustomEvent('agp-inventory-changed', {
+          detail: { action: 'add', itemId: action.itemId, quantity: addQuantity },
+        })
+      );
     }
 
     static executeRemoveItemAction(action, state, itemsData, saveProgress) {
       const removeQuantity = action.quantity || 1;
-      const itemIndex = state.playerState.inventory.items.findIndex(item => item.id === action.itemId);
+      const itemIndex = state.playerState.inventory.items.findIndex(
+        item => item.id === action.itemId
+      );
       if (itemIndex !== -1) {
         const item = state.playerState.inventory.items[itemIndex];
         if (item.quantity <= removeQuantity) {
@@ -82,9 +111,11 @@
           item.quantity -= removeQuantity;
         }
         saveProgress();
-        document.dispatchEvent(new CustomEvent('agp-inventory-changed', {
-          detail: { action: 'remove', itemId: action.itemId, quantity: removeQuantity }
-        }));
+        document.dispatchEvent(
+          new CustomEvent('agp-inventory-changed', {
+            detail: { action: 'remove', itemId: action.itemId, quantity: removeQuantity },
+          })
+        );
       }
     }
 
@@ -96,7 +127,8 @@
       }
 
       // Consume item if specified
-      if (action.consume !== false) { // Default to true
+      if (action.consume !== false) {
+        // Default to true
         if (useItem.quantity <= 1) {
           const index = state.playerState.inventory.items.indexOf(useItem);
           state.playerState.inventory.items.splice(index, 1);
@@ -111,17 +143,21 @@
       }
 
       saveProgress();
-      document.dispatchEvent(new CustomEvent('agp-inventory-changed', {
-        detail: { action: 'use', itemId: action.itemId, quantity: 1 }
-      }));
+      document.dispatchEvent(
+        new CustomEvent('agp-inventory-changed', {
+          detail: { action: 'use', itemId: action.itemId, quantity: 1 },
+        })
+      );
     }
 
     static executeClearInventoryAction(state, saveProgress) {
       state.playerState.inventory.items = [];
       saveProgress();
-      document.dispatchEvent(new CustomEvent('agp-inventory-changed', {
-        detail: { action: 'clear' }
-      }));
+      document.dispatchEvent(
+        new CustomEvent('agp-inventory-changed', {
+          detail: { action: 'clear' },
+        })
+      );
     }
 
     static executeSetVariableAction(action, state, saveProgress) {
@@ -178,9 +214,19 @@
         return {
           items: inventory.map(itemId => {
             const itemData = itemsData.find(item => item.id === itemId);
-            return itemData ? { ...itemData, quantity: 1, icon: this.getItemIcon(itemData) } : { id: itemId, name: `不明なアイテム (${itemId})`, description: '', quantity: 1, type: 'item', usable: false, icon: '❓' };
+            return itemData
+              ? { ...itemData, quantity: 1, icon: this.getItemIcon(itemData) }
+              : {
+                  id: itemId,
+                  name: `不明なアイテム (${itemId})`,
+                  description: '',
+                  quantity: 1,
+                  type: 'item',
+                  usable: false,
+                  icon: '❓',
+                };
           }),
-          maxSlots: 20
+          maxSlots: 20,
         };
       } else if (!inventory || typeof inventory !== 'object') {
         return { items: [], maxSlots: 20 };
@@ -208,8 +254,8 @@
           choicesMade: state.history.length,
           inventoryCount: state.playerState.inventory.items.length,
           lastNodeText: getNode()?.text?.substring(0, 100) || '',
-          version: '1.0'
-        }
+          version: '1.0',
+        },
       };
     }
   }

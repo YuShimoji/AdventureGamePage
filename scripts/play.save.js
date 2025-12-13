@@ -1,15 +1,15 @@
 (function () {
   // Play Save/Load Module - Save slot management and auto-save
-  const SAVE_SLOTS_KEY_PREFIX = window.APP_CONFIG?.storage?.keys?.saveSlots || "agp_save_slots";
+  const SAVE_SLOTS_KEY_PREFIX = window.APP_CONFIG?.storage?.keys?.saveSlots || 'agp_save_slots';
   window.PlaySave = {
-    init: function(engine, gameTitle) {
+    init: function (engine, gameTitle) {
       this.engine = engine;
       this.currentGameTitle = gameTitle;
       this.setupModal();
       this.setupAutoSave();
     },
 
-    setupModal: function() {
+    setupModal: function () {
       const playSave = this;
       const modal = document.getElementById('save-load-modal');
       const modalTitle = document.getElementById('modal-title');
@@ -29,7 +29,7 @@
         modal.style.display = 'none';
       }
 
-      const applyMode = (mode) => {
+      const applyMode = mode => {
         if (!modal) return;
         const normalizedMode = mode === 'load' ? 'load' : 'save';
         playSave.currentMode = normalizedMode;
@@ -47,7 +47,10 @@
           if (saveNameInput) {
             saveNameInput.value = '';
             setTimeout(() => {
-              if (document.activeElement && document.activeElement.closest('#save-load-modal') === modal) {
+              if (
+                document.activeElement &&
+                document.activeElement.closest('#save-load-modal') === modal
+              ) {
                 return;
               }
               saveNameInput.focus();
@@ -63,10 +66,12 @@
         applyMode(mode);
         modal.hidden = false;
         modal.style.display = 'flex';
-        modal.dispatchEvent(new CustomEvent('agp-play-save-shown', {
-          bubbles: true,
-          detail: { mode: playSave.currentMode }
-        }));
+        modal.dispatchEvent(
+          new CustomEvent('agp-play-save-shown', {
+            bubbles: true,
+            detail: { mode: playSave.currentMode },
+          })
+        );
       };
 
       const hideModal = () => {
@@ -85,7 +90,7 @@
       };
 
       // Legacy compatibility for existing callers
-      window.showSaveLoadModal = (type) => {
+      window.showSaveLoadModal = type => {
         playSave.showModal(type);
       };
       window.hideSaveLoadModal = () => {
@@ -130,13 +135,13 @@
 
       // Close on backdrop click
       if (modal) {
-        modal.addEventListener('click', (e) => {
+        modal.addEventListener('click', e => {
           if (e.target === modal) playSave.hideModal();
         });
       }
     },
 
-    saveGameToStorage: function(saveData) {
+    saveGameToStorage: function (saveData) {
       const key = `${SAVE_SLOTS_KEY_PREFIX}_${this.currentGameTitle}`;
       const existing = StorageUtil.loadJSON(key) || [];
       // Remove existing save with same name if exists
@@ -147,7 +152,7 @@
       StorageUtil.saveJSON(key, recent);
     },
 
-    loadSavedGames: function(container) {
+    loadSavedGames: function (container) {
       const key = `${SAVE_SLOTS_KEY_PREFIX}_${this.currentGameTitle}`;
       const saves = StorageUtil.loadJSON(key) || [];
       container.innerHTML = '';
@@ -157,92 +162,96 @@
         return;
       }
 
-      saves.sort((a, b) => b.timestamp - a.timestamp).forEach(save => {
-        const item = document.createElement('div');
-        item.className = 'saved-game-item';
+      saves
+        .sort((a, b) => b.timestamp - a.timestamp)
+        .forEach(save => {
+          const item = document.createElement('div');
+          item.className = 'saved-game-item';
 
-        const info = document.createElement('div');
-        info.className = 'saved-game-info';
+          const info = document.createElement('div');
+          info.className = 'saved-game-info';
 
-        const name = document.createElement('div');
-        name.className = 'saved-game-name';
-        name.textContent = save.slotName;
+          const name = document.createElement('div');
+          name.className = 'saved-game-name';
+          name.textContent = save.slotName;
 
-        const meta = document.createElement('div');
-        meta.className = 'saved-game-meta';
-        const saveDate = new Date(save.timestamp).toLocaleString();
-        const metadata = save.metadata || {};
-        const duration = metadata.gameDuration ? this.formatDuration(metadata.gameDuration) : '';
-        const stats = metadata.nodesVisited ? ` (${metadata.nodesVisited}ノード, ${metadata.inventoryCount}アイテム)` : '';
-        meta.textContent = `${saveDate}${duration ? ` • ${duration}` : ''}${stats}`;
+          const meta = document.createElement('div');
+          meta.className = 'saved-game-meta';
+          const saveDate = new Date(save.timestamp).toLocaleString();
+          const metadata = save.metadata || {};
+          const duration = metadata.gameDuration ? this.formatDuration(metadata.gameDuration) : '';
+          const stats = metadata.nodesVisited
+            ? ` (${metadata.nodesVisited}ノード, ${metadata.inventoryCount}アイテム)`
+            : '';
+          meta.textContent = `${saveDate}${duration ? ` • ${duration}` : ''}${stats}`;
 
-        const lastNode = document.createElement('div');
-        lastNode.className = 'saved-game-last-node';
-        if (metadata.lastNodeText) {
-          lastNode.textContent = `「${metadata.lastNodeText}${metadata.lastNodeText.length >= 100 ? '...' : ''}」`;
-        }
-
-        info.appendChild(name);
-        info.appendChild(meta);
-        if (lastNode.textContent) info.appendChild(lastNode);
-
-        const actions = document.createElement('div');
-        actions.className = 'saved-game-actions';
-
-        const loadBtn = document.createElement('button');
-        loadBtn.className = 'btn btn-accent';
-        loadBtn.textContent = '読み込み';
-        loadBtn.addEventListener('click', () => {
-          if (this.engine.loadGame(save)) {
-            playSave.hideModal();
-            ToastManager.success('ゲームデータを読み込みました');
-          } else {
-            ToastManager.error('ゲームデータの読み込みに失敗しました');
+          const lastNode = document.createElement('div');
+          lastNode.className = 'saved-game-last-node';
+          if (metadata.lastNodeText) {
+            lastNode.textContent = `「${metadata.lastNodeText}${metadata.lastNodeText.length >= 100 ? '...' : ''}」`;
           }
+
+          info.appendChild(name);
+          info.appendChild(meta);
+          if (lastNode.textContent) info.appendChild(lastNode);
+
+          const actions = document.createElement('div');
+          actions.className = 'saved-game-actions';
+
+          const loadBtn = document.createElement('button');
+          loadBtn.className = 'btn btn-accent';
+          loadBtn.textContent = '読み込み';
+          loadBtn.addEventListener('click', () => {
+            if (this.engine.loadGame(save)) {
+              this.hideModal();
+              ToastManager.success('ゲームデータを読み込みました');
+            } else {
+              ToastManager.error('ゲームデータの読み込みに失敗しました');
+            }
+          });
+
+          const renameBtn = document.createElement('button');
+          renameBtn.className = 'btn';
+          renameBtn.textContent = '名前変更';
+          renameBtn.addEventListener('click', () => {
+            const newName = prompt('新しいセーブ名を入力してください:', save.slotName);
+            if (newName && newName.trim() && newName !== save.slotName) {
+              save.slotName = newName.trim();
+              StorageUtil.saveJSON(key, saves);
+              this.loadSavedGames(container);
+            }
+          });
+
+          const exportBtn = document.createElement('button');
+          exportBtn.className = 'btn';
+          exportBtn.textContent = 'エクスポート';
+          exportBtn.addEventListener('click', () => {
+            this.exportSaveData(save);
+          });
+
+          const deleteBtn = document.createElement('button');
+          deleteBtn.className = 'btn';
+          deleteBtn.textContent = '削除';
+          deleteBtn.addEventListener('click', () => {
+            if (confirm(`"${save.slotName}" を削除しますか？`)) {
+              const updated = saves.filter(s => s !== save);
+              StorageUtil.saveJSON(key, updated);
+              this.loadSavedGames(container);
+            }
+          });
+
+          actions.appendChild(loadBtn);
+          actions.appendChild(renameBtn);
+          actions.appendChild(exportBtn);
+          actions.appendChild(deleteBtn);
+
+          item.appendChild(info);
+          item.appendChild(actions);
+          container.appendChild(item);
         });
-
-        const renameBtn = document.createElement('button');
-        renameBtn.className = 'btn';
-        renameBtn.textContent = '名前変更';
-        renameBtn.addEventListener('click', () => {
-          const newName = prompt('新しいセーブ名を入力してください:', save.slotName);
-          if (newName && newName.trim() && newName !== save.slotName) {
-            save.slotName = newName.trim();
-            StorageUtil.saveJSON(key, saves);
-            this.loadSavedGames(container);
-          }
-        });
-
-        const exportBtn = document.createElement('button');
-        exportBtn.className = 'btn';
-        exportBtn.textContent = 'エクスポート';
-        exportBtn.addEventListener('click', () => {
-          this.exportSaveData(save);
-        });
-
-        const deleteBtn = document.createElement('button');
-        deleteBtn.className = 'btn';
-        deleteBtn.textContent = '削除';
-        deleteBtn.addEventListener('click', () => {
-          if (confirm(`"${save.slotName}" を削除しますか？`)) {
-            const updated = saves.filter(s => s !== save);
-            StorageUtil.saveJSON(key, updated);
-            this.loadSavedGames(container);
-          }
-        });
-
-        actions.appendChild(loadBtn);
-        actions.appendChild(renameBtn);
-        actions.appendChild(exportBtn);
-        actions.appendChild(deleteBtn);
-
-        item.appendChild(info);
-        item.appendChild(actions);
-        container.appendChild(item);
-      });
     },
 
-    formatDuration: function(ms) {
+    formatDuration: function (ms) {
       const seconds = Math.floor(ms / 1000);
       const minutes = Math.floor(seconds / 60);
       const hours = Math.floor(minutes / 60);
@@ -256,12 +265,12 @@
       }
     },
 
-    exportSaveData: function(saveData) {
+    exportSaveData: function (saveData) {
       try {
         const exportData = {
           ...saveData,
           exportedAt: Date.now(),
-          exportVersion: '1.0'
+          exportVersion: '1.0',
         };
 
         const dataStr = JSON.stringify(exportData, null, 2);
@@ -283,16 +292,16 @@
       }
     },
 
-    importSaveData: function() {
+    importSaveData: function () {
       const input = document.createElement('input');
       input.type = 'file';
       input.accept = '.json';
-      input.onchange = (e) => {
+      input.onchange = e => {
         const file = e.target.files[0];
         if (!file) return;
 
         const reader = new FileReader();
-        reader.onload = (e) => {
+        reader.onload = e => {
           try {
             const importData = JSON.parse(e.target.result);
 
@@ -308,7 +317,10 @@
 
             let finalSlotName = importData.slotName;
             if (existingNames.includes(finalSlotName)) {
-              const newName = prompt('同じ名前のセーブデータが存在します。新しい名前を入力してください:', `${finalSlotName} (imported)`);
+              const newName = prompt(
+                '同じ名前のセーブデータが存在します。新しい名前を入力してください:',
+                `${finalSlotName} (imported)`
+              );
               if (!newName || !newName.trim()) return;
               finalSlotName = newName.trim();
             }
@@ -318,7 +330,7 @@
               ...importData,
               slotName: finalSlotName,
               imported: true,
-              importTimestamp: Date.now()
+              importTimestamp: Date.now(),
             };
 
             existing.push(saveData);
@@ -326,7 +338,9 @@
             ToastManager.success(`セーブデータをインポートしました: ${finalSlotName}`);
           } catch (error) {
             console.error('Import failed:', error);
-            ToastManager.error('インポートに失敗しました。ファイル形式が正しいか確認してください。');
+            ToastManager.error(
+              'インポートに失敗しました。ファイル形式が正しいか確認してください。'
+            );
           }
         };
         reader.readAsText(file);
@@ -334,11 +348,11 @@
       input.click();
     },
 
-    setupAutoSave: function() {
+    setupAutoSave: function () {
       let autoSaveIntervalId = null;
       let lastAutoSaveTime = 0;
 
-      const enableAutoSave = (intervalMinutes) => {
+      const enableAutoSave = intervalMinutes => {
         if (!intervalMinutes || intervalMinutes <= 0) return;
 
         const intervalMs = intervalMinutes * 60 * 1000;
@@ -376,13 +390,15 @@
         lastAutoSaveTime = now;
 
         // Dispatch auto-save event (for future GIF animation)
-        document.dispatchEvent(new CustomEvent('agp-auto-save', {
-          detail: {
-            slotName,
-            timestamp: saveData.timestamp,
-            saveData
-          }
-        }));
+        document.dispatchEvent(
+          new CustomEvent('agp-auto-save', {
+            detail: {
+              slotName,
+              timestamp: saveData.timestamp,
+              saveData,
+            },
+          })
+        );
 
         console.log(`Auto-saved: ${slotName}`);
       };
@@ -391,7 +407,7 @@
       const autoSaveIntervalInput = document.getElementById('auto-save-interval');
 
       if (autoSaveToggle && autoSaveIntervalInput) {
-        autoSaveToggle.addEventListener('change', (e) => {
+        autoSaveToggle.addEventListener('change', e => {
           const enabled = e.target.checked;
           const interval = parseFloat(autoSaveIntervalInput.value) || 5;
           if (enabled) {
@@ -412,6 +428,6 @@
           enableAutoSave(interval);
         });
       }
-    }
+    },
   };
 })();

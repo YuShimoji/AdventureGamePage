@@ -14,12 +14,12 @@
       playerState: {
         inventory: {
           items: [], // Array of item objects: {id, name, description, quantity, type, usable, ...}
-          maxSlots: 20
+          maxSlots: 20,
         },
         flags: {}, // Object of boolean/string flags
         variables: {}, // Object of numeric/string variables
-        history: [] // Array of visited node IDs for wiki unlock etc.
-      }
+        history: [], // Array of visited node IDs for wiki unlock etc.
+      },
     };
 
     // Initialize managers
@@ -27,18 +27,32 @@
     const uiManager = new GameEngineUIManager(elements);
 
     // Bind UI events
-    uiManager.setChoiceClickHandler((to) => logicManager.setNode(to, executeAction, render, logicManager.saveProgress.bind(logicManager)));
+    uiManager.setChoiceClickHandler(to =>
+      logicManager.setNode(to, executeAction, render, logicManager.saveProgress.bind(logicManager))
+    );
     uiManager.attachListeners(
       () => logicManager.goBack(render, logicManager.saveProgress.bind(logicManager)),
       () => logicManager.goForward(render, logicManager.saveProgress.bind(logicManager))
     );
 
     function render() {
-      return uiManager.render(gameData, state, logicManager.getNode.bind(logicManager), logicManager.canGoBack.bind(logicManager), logicManager.canGoForward.bind(logicManager));
+      return uiManager.render(
+        gameData,
+        state,
+        logicManager.getNode.bind(logicManager),
+        logicManager.canGoBack.bind(logicManager),
+        logicManager.canGoForward.bind(logicManager),
+        logicManager.checkConditions ? logicManager.checkConditions.bind(logicManager) : null
+      );
     }
 
     function executeAction(action) {
-      return GameEngineUtils.executeAction(action, state, itemsData, logicManager.saveProgress.bind(logicManager));
+      return GameEngineUtils.executeAction(
+        action,
+        state,
+        itemsData,
+        logicManager.saveProgress.bind(logicManager)
+      );
     }
 
     // Load initial progress
@@ -48,7 +62,13 @@
     // Return API
     return {
       render,
-      setNode: (id) => logicManager.setNode(id, executeAction, render, logicManager.saveProgress.bind(logicManager)),
+      setNode: id =>
+        logicManager.setNode(
+          id,
+          executeAction,
+          render,
+          logicManager.saveProgress.bind(logicManager)
+        ),
       loadProgress: logicManager.loadProgress.bind(logicManager),
       reset: () => logicManager.reset(logicManager.saveProgress.bind(logicManager), render),
       canGoBack: logicManager.canGoBack.bind(logicManager),
@@ -77,7 +97,7 @@
       loadFromSlot: logicManager.loadFromSlot.bind(logicManager),
       renameSlot: logicManager.renameSlot.bind(logicManager),
       getSlotInfo: logicManager.getSlotInfo.bind(logicManager),
-      copySlot: logicManager.copySlot.bind(logicManager)
+      copySlot: logicManager.copySlot.bind(logicManager),
     };
   }
 

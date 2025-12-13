@@ -81,9 +81,7 @@
     // ページ固有のクリーンアップ（どのページでも実行）
     document.addEventListener('DOMContentLoaded', function () {
       // adminコンテキスト以外では管理要素を強制的に非表示
-      if (typeof isAdminContext === 'function' && !isAdminContext()) {
-        hideAdminElements();
-      } else if (typeof window.isAdminContext === 'function' && !window.isAdminContext()) {
+      if (typeof window.isAdminContext === 'function' && !window.isAdminContext()) {
         hideAdminElements();
       }
     });
@@ -94,7 +92,7 @@
     cleanupOnPageChange,
     hideAdminElements,
     setupPageChangeListeners,
-    setupNonAdminCleanup
+    setupNonAdminCleanup,
   };
 
   // Auto-setup listeners

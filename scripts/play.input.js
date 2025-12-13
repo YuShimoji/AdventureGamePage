@@ -152,16 +152,29 @@
       if (mobileBtnRestart)
         mobileBtnRestart.addEventListener('click', () => {
           if (confirm('ゲームを最初から開始しますか？')) {
-            this.engine.restartGame();
-            // announce action if needed
+            if (this.engine && typeof this.engine.reset === 'function') {
+              this.engine.reset();
+            }
+            if (typeof this.announceGameAction === 'function') {
+              this.announceGameAction('restarted');
+            }
           }
           closeMobileMenu();
         });
       if (mobileBtnTheme)
         mobileBtnTheme.addEventListener('click', () => {
-          const themePanel = document.getElementById('theme-panel');
-          if (themePanel) {
-            themePanel.hidden = !themePanel.hidden;
+          const btnTheme = document.getElementById('btn-theme');
+          if (btnTheme && typeof btnTheme.click === 'function') {
+            btnTheme.click();
+          } else {
+            const themePanel = document.getElementById('theme-panel');
+            if (themePanel && window.PlayModalFocus) {
+              if (themePanel.hidden || themePanel.style.display === 'none') {
+                window.PlayModalFocus.openModalWithFocus(themePanel);
+              } else {
+                window.PlayModalFocus.closeModalWithFocus(themePanel);
+              }
+            }
           }
           closeMobileMenu();
         });
@@ -310,10 +323,9 @@
 
       // Advanced keyboard navigation and accessibility
       let currentFocusIndex = -1;
-      let focusableElements = [];
 
       const updateFocusableElements = () => {
-        focusableElements = Array.from(
+        const focusableElements = Array.from(
           document.querySelectorAll(
             'button:not([disabled]), [tabindex]:not([tabindex="-1"]), input:not([disabled]), select:not([disabled]), textarea:not([disabled])'
           )
@@ -321,6 +333,8 @@
           const rect = el.getBoundingClientRect();
           return rect.width > 0 && rect.height > 0 && el.offsetParent !== null;
         });
+
+        return focusableElements;
       };
 
       const navigateChoices = direction => {

@@ -28,6 +28,7 @@
     getUIElements: function () {
       return {
         titleEl: document.getElementById('game-title'),
+        imageEl: document.getElementById('scene-image'),
         textEl: document.getElementById('scene'),
         choicesEl: document.getElementById('choices'),
         btnRestart: document.getElementById('btn-restart'),
@@ -110,6 +111,7 @@
       console.log('Game data start property:', game?.start);
       return GameEngine.createEngine(game, {
         titleEl: elements.titleEl,
+        imageEl: elements.imageEl,
         textEl: elements.textEl,
         choicesEl: elements.choicesEl,
         backBtn: elements.backBtn,

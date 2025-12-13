@@ -1,13 +1,16 @@
-describe('GameEngine', function(){
-  beforeEach(() => { TestHelpers.clearTestStorage(); });
+describe('GameEngine', function () {
+  beforeEach(() => {
+    TestHelpers.clearTestStorage();
+  });
 
-  it('renders start node and navigates via setNode()', function(){
+  it('renders start node and navigates via setNode()', function () {
     const game = {
-      title: 'Unit', start: 's',
+      title: 'Unit',
+      start: 's',
       nodes: {
-        s: { title:'S', text:'Start', choices:[{ text:'Go', to:'e' }] },
-        e: { title:'E', text:'End', choices:[] }
-      }
+        s: { title: 'S', text: 'Start', choices: [{ text: 'Go', to: 'e' }] },
+        e: { title: 'E', text: 'End', choices: [] },
+      },
     };
     const els = TestHelpers.makeEls();
     const engine = GameEngine.createEngine(game, els);
@@ -17,13 +20,14 @@ describe('GameEngine', function(){
     expect(els.textEl.textContent).to.equal('End');
   });
 
-  it('saves and loads progress', function(){
+  it('saves and loads progress', function () {
     const game = {
-      title: 'Progress', start: 's',
+      title: 'Progress',
+      start: 's',
       nodes: {
-        s: { text:'S', choices:[{ text:'Go', to:'e' }] },
-        e: { text:'E', choices:[] }
-      }
+        s: { text: 'S', choices: [{ text: 'Go', to: 'e' }] },
+        e: { text: 'E', choices: [] },
+      },
     };
     const els = TestHelpers.makeEls();
     const engine = GameEngine.createEngine(game, els);
@@ -34,5 +38,57 @@ describe('GameEngine', function(){
     engine2.loadProgress();
     engine2.render();
     expect(els2.textEl.textContent).to.equal('E');
+  });
+
+  it('filters choices by conditions', function () {
+    const game = {
+      title: 'Cond',
+      start: 's',
+      nodes: {
+        s: {
+          text: 'S',
+          choices: [
+            {
+              text: 'Locked',
+              to: 'a',
+              conditions: [{ type: 'variable_equals', key: 'bravery', operator: '>=', value: 3 }],
+            },
+            { text: 'Free', to: 'b' },
+          ],
+        },
+        a: { text: 'A', choices: [] },
+        b: { text: 'B', choices: [] },
+      },
+    };
+    const els = TestHelpers.makeEls();
+    const engine = GameEngine.createEngine(game, els);
+
+    engine.setPlayerState({ variables: { bravery: 0 } });
+    engine.render();
+    expect(els.choicesEl.querySelectorAll('button').length).to.equal(1);
+
+    engine.setPlayerState({ variables: { bravery: 3 } });
+    engine.render();
+    expect(els.choicesEl.querySelectorAll('button').length).to.equal(2);
+  });
+
+  it('renders node image when imageEl is provided', function () {
+    const game = {
+      title: 'Img',
+      start: 's',
+      nodes: {
+        s: { title: 'Scene', text: 'S', image: 'images/test.jpg', choices: [] },
+      },
+    };
+    const els = TestHelpers.makeEls();
+    const imageEl = document.createElement('div');
+    document.body.appendChild(imageEl);
+    const engine = GameEngine.createEngine(game, { ...els, imageEl });
+    engine.render();
+
+    expect(imageEl.hidden).to.equal(false);
+    const img = imageEl.querySelector('img');
+    expect(img).to.exist;
+    expect(img.getAttribute('src')).to.equal('images/test.jpg');
   });
 });
