@@ -125,9 +125,9 @@
 
 ## 次の中断可能点（再開ガイド）
 
-- 1. ESLint warnings を段階的に削減（案B）
-- 2. docs/HANDOVER.md と AI_CONTEXT.md を更新 → main へ push（ダブルチェック）
-- 3. 変更をコミットしてリモート main に反映（push後に二重チェック）
+- 1. 総点検（ハードコード/仮実装/巨大ファイル/命名/責務）を継続し、高優先の修正対象を確定
+- 2. docs（ISSUES/HANDOVER/PROGRESS など）を現状コード/実装状況と同期
+- 3. 変更をコミットしてリモート main に反映（push後に git status / npm run lint / npm test を二重チェック）
 
 ## 2025-11-10 状況更新（UI安定化・統一方針）
 

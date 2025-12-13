@@ -1,5 +1,11 @@
 (function () {
   // Play Core Module - Game initialization and engine setup
+  function debugLog(...args) {
+    if (window.APP_CONFIG?.debug?.showConsoleLogs) {
+      console.log(...args);
+    }
+  }
+
   window.PlayCore = {
     init: function () {
       const elements = this.getUIElements();
@@ -66,13 +72,13 @@
       }
 
       const loaded = StorageUtil.loadJSON(GAME_DATA_KEY);
-      console.log('Loaded game data from storage:', loaded);
+      debugLog('Loaded game data from storage:', loaded);
       const normalize = window.Converters?.normalizeSpecToEngine || normalizeSpecToEngine;
-      console.log('Using normalize function:', normalize);
+      debugLog('Using normalize function:', normalize);
       let game;
       try {
         game = normalize(loaded);
-        console.log('Normalized game data:', game);
+        debugLog('Normalized game data:', game);
         if (!game && loaded) {
           const invalidError = new Error('保存されたゲームデータの形式が無効です。');
           invalidError.code = 'INVALID_GAME_DATA';
@@ -102,13 +108,13 @@
         }
         throw wrapped;
       }
-      console.log('Final game data:', game);
+      debugLog('Final game data:', game);
       return game;
     },
 
     createEngine: function (elements, game) {
-      console.log('Creating engine with game data:', game);
-      console.log('Game data start property:', game?.start);
+      debugLog('Creating engine with game data:', game);
+      debugLog('Game data start property:', game?.start);
       return GameEngine.createEngine(game, {
         titleEl: elements.titleEl,
         imageEl: elements.imageEl,

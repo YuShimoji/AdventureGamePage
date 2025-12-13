@@ -10,6 +10,34 @@
       this.gameData = gameData;
       this.state = state;
       this.itemsData = itemsData;
+
+      this._autoSaveNotifyTimerId = null;
+    }
+
+    _scheduleAutoSaveEvent(reason) {
+      const conf = window.APP_CONFIG?.game?.autoSave;
+      if (!conf || conf.enabled !== true) return;
+
+      const delayMs = typeof conf.delayMs === 'number' ? conf.delayMs : 0;
+      if (this._autoSaveNotifyTimerId) {
+        clearTimeout(this._autoSaveNotifyTimerId);
+      }
+
+      this._autoSaveNotifyTimerId = setTimeout(() => {
+        this._autoSaveNotifyTimerId = null;
+        try {
+          document.dispatchEvent(
+            new CustomEvent('agp-auto-save', {
+              detail: {
+                source: 'engine',
+                reason,
+                nodeId: this.state.nodeId,
+                timestamp: Date.now(),
+              },
+            })
+          );
+        } catch {}
+      }, delayMs);
     }
 
     checkConditions(conditions) {
@@ -122,6 +150,7 @@
 
       render();
       saveProgress();
+      this._scheduleAutoSaveEvent('setNode');
     }
 
     // 現在のノード取得
@@ -147,6 +176,7 @@
       this.state.nodeId = prev;
       render();
       saveProgress();
+      this._scheduleAutoSaveEvent('goBack');
       return true;
     }
 
@@ -167,6 +197,7 @@
       this.state.nodeId = next;
       render();
       saveProgress();
+      this._scheduleAutoSaveEvent('goForward');
       return true;
     }
 
@@ -185,6 +216,7 @@
         history: [],
       };
       saveProgress();
+      this._scheduleAutoSaveEvent('reset');
       render();
     }
 

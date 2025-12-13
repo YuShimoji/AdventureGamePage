@@ -8,21 +8,17 @@
     index: {
       title: 'Adventure Game Page',
       render: renderIndexView,
-      scripts: []
+      scripts: [],
     },
     learn: {
       title: '学ぶ',
       render: renderLearnView,
-      scripts: []
+      scripts: [],
     },
     admin: {
       title: '管理',
       render: renderAdminView,
-      scripts: [
-        'scripts/admin-boot.js',
-        'scripts/admin.editor.js',
-        'scripts/admin.core.js'
-      ]
+      scripts: ['scripts/admin-boot.js', 'scripts/admin.editor.js', 'scripts/admin.core.js'],
     },
     play: {
       title: 'プレイ',
@@ -33,22 +29,22 @@
         'scripts/play.inventory.js',
         'scripts/play.input.js',
         'scripts/play.modal.js',
-        'scripts/play.js'
-      ]
-    }
+        'scripts/play.js',
+      ],
+    },
   };
 
   function init(container) {
     viewContainer = container;
-    
+
     // Handle hash changes
     window.addEventListener('hashchange', handleRouteChange);
-    
+
     // Handle initial route
     handleRouteChange();
-    
+
     // Intercept navigation links
-    document.addEventListener('click', (e) => {
+    document.addEventListener('click', e => {
       const link = e.target.closest('a[href^="#!/"]');
       if (link) {
         e.preventDefault();
@@ -60,7 +56,7 @@
   function handleRouteChange() {
     const hash = window.location.hash.substring(2); // Remove #!
     const viewId = hash || 'index';
-    
+
     if (VIEWS[viewId]) {
       loadView(viewId);
     } else {
@@ -97,21 +93,25 @@
     }
 
     // Dispatch view-loaded event
-    document.dispatchEvent(new CustomEvent('spa-view-loaded', {
-      detail: { viewId: viewId }
-    }));
+    document.dispatchEvent(
+      new CustomEvent('spa-view-loaded', {
+        detail: { viewId: viewId },
+      })
+    );
   }
 
   function loadScripts(scriptPaths) {
-    return Promise.all(scriptPaths.map(path => {
-      return new Promise((resolve, reject) => {
-        const script = document.createElement('script');
-        script.src = path;
-        script.onload = resolve;
-        script.onerror = reject;
-        document.body.appendChild(script);
-      });
-    }));
+    return Promise.all(
+      scriptPaths.map(path => {
+        return new Promise((resolve, reject) => {
+          const script = document.createElement('script');
+          script.src = path;
+          script.onload = resolve;
+          script.onerror = reject;
+          document.body.appendChild(script);
+        });
+      })
+    );
   }
 
   // View renderers
@@ -200,7 +200,8 @@
           fetch(filename)
             .then(r => r.json())
             .then(data => {
-              localStorage.setItem('agp_game_data', JSON.stringify(data));
+              const key = window.APP_CONFIG?.storage?.keys?.gameData || 'agp_game_data';
+              localStorage.setItem(key, JSON.stringify(data));
               window.location.hash = '!/play';
             })
             .catch(e => alert('サンプルの読み込みに失敗しました: ' + e.message));
@@ -245,6 +246,6 @@
   window.SPARouter = {
     init: init,
     navigateTo: navigateTo,
-    getCurrentView: () => currentView
+    getCurrentView: () => currentView,
   };
 })();

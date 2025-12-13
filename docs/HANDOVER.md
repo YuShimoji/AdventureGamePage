@@ -224,6 +224,30 @@
 - **Admin: SavePreview のレガシー互換 shim を最小化**
   - `savePreview.js` を「モジュラーがあれば委譲、なければ no-op」で提供する shim に整理。
 
+## 今回セッションの作業サマリ (2025-12-14)
+
+- **総点検: ハードコーディング/仮実装の解消（第1弾）**
+  - `floatingPanelManager.js`: 保存キー直書きを `APP_CONFIG.storage.keys.floatingPanel` に統一。
+  - `migrationWizard.js`: `agp_*` 直書きをキー取得関数で集約し、`APP_CONFIG.storage.keys` 優先で参照（ロード順依存も低減）。
+  - `config.js`: migrationWizard 用のキー（items/characters/lore/state/backupLegacy）を `APP_CONFIG.storage.keys` に追加。
+  - `spaRouter.js`: サンプル読み込み時の `agp_game_data` 直書きを `APP_CONFIG.storage.keys.gameData` 優先へ変更。
+
+- **WYSIWYG 条件エディタ: 仮実装の解消**
+  - `wysiwygStoryEditor.conditions.js`: `loadConditionData()` を実装し、既存条件の復元と編集結果の保存（上書き）に対応。
+
+- **Play: ログ/自動セーブ通知の整合性修正**
+  - `play.core.js`: 常時 `console.log` を抑制し、`APP_CONFIG.debug.showConsoleLogs` でガード。
+  - `gameEngineLogicManager.js`: ノード遷移時に `APP_CONFIG.game.autoSave` の `delayMs` を用いて debounced に `agp-auto-save` を発火。
+    - これにより `play.js` の `agp-auto-save` 読み上げ通知と整合。
+
+- **docs: 実装状況の同期**
+  - `docs/issues/34-game-features-analysis.md`: 画像/音声/条件/変数/アイテム使用/自動セーブの「未実装」記述を現状に合わせて更新。
+
+- **品質ゲート**
+  - `npm run lint`: PASS
+  - `npm test`: PASS
+  - `npm run test:ci`: PASS
+
 ---
 
 ## 重要技術情報
@@ -250,7 +274,7 @@
 
 ## 最終更新日時
 
-**2025-12-13** - node_modules 追跡解除（案B）と Play 機能（画像/条件/音声）実装、関連テスト/ドキュメント整備を反映
+**2025-12-14** - 総点検（ハードコード/仮実装/ログ/自動セーブ通知）と docs 同期を反映
 
 ---
 

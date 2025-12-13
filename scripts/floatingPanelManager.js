@@ -134,7 +134,7 @@
           minimized: panel.classList.contains('minimized'),
           hidden: panel.classList.contains('hidden'),
         };
-        localStorage.setItem('agp_floating_panel', JSON.stringify(state));
+        localStorage.setItem(FLOATING_PANEL_KEY, JSON.stringify(state));
       }
 
       // Handle window resize to keep panel in bounds

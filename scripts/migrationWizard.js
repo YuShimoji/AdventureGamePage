@@ -1,12 +1,26 @@
 // Data Migration Wizard
 // Provides user-controlled migration from legacy data to extended schema
 
+function getMigrationKeys() {
+  const keys = window.APP_CONFIG?.storage?.keys || {};
+  return {
+    manuscriptFull: keys.full || 'agp_manuscript_full',
+    items: keys.items || 'agp_items',
+    characters: keys.characters || 'agp_characters',
+    lore: keys.lore || 'agp_lore',
+    state: keys.state || 'agp_state',
+    backupLegacy: keys.backupLegacy || 'agp_backup_legacy',
+  };
+}
+
 function showMigrationWizard() {
   if (typeof localStorage === 'undefined') return;
 
+  const keys = getMigrationKeys();
+
   // Check if legacy data exists and migration not done
-  const legacyData = localStorage.getItem('agp_manuscript_full');
-  if (!legacyData || localStorage.getItem('agp_items')) return;
+  const legacyData = localStorage.getItem(keys.manuscriptFull);
+  if (!legacyData || localStorage.getItem(keys.items)) return;
 
   // Create wizard overlay
   const overlay = document.createElement('div');
@@ -53,7 +67,7 @@ function showMigrationWizard() {
   document.getElementById('migration-start').addEventListener('click', async () => {
     // Create backup before migration
     const backupCreated = createBackup();
-    
+
     // Show progress UI
     wizard.innerHTML = `
       <h2 style="margin-top: 0;">データ移行中...</h2>
@@ -67,7 +81,7 @@ function showMigrationWizard() {
     `;
 
     const result = await performMigrationWithProgress();
-    
+
     if (result.success) {
       wizard.innerHTML = `
         <h2 style="margin-top: 0;">✅ 移行完了</h2>
@@ -83,7 +97,7 @@ function showMigrationWizard() {
           </ul>
         </div>
 
-        ${backupCreated ? '<p style="font-size: 12px; color: var(--muted);">バックアップが作成されました: agp_backup_legacy</p>' : ''}
+        ${backupCreated ? `<p style="font-size: 12px; color: var(--muted);">バックアップが作成されました: ${keys.backupLegacy}</p>` : ''}
 
         <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 20px;">
           <button id="migration-close" class="btn btn-accent">閉じる</button>
@@ -109,7 +123,7 @@ function showMigrationWizard() {
           <button id="migration-close" class="btn">閉じる</button>
         </div>
       `;
-      
+
       if (backupCreated) {
         document.getElementById('migration-restore').addEventListener('click', () => {
           restoreFromBackup();
@@ -121,7 +135,7 @@ function showMigrationWizard() {
           overlay.remove();
         });
       }
-      
+
       document.getElementById('migration-close').addEventListener('click', () => {
         overlay.remove();
       });
@@ -130,7 +144,8 @@ function showMigrationWizard() {
 }
 
 function previewMigration() {
-  const legacyData = localStorage.getItem('agp_manuscript_full');
+  const keys = getMigrationKeys();
+  const legacyData = localStorage.getItem(keys.manuscriptFull);
   if (!legacyData) return;
 
   try {
@@ -155,14 +170,15 @@ function previewMigration() {
 
 function createBackup() {
   try {
-    const legacyData = localStorage.getItem('agp_manuscript_full');
+    const keys = getMigrationKeys();
+    const legacyData = localStorage.getItem(keys.manuscriptFull);
     if (!legacyData) return false;
-    
-    const backupKey = 'agp_backup_legacy';
+
+    const backupKey = keys.backupLegacy;
     const backup = {
       data: legacyData,
       timestamp: new Date().toISOString(),
-      version: '1.0'
+      version: '1.0',
     };
     localStorage.setItem(backupKey, JSON.stringify(backup));
     console.log('Backup created successfully:', backupKey);
@@ -175,19 +191,20 @@ function createBackup() {
 
 function restoreFromBackup() {
   try {
-    const backupKey = 'agp_backup_legacy';
+    const keys = getMigrationKeys();
+    const backupKey = keys.backupLegacy;
     const backupStr = localStorage.getItem(backupKey);
     if (!backupStr) return false;
-    
+
     const backup = JSON.parse(backupStr);
-    localStorage.setItem('agp_manuscript_full', backup.data);
-    
+    localStorage.setItem(keys.manuscriptFull, backup.data);
+
     // Clear migrated data
-    localStorage.removeItem('agp_items');
-    localStorage.removeItem('agp_characters');
-    localStorage.removeItem('agp_lore');
-    localStorage.removeItem('agp_state');
-    
+    localStorage.removeItem(keys.items);
+    localStorage.removeItem(keys.characters);
+    localStorage.removeItem(keys.lore);
+    localStorage.removeItem(keys.state);
+
     console.log('Restored from backup successfully');
     return true;
   } catch (e) {
@@ -200,7 +217,7 @@ function updateProgress(percent, status, logMessage) {
   const progressBar = document.getElementById('migration-progress-bar');
   const statusEl = document.getElementById('migration-status');
   const logEl = document.getElementById('migration-log');
-  
+
   if (progressBar) progressBar.style.width = `${percent}%`;
   if (statusEl) statusEl.textContent = status;
   if (logEl && logMessage) {
@@ -211,15 +228,16 @@ function updateProgress(percent, status, logMessage) {
 }
 
 async function performMigrationWithProgress() {
+  const keys = getMigrationKeys();
   const result = {
     success: false,
     stats: { items: 0, characters: 0, lore: 0 },
-    error: null
+    error: null,
   };
 
   try {
     updateProgress(10, 'レガシーデータ読み込み中...', 'データ取得開始');
-    const legacyData = localStorage.getItem('agp_manuscript_full');
+    const legacyData = localStorage.getItem(keys.manuscriptFull);
     if (!legacyData) {
       throw new Error('レガシーデータが見つかりません');
     }
@@ -236,27 +254,39 @@ async function performMigrationWithProgress() {
     // Migrate items
     updateProgress(30, 'アイテム変換中...', 'アイテムデータを抽出しています');
     const items = extractItemsFromText(parsed.text || parsed.html || '');
-    localStorage.setItem('agp_items', JSON.stringify({ items }));
+    localStorage.setItem(keys.items, JSON.stringify({ items }));
     result.stats.items = items.length;
-    updateProgress(45, `アイテム変換完了 (${items.length}件)`, `${items.length}件のアイテムを保存しました`);
+    updateProgress(
+      45,
+      `アイテム変換完了 (${items.length}件)`,
+      `${items.length}件のアイテムを保存しました`
+    );
 
     await new Promise(resolve => setTimeout(resolve, 200));
 
     // Migrate characters
     updateProgress(55, 'キャラクター変換中...', 'キャラクターデータを抽出しています');
     const characters = extractCharactersFromText(parsed.text || parsed.html || '');
-    localStorage.setItem('agp_characters', JSON.stringify({ characters }));
+    localStorage.setItem(keys.characters, JSON.stringify({ characters }));
     result.stats.characters = characters.length;
-    updateProgress(70, `キャラクター変換完了 (${characters.length}件)`, `${characters.length}件のキャラクターを保存しました`);
+    updateProgress(
+      70,
+      `キャラクター変換完了 (${characters.length}件)`,
+      `${characters.length}件のキャラクターを保存しました`
+    );
 
     await new Promise(resolve => setTimeout(resolve, 200));
 
     // Migrate lore
     updateProgress(80, 'Wiki変換中...', 'Wikiエントリを抽出しています');
     const lore = extractLoreFromText(parsed.text || parsed.html || '');
-    localStorage.setItem('agp_lore', JSON.stringify({ lore }));
+    localStorage.setItem(keys.lore, JSON.stringify({ lore }));
     result.stats.lore = lore.length;
-    updateProgress(90, `Wiki変換完了 (${lore.length}件)`, `${lore.length}件のWikiエントリを保存しました`);
+    updateProgress(
+      90,
+      `Wiki変換完了 (${lore.length}件)`,
+      `${lore.length}件のWikiエントリを保存しました`
+    );
 
     await new Promise(resolve => setTimeout(resolve, 200));
 
@@ -266,9 +296,9 @@ async function performMigrationWithProgress() {
       inventory: {},
       flags: {},
       variables: { migratedFromLegacy: true, migrationDate: new Date().toISOString() },
-      history: parsed.history || []
+      history: parsed.history || [],
     };
-    localStorage.setItem('agp_state', JSON.stringify({ state }));
+    localStorage.setItem(keys.state, JSON.stringify({ state }));
     updateProgress(100, '移行完了！', 'すべてのデータ変換が完了しました');
 
     result.success = true;
@@ -288,7 +318,7 @@ function extractItemsFromText(text) {
   const itemPatterns = [
     { regex: /剣|刀|武器/g, type: 'weapon' },
     { regex: /薬|ポーション/g, type: 'consumable' },
-    { regex: /鎧|盾/g, type: 'armor' }
+    { regex: /鎧|盾/g, type: 'armor' },
   ];
 
   itemPatterns.forEach(({ regex, type }) => {
@@ -300,7 +330,7 @@ function extractItemsFromText(text) {
           name: match,
           type,
           description: `${match} - 自動抽出されたアイテム。`,
-          properties: {}
+          properties: {},
         });
       });
     }
@@ -321,7 +351,7 @@ function extractCharactersFromText(text) {
       type: 'npc',
       description: `${name} - 自動抽出されたキャラクター。`,
       stats: { hp: 50, attack: 5, defense: 5 },
-      relationships: []
+      relationships: [],
     });
   });
 
@@ -333,13 +363,18 @@ function extractLoreFromText(text) {
   const sections = text.split(/\n\s*\n/);
 
   sections.forEach((section, index) => {
-    if (section.includes('歴史') || section.includes('伝説') || section.includes('王国') || section.includes('古代')) {
+    if (
+      section.includes('歴史') ||
+      section.includes('伝説') ||
+      section.includes('王国') ||
+      section.includes('古代')
+    ) {
       lore.push({
         id: `lore${index + 1}`,
         title: `抽出されたロア ${index + 1}`,
         content: section,
         tags: ['auto-extracted'],
-        related: []
+        related: [],
       });
     }
   });
