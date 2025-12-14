@@ -21,92 +21,100 @@
     <header class="app-header play-header">
       <a class="header-brand" href="index.html">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M15 18l-6-6 6-6"/>
+          <path d="M15 18l-6-6 6-6" />
         </svg>
         <span>トップ</span>
       </a>
-      
+
       <h1 id="game-title" class="header-title game-title">サンプルアドベンチャー</h1>
-      
+
       <nav class="header-actions">
         <!-- Navigation buttons -->
         <button id="btn-back" class="toolbar-btn" aria-label="前のノードに戻る" title="戻る (←)">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M19 12H5M12 19l-7-7 7-7"/>
+            <path d="M19 12H5M12 19l-7-7 7-7" />
           </svg>
         </button>
         <button id="btn-forward" class="toolbar-btn" aria-label="次のノードに進む" title="進む (→)">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M5 12h14M12 5l7 7-7 7"/>
+            <path d="M5 12h14M12 5l7 7-7 7" />
           </svg>
         </button>
-        
+
         <span class="toolbar-divider"></span>
-        
+
         <!-- Save/Load -->
         <button id="btn-save" class="toolbar-btn" aria-label="保存モーダルを開く" title="保存">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/>
-            <polyline points="17,21 17,13 7,13 7,21"/>
-            <polyline points="7,3 7,8 15,8"/>
+            <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z" />
+            <polyline points="17,21 17,13 7,13 7,21" />
+            <polyline points="7,3 7,8 15,8" />
           </svg>
         </button>
         <button id="btn-load" class="toolbar-btn" aria-label="読込モーダルを開く" title="読込">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
-            <polyline points="7,10 12,15 17,10"/>
-            <line x1="12" y1="15" x2="12" y2="3"/>
+            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+            <polyline points="7,10 12,15 17,10" />
+            <line x1="12" y1="15" x2="12" y2="3" />
           </svg>
         </button>
         <button id="btn-save-slots" class="toolbar-btn" title="セーブスロット" aria-label="セーブスロットを開く">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
-            <line x1="8" y1="21" x2="16" y2="21"/>
-            <line x1="12" y1="17" x2="12" y2="21"/>
+            <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+            <line x1="8" y1="21" x2="16" y2="21" />
+            <line x1="12" y1="17" x2="12" y2="21" />
           </svg>
         </button>
-        
+
         <span class="toolbar-divider"></span>
-        
+
         <!-- Inventory -->
-        <button id="btn-inventory" class="toolbar-btn" title="インベントリ" aria-label="インベントリを開く" aria-expanded="false">
+        <button
+          id="btn-inventory"
+          class="toolbar-btn"
+          title="インベントリ"
+          aria-label="インベントリを開く"
+          aria-expanded="false"
+        >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/>
+            <path
+              d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"
+            />
           </svg>
         </button>
-        
+
         <!-- Restart -->
         <button id="btn-restart" class="toolbar-btn" aria-label="ゲームを最初からやり直す" title="リスタート">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="1,4 1,10 7,10"/>
-            <path d="M3.51 15a9 9 0 102.13-9.36L1 10"/>
+            <polyline points="1,4 1,10 7,10" />
+            <path d="M3.51 15a9 9 0 102.13-9.36L1 10" />
           </svg>
         </button>
-        
+
         <span class="toolbar-divider"></span>
-        
+
         <!-- Theme -->
         <button id="btn-theme" class="toolbar-btn" title="テーマ設定" aria-label="テーマ設定を開く">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="5"/>
-            <line x1="12" y1="1" x2="12" y2="3"/>
-            <line x1="12" y1="21" x2="12" y2="23"/>
-            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
-            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-            <line x1="1" y1="12" x2="3" y2="12"/>
-            <line x1="21" y1="12" x2="23" y2="12"/>
-            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
-            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+            <circle cx="12" cy="12" r="5" />
+            <line x1="12" y1="1" x2="12" y2="3" />
+            <line x1="12" y1="21" x2="12" y2="23" />
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+            <line x1="1" y1="12" x2="3" y2="12" />
+            <line x1="21" y1="12" x2="23" y2="12" />
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
           </svg>
         </button>
-        
+
         <!-- Import JSON -->
         <label class="toolbar-btn" aria-label="ゲームデータを読み込む" title="JSONインポート">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
-            <polyline points="14,2 14,8 20,8"/>
-            <line x1="12" y1="18" x2="12" y2="12"/>
-            <line x1="9" y1="15" x2="15" y2="15"/>
+            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+            <polyline points="14,2 14,8 20,8" />
+            <line x1="12" y1="18" x2="12" y2="12" />
+            <line x1="9" y1="15" x2="15" y2="15" />
           </svg>
           <input id="play-file-import" type="file" accept="application/json" hidden />
         </label>
@@ -118,12 +126,12 @@
       <div class="play-container">
         <!-- Scene Image -->
         <div id="scene-image" class="scene-image" hidden></div>
-        
+
         <!-- Scene Content -->
         <div class="scene-container">
           <article id="scene" class="scene scene-text" aria-live="polite" aria-atomic="true"></article>
         </div>
-        
+
         <!-- Choices -->
         <div id="choices" class="choices" role="radiogroup" aria-label="選択肢"></div>
       </div>
@@ -143,7 +151,8 @@
         <span id="inventory-count" class="text-muted text-sm" aria-live="polite"></span>
         <button id="inventory-close" class="btn-icon" title="閉じる" aria-label="インベントリを閉じる">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
           </svg>
         </button>
       </header>
@@ -172,7 +181,8 @@
         <h3 class="panel-title">セーブスロット</h3>
         <button id="save-slots-close" class="btn-icon" title="閉じる" aria-label="セーブスロットを閉じる">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
           </svg>
         </button>
       </header>
@@ -196,7 +206,8 @@
           <h2 id="modal-title" class="modal-title">ゲームデータを保存</h2>
           <button id="modal-close" class="btn-icon modal-close" aria-label="閉じる">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
             </svg>
           </button>
         </header>
@@ -230,7 +241,9 @@
     <!-- Mobile Menu (Modern) -->
     <button id="mobile-menu-btn" class="mobile-menu-btn btn-icon" aria-label="メニューを開く">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/>
+        <line x1="3" y1="12" x2="21" y2="12" />
+        <line x1="3" y1="6" x2="21" y2="6" />
+        <line x1="3" y1="18" x2="21" y2="18" />
       </svg>
     </button>
     <div id="mobile-menu-overlay" class="mobile-menu-overlay modal-overlay" hidden>
@@ -239,7 +252,8 @@
           <h3 class="modal-title">メニュー</h3>
           <button id="mobile-menu-close" class="btn-icon" aria-label="閉じる">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
             </svg>
           </button>
         </header>
@@ -294,6 +308,12 @@
     <script>
       // プレイページ用の初期化
       document.addEventListener('DOMContentLoaded', function () {
+        const debugLog = (...args) => {
+          if (window.APP_CONFIG?.debug?.showConsoleLogs) {
+            console.log(...args);
+          }
+        };
+
         // 他のページの要素が残っている可能性があるため、強制的に非表示
         const adminElements = [
           'preview-panel',
@@ -307,14 +327,14 @@
         adminElements.forEach(id => {
           const el = document.getElementById(id);
           if (el) {
-            el.style.display = 'none !important';
+            el.style.display = 'none';
             el.hidden = true;
             el.setAttribute('aria-hidden', 'true');
             el.setAttribute('inert', '');
           }
         });
 
-        console.log('[PLAY] Page-specific elements hidden for play.html');
+        debugLog('[PLAY] Page-specific elements hidden for play.html');
       });
     </script>
   </body>
