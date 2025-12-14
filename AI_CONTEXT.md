@@ -12,6 +12,12 @@
 - `node_modules` は Git 追跡から除外し、`package-lock.json` + `npm ci` 前提へ移行
 - 品質ゲート: `npm run lint` は errors=0、`npm test` / `npm run test:ci` は PASS を維持する
 
+## 直近の決定事項（2025-12-15）
+
+- `use_item` の effect（`set_variable` / `set_flag` / `heal`）は UI 側ではなく **ゲームエンジン側（`GameEngineUtils.executeEffect`）で実行**し、挙動の SSOT をエンジンに寄せる
+- `executeEffect` は `executeEffect(effect, state)` として `state` を受け取り、`playerState.variables/flags` を更新できる形を前提とする
+- `stop_sfx` は `AudioManager.stopAllSFX()` に委譲し、オーディオ制御点を AudioManager に集約する
+
 ## プロジェクト概要
 
 - リポジトリ: AdventureGamePage（static-web-app+node-tooling）
@@ -48,6 +54,18 @@
 - **ヘルプドキュメント整備**: `docs/help/admin-guide.md` に操作ガイドを統合。UI内説明文を段階的にヘルプリンクへ移行
 - **プレイ機能**: `node.image` 表示、`choices[].conditions` の評価、audio actions の対応は実装済み
 - **node_modules**: Git追跡から除外済み（`package-lock.json` + `npm ci` 前提）
+
+- **use_item のテスト不足**
+  - `use_item` の基本挙動（消費/consume:false/存在しないアイテムで例外にならない）はテスト追加済み。
+  - ただし `set_flag` / `heal` の effect 反映についてはテスト未追加（実装は済み）。
+
+- **tests/test.html の依存不足（sinon）**
+  - `errorHandler.spec.js` / `migrationWizard.spec.js` / `snapshotCompare.spec.js` 等が `sinon` を使用しているが、`tests/test.html` が sinon を読み込んでいない。
+  - 現状の `npm test` は `/tests/test.html` の HTTP 200 を見るスモークテストであり、Mocha の失敗を CI で評価していない点に注意。
+
+- **test-rpg.html の script 参照破損**
+  - `scripts/sample-game-basic.js` が存在しない（現状は `scripts/sampleData.js` が該当）。
+  - `play.html` と script ロード順が異なり、単体での動作確認が崩れている。
 
 ## 次の一手（提案）
 
@@ -128,6 +146,10 @@
 - 1. 総点検（ハードコード/仮実装/巨大ファイル/命名/責務）を継続し、高優先の修正対象を確定
 - 2. docs（ISSUES/HANDOVER/PROGRESS など）を現状コード/実装状況と同期
 - 3. 変更をコミットしてリモート main に反映（push後に git status / npm run lint / npm test を二重チェック）
+
+- 4. `tests/test.html` の依存（sinon, gameEngine 関連スクリプト等）を整理し、ブラウザで Mocha が全 spec を実行できる状態にする
+- 5. `use_item` の effect テスト（`set_flag` / `heal`）を追加し、エンジン側実装の挙動を固定する
+- 6. `test-rpg.html` の欠損 script（sample-game-basic.js）を解消し、`play.html` と同等のロード順に揃える
 
 ## 2025-11-10 状況更新（UI安定化・統一方針）
 

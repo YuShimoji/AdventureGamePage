@@ -60,6 +60,11 @@
               });
             }
             break;
+          case 'stop_sfx':
+            if (window.AudioManager && typeof window.AudioManager.stopAllSFX === 'function') {
+              window.AudioManager.stopAllSFX();
+            }
+            break;
           default:
             console.warn(`Unknown action type: ${action.type}`);
         }
@@ -139,7 +144,7 @@
 
       // Execute effect
       if (action.effect) {
-        this.executeEffect(action.effect);
+        this.executeEffect(action.effect, state);
       }
 
       saveProgress();
@@ -185,7 +190,7 @@
       }
     }
 
-    static executeEffect(effect) {
+    static executeEffect(effect, state) {
       if (!effect || !effect.type) return;
 
       switch (effect.type) {
@@ -200,9 +205,64 @@
             }, 500);
           }
           break;
-        case 'set_variable':
-          // Already handled in set_variable action
+        case 'set_variable': {
+          if (!state || !state.playerState || !effect.key) break;
+          if (!state.playerState.variables || typeof state.playerState.variables !== 'object') {
+            state.playerState.variables = {};
+          }
+          const op = effect.operation || 'set';
+          const current = state.playerState.variables[effect.key] ?? 0;
+          let value = effect.value;
+          if (op !== 'set') {
+            const numCur = typeof current === 'number' ? current : parseFloat(current) || 0;
+            const numVal = typeof value === 'number' ? value : parseFloat(value) || 0;
+            switch (op) {
+              case 'add':
+                value = numCur + numVal;
+                break;
+              case 'subtract':
+                value = numCur - numVal;
+                break;
+              case 'multiply':
+                value = numCur * (numVal || 1);
+                break;
+              case 'divide':
+                value = numVal !== 0 ? numCur / numVal : numCur;
+                break;
+              default:
+                value = effect.value;
+            }
+          } else if (value === undefined) {
+            value = true;
+          }
+          state.playerState.variables[effect.key] = value;
           break;
+        }
+        case 'set_flag': {
+          if (!state || !state.playerState || !effect.flag) break;
+          if (!state.playerState.flags || typeof state.playerState.flags !== 'object') {
+            state.playerState.flags = {};
+          }
+          state.playerState.flags[effect.flag] = effect.value !== undefined ? effect.value : true;
+          break;
+        }
+        case 'heal': {
+          if (!state || !state.playerState) break;
+          if (!state.playerState.variables || typeof state.playerState.variables !== 'object') {
+            state.playerState.variables = {};
+          }
+          const key = effect.key || 'health';
+          const current = state.playerState.variables[key];
+          const curNum = typeof current === 'number' ? current : parseFloat(current) || 0;
+          const add =
+            typeof effect.value === 'number' ? effect.value : parseFloat(effect.value) || 10;
+          const max =
+            typeof effect.maxHealth === 'number'
+              ? effect.maxHealth
+              : parseFloat(effect.maxHealth) || 100;
+          state.playerState.variables[key] = Math.min(curNum + add, max);
+          break;
+        }
         default:
           console.warn(`Unknown effect type: ${effect.type}`);
       }

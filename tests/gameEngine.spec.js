@@ -91,4 +91,100 @@ describe('GameEngine', function () {
     expect(img).to.exist;
     expect(img.getAttribute('src')).to.equal('images/test.jpg');
   });
+
+  it('executes use_item effect and consumes item by default', function () {
+    const game = {
+      title: 'UseItem',
+      start: 's',
+      items: [{ id: 'potion', name: 'Potion', type: 'consumable', description: '', usable: true }],
+      nodes: {
+        s: { text: 'S', choices: [{ text: 'Use', to: 'u' }] },
+        u: {
+          text: 'U',
+          choices: [],
+          actions: [
+            { type: 'add_item', itemId: 'potion', quantity: 1 },
+            {
+              type: 'use_item',
+              itemId: 'potion',
+              effect: { type: 'set_variable', key: 'hp', operation: 'add', value: 10 },
+            },
+          ],
+        },
+      },
+    };
+
+    const els = TestHelpers.makeEls();
+    const engine = GameEngine.createEngine(game, els);
+    engine.render();
+    engine.setNode('u');
+
+    const state = engine.getPlayerState();
+    expect(state.variables.hp).to.equal(10);
+    expect(engine.hasItem('potion')).to.equal(false);
+  });
+
+  it('does not consume item when consume is false', function () {
+    const game = {
+      title: 'UseItemNoConsume',
+      start: 's',
+      items: [{ id: 'potion', name: 'Potion', type: 'consumable', description: '', usable: true }],
+      nodes: {
+        s: { text: 'S', choices: [{ text: 'Use', to: 'u' }] },
+        u: {
+          text: 'U',
+          choices: [],
+          actions: [
+            { type: 'add_item', itemId: 'potion', quantity: 2 },
+            {
+              type: 'use_item',
+              itemId: 'potion',
+              consume: false,
+              effect: { type: 'set_variable', key: 'used', value: true },
+            },
+          ],
+        },
+      },
+    };
+
+    const els = TestHelpers.makeEls();
+    const engine = GameEngine.createEngine(game, els);
+    engine.render();
+    engine.setNode('u');
+
+    expect(engine.getItemCount('potion')).to.equal(2);
+    const state = engine.getPlayerState();
+    expect(state.variables.used).to.equal(true);
+  });
+
+  it('does not throw when using a missing item', function () {
+    const game = {
+      title: 'UseMissingItem',
+      start: 's',
+      items: [{ id: 'potion', name: 'Potion', type: 'consumable', description: '', usable: true }],
+      nodes: {
+        s: { text: 'S', choices: [{ text: 'Try', to: 'u' }] },
+        u: {
+          text: 'U',
+          choices: [],
+          actions: [
+            {
+              type: 'use_item',
+              itemId: 'potion',
+              effect: { type: 'set_variable', key: 'hp', value: 999 },
+            },
+          ],
+        },
+      },
+    };
+
+    const els = TestHelpers.makeEls();
+    const engine = GameEngine.createEngine(game, els);
+    engine.render();
+    expect(() => engine.setNode('u')).to.not.throw();
+
+    const state = engine.getPlayerState();
+    expect(state.variables.hp).to.equal(undefined);
+    expect(engine.getInventory().items.length).to.equal(0);
+  });
 });

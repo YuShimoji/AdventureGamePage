@@ -248,6 +248,77 @@
   - `npm test`: PASS
   - `npm run test:ci`: PASS
 
+## 今回セッションの作業サマリ (2025-12-15)
+
+### 実施した変更内容
+
+- `scripts/gameEngineUtils.js`
+  - `executeAction` に `stop_sfx` を追加（`AudioManager.stopAllSFX()` に委譲）。
+  - `use_item` の効果実行で `executeEffect(action.effect, state)` の形に統一（state を渡す）。
+  - `executeEffect` を拡張し、以下の effect をゲームエンジン側で反映するようにした。
+    - `set_variable`
+    - `set_flag`
+    - `heal`
+
+- `tests/gameEngine.spec.js`
+  - `use_item` のユニットテストを追加。
+    - デフォルトで消費されること（quantity=1 の場合は削除）
+    - `consume: false` の場合に消費されないこと
+    - 存在しないアイテム使用で例外にならないこと
+
+### 設計上の判断と理由
+
+- `use_item` の effect 反映を UI ではなく **エンジン側（`GameEngineUtils.executeEffect`）へ寄せる**
+  - ノードエディタ（UI）で設定した effect が、実行環境（ゲームエンジン）で確実に再現される状態を SSOT にするため。
+  - UI 実装に依存せず、`use_item` の仕様（消費/効果）がテスト可能になるため。
+
+- `executeEffect(effect, state)` のシグネチャに変更
+  - effect の種類が増える前提で、プレイヤー状態（variables/flags 等）を確実に更新できるようにするため。
+
+- `stop_sfx` は `AudioManager.stopAllSFX()` に委譲
+  - `stop_bgm` と同様に AudioManager を唯一のオーディオ制御点として扱い、分岐ロジックを増やさないため。
+
+### 仮定した仕様（今回実装/テストが前提にしたもの）
+
+- `use_item`
+  - `consume !== false` のとき 1 個消費（デフォルト消費）。
+  - インベントリに該当 item が無い / quantity が 0 の場合は **例外にせず終了**。
+
+- `effect.type === 'set_variable'`
+  - `effect.key` が変数キー。
+  - `effect.operation` は `set/add/subtract/multiply/divide` を想定（未指定は `set`）。
+  - `set` で `value` 未指定の場合は `true` を入れる。
+
+- `effect.type === 'set_flag'`
+  - `effect.flag` がフラグキー。
+  - `effect.value` 未指定の場合は `true`。
+
+- `effect.type === 'heal'`
+  - 反映先は `playerState.variables`。
+  - `effect.key` 未指定の場合は `'health'`。
+  - `effect.value` 未指定の場合は `10`。
+  - `effect.maxHealth` 未指定の場合は `100`。
+  - 結果は `maxHealth` で上限 clamp。
+
+### 未対応・今後の課題
+
+- `use_item` の effect テストが不足
+  - `set_flag` と `heal` のユニットテストが未追加（実装は済み）。
+
+- `tests/test.html` のテスト実行環境が未整備
+  - `sinon` 依存（`errorHandler.spec.js` / `migrationWizard.spec.js` / `snapshotCompare.spec.js` 等）に対して、`tests/test.html` が sinon をロードしていない。
+  - `tests/test.html` は現状 `npm test` のスモーク用途（HTTP 200）としては機能するが、Mocha の実行結果を CI で評価していない。
+
+- `test-rpg.html` の script 参照が破損
+  - `scripts/sample-game-basic.js` が存在せず（現状は `scripts/sampleData.js` が該当）、ページ単体での確認が崩れている。
+  - `play.html` と同等のロード順に揃える対応が未実施。
+
+### 次に着手すべき作業
+
+1. `tests/test.html` に sinon を追加し、ブラウザ上で Mocha が全 spec を実行できる状態にする（依存スクリプトも必要に応じて追加）。
+2. `use_item` のユニットテストに `set_flag` / `heal` ケースを追加し、今回の `executeEffect` 拡張を固定する。
+3. `test-rpg.html` の欠損 script を修正し、`play.html` と同等のロード順に揃える（最低限 `sampleData.js` への置換）。
+
 ---
 
 ## 重要技術情報
@@ -274,7 +345,7 @@
 
 ## 最終更新日時
 
-**2025-12-14** - 総点検（ハードコード/仮実装/ログ/自動セーブ通知）と docs 同期を反映
+**2025-12-15** - アイテム使用（use_item）の effect 反映をゲームエンジン側へ実装し、ユニットテストを追加
 
 ---
 
