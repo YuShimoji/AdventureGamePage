@@ -7,7 +7,7 @@ window.GameEngineTests = {
 
   // テスト実行
   run: function() {
-    console.log('=== Game Engine Test Suite ===');
+    console.debug('=== Game Engine Test Suite ===');
     this.results = [];
     this.passed = 0;
     this.failed = 0;
@@ -28,7 +28,7 @@ window.GameEngineTests = {
   assert: function(condition, message) {
     if (condition) {
       this.passed++;
-      console.log('✅ PASS:', message);
+      console.debug('✅ PASS:', message);
       this.results.push({ status: 'PASS', message });
     } else {
       this.failed++;
@@ -52,7 +52,7 @@ window.GameEngineTests = {
 
   // 基本機能テスト
   testBasicFunctionality: function() {
-    console.log('--- Basic Functionality Tests ---');
+    console.debug('--- Basic Functionality Tests ---');
 
     const testGame = {
       title: "Test Game",
@@ -83,7 +83,7 @@ window.GameEngineTests = {
 
   // インベントリシステムテスト
   testInventorySystem: function() {
-    console.log('--- Inventory System Tests ---');
+    console.debug('--- Inventory System Tests ---');
 
     const testGame = { title: "Test", start: "start", nodes: { start: { title: "Start", text: "Text", choices: [] } } };
     const elements = { titleEl: document.createElement('div'), textEl: document.createElement('div'), choicesEl: document.createElement('div') };
@@ -109,7 +109,7 @@ window.GameEngineTests = {
 
   // 変数システムテスト
   testVariableSystem: function() {
-    console.log('--- Variable System Tests ---');
+    console.debug('--- Variable System Tests ---');
 
     const testGame = { title: "Test", start: "start", nodes: { start: { title: "Start", text: "Text", choices: [] } } };
     const elements = { titleEl: document.createElement('div'), textEl: document.createElement('div'), choicesEl: document.createElement('div') };
@@ -128,7 +128,7 @@ window.GameEngineTests = {
 
   // 条件システムテスト
   testConditionSystem: function() {
-    console.log('--- Condition System Tests ---');
+    console.debug('--- Condition System Tests ---');
 
     const testGame = { title: "Test", start: "start", nodes: { start: { title: "Start", text: "Text", choices: [] } } };
     const elements = { titleEl: document.createElement('div'), textEl: document.createElement('div'), choicesEl: document.createElement('div') };
@@ -147,7 +147,7 @@ window.GameEngineTests = {
 
   // 永続化テスト
   testPersistence: function() {
-    console.log('--- Persistence Tests ---');
+    console.debug('--- Persistence Tests ---');
 
     const testGame = { title: "Test Game", start: "start", nodes: { start: { title: "Start", text: "Text", choices: [] } } };
     const elements = { titleEl: document.createElement('div'), textEl: document.createElement('div'), choicesEl: document.createElement('div') };
@@ -170,7 +170,7 @@ window.GameEngineTests = {
 
   // 自動セーブテスト
   testAutoSave: function() {
-    console.log('--- Auto Save Tests ---');
+    console.debug('--- Auto Save Tests ---');
 
     // 自動セーブ設定が有効な場合のテスト
     if (window.APP_CONFIG?.game?.autoSave?.enabled) {
@@ -190,20 +190,20 @@ window.GameEngineTests = {
         this.assert(saveCalled, 'Auto save should be called');
       }, 100);
     } else {
-      console.log('Auto save disabled, skipping test');
+      console.debug('Auto save disabled, skipping test');
     }
   },
 
   // 結果表示
   showResults: function() {
-    console.log('=== Test Results ===');
-    console.log(`Total: ${this.passed + this.failed}`);
-    console.log(`Passed: ${this.passed}`);
-    console.log(`Failed: ${this.failed}`);
+    console.debug('=== Test Results ===');
+    console.debug(`Total: ${this.passed + this.failed}`);
+    console.debug(`Passed: ${this.passed}`);
+    console.debug(`Failed: ${this.failed}`);
 
     if (this.failed > 0) {
-      console.log('Failed tests:');
-      this.results.filter(r => r.status === 'FAIL').forEach(r => console.log(' -', r.message));
+      console.debug('Failed tests:');
+      this.results.filter(r => r.status === 'FAIL').forEach(r => console.debug(' -', r.message));
     }
 
     // DOMに結果表示

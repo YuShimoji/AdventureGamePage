@@ -1,7 +1,5 @@
 (function () {
-  // SavePreviewPanelManager - 状態管理と初期化専用モジュール
-  // 分割されたSavePreviewモジュールの統合マネージャー
-
+  // SavePreview Core Module - Main panel manager class
   class SavePreviewPanelManager {
     constructor() {
       this.panelId = 'preview-panel';
@@ -9,14 +7,13 @@
       this.panel = null;
       this.listEl = null;
       this.overlay = null;
-      this.renderer = null;
-      this.controls = null;
       this.state = {
         isOpen: false,
         selected: new Set(),
         controls: {}
       };
       this.initialized = false;
+      this.listenersAttached = false;
       // ページコンテキスト: admin.htmlでのみ有効
       this.isAdminPage = this.checkIfAdminPage();
     }
@@ -47,8 +44,8 @@
           throw new Error('Required DOM elements not found');
         }
 
-        // 分割モジュールの初期化
-        this.initializeModules();
+        console.debug('[DEBUG] Elements found, ensuring overlay...');
+        this.ensureOverlay();
 
         console.debug('[DEBUG] Attaching listeners...');
         this.attachListeners();
@@ -73,26 +70,13 @@
       }
     }
 
-    // 分割モジュールの初期化
-    initializeModules() {
-      // オーバーレイモジュールの初期化
-      this.overlay = new window.SavePreviewOverlay(this.panel);
-      this.overlay.initialize();
-
-      // レンダラーモジュールの初期化
-      this.renderer = new window.SavePreviewRenderer(this.listEl);
-
-      // コントロールモジュールの初期化
-      this.controls = new window.SavePreviewControls(this);
-    }
-
-    // 初期状態を強制的に設定
+    // 初期状態を強制的に設定（安全策）
     forceInitialState() {
       if (!this.panel) return;
 
       // パネルを必ず非表示に
       this.panel.setAttribute('hidden', '');
-      this.panel.setAttribute('inert', '');
+      this.panel.setAttribute('inert', ''); // 完全に非対話化
       this.panel.dataset.state = 'closed';
       this.panel.classList.remove('is-open');
       this.panel.setAttribute('aria-hidden', 'true');
@@ -106,12 +90,22 @@
     getElements() {
       this.panel = document.getElementById(this.panelId);
       this.listEl = document.getElementById(this.listId);
+      this.state.controls = {
+        openBtn: document.getElementById("btn-quick-preview"),
+        closeBtn: document.getElementById("preview-close"),
+        refreshBtn: document.getElementById("preview-refresh"),
+        typeSel: document.getElementById("preview-filter-type"),
+        sortSel: document.getElementById("preview-sort"),
+        searchInput: document.getElementById("preview-search"),
+        tagSel: document.getElementById("preview-filter-tag"),
+        dateFromInput: document.getElementById("preview-date-from"),
+        dateToInput: document.getElementById("preview-date-to"),
+        compareBtn: document.getElementById("snapshot-compare-btn"),
+        delSelBtn: document.getElementById("preview-delete-selected"),
+        snapBtn: document.getElementById("snapshot-create"),
+        snapLabel: document.getElementById("snapshot-label")
+      };
       return this.panel && this.listEl;
-    }
-
-    // コントロールイベントリスナーの設定
-    attachListeners() {
-      this.controls.attachListeners();
     }
 
     // パネルを開く
@@ -144,12 +138,6 @@
       return this.initialized && this.isAdminPage && this.overlay.isOpen();
     }
 
-    // 削除選択ボタンの更新
-    updateDeleteSelectedBtn() {
-      const btn = this.state.controls.delSelBtn;
-      if (btn) btn.disabled = this.state.selected.size === 0;
-    }
-
     // リフレッシュ
     async refresh() {
       if (!this.initialized) return;
@@ -175,30 +163,13 @@
         } catch (e) {
           /* non-fatal */
         }
-        this.renderer.renderList(items);
+        this.renderList(items);
       } catch (e) {
         console.error("savePreview.refresh error", e);
       }
     }
   }
 
-  // シングルトンインスタンス
-  const panelManager = new SavePreviewPanelManager();
-
-  // admin-boot.js で初期化されるよう公開（adminページでのみ）
-  if (window.location.pathname.endsWith('admin.html') || window.location.pathname === '/admin.html') {
-    window.SavePreviewPanelManager = panelManager;
-  }
-
-  // レガシーAPIとの互換性維持
-  if (window.location.pathname.endsWith('admin.html') || window.location.pathname === '/admin.html') {
-    window.SavePreview = {
-      refresh: () => panelManager.refresh(),
-      open: (options) => panelManager.open(options),
-      close: (options) => panelManager.close(options),
-      toggle: (options) => panelManager.toggle(options),
-      getState: () => ({ ...panelManager.state, selected: Array.from(panelManager.state.selected) })
-    };
-  }
-
+  // Export for other modules
+  window.SavePreviewPanelManager = SavePreviewPanelManager;
 })();

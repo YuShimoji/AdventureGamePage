@@ -43,7 +43,7 @@
       listeners.sort((a, b) => b.priority - a.priority);
 
       if (this.debugMode) {
-        console.log(`[EventBus] Subscribed to "${event}"`, { options });
+        console.debug(`[EventBus] Subscribed to "${event}"`, { options });
       }
 
       // Return unsubscribe function
@@ -76,7 +76,7 @@
       if (index !== -1) {
         listeners.splice(index, 1);
         if (this.debugMode) {
-          console.log(`[EventBus] Unsubscribed from "${event}"`);
+          console.debug(`[EventBus] Unsubscribed from "${event}"`);
         }
       }
 
@@ -95,7 +95,7 @@
     async emit(event, data) {
       if (!this.listeners.has(event)) {
         if (this.debugMode) {
-          console.log(`[EventBus] No listeners for "${event}"`);
+          console.debug(`[EventBus] No listeners for "${event}"`);
         }
         return;
       }
@@ -111,7 +111,7 @@
       this.logEvent(eventInfo);
 
       if (this.debugMode) {
-        console.log(`[EventBus] Emitting "${event}"`, data);
+        console.debug(`[EventBus] Emitting "${event}"`, data);
       }
 
       // Execute listeners
@@ -138,7 +138,7 @@
     emitSync(event, data) {
       if (!this.listeners.has(event)) {
         if (this.debugMode) {
-          console.log(`[EventBus] No listeners for "${event}"`);
+          console.debug(`[EventBus] No listeners for "${event}"`);
         }
         return;
       }
@@ -154,7 +154,7 @@
       this.logEvent(eventInfo);
 
       if (this.debugMode) {
-        console.log(`[EventBus] Emitting (sync) "${event}"`, data);
+        console.debug(`[EventBus] Emitting (sync) "${event}"`, data);
       }
 
       // Execute listeners synchronously
@@ -180,12 +180,12 @@
       if (event) {
         this.listeners.delete(event);
         if (this.debugMode) {
-          console.log(`[EventBus] Cleared listeners for "${event}"`);
+          console.debug(`[EventBus] Cleared listeners for "${event}"`);
         }
       } else {
         this.listeners.clear();
         if (this.debugMode) {
-          console.log('[EventBus] Cleared all listeners');
+          console.debug('[EventBus] Cleared all listeners');
         }
       }
     }
@@ -235,7 +235,7 @@
      */
     setDebugMode(enabled) {
       this.debugMode = !!enabled;
-      console.log(`[EventBus] Debug mode ${enabled ? 'enabled' : 'disabled'}`);
+      console.debug(`[EventBus] Debug mode ${enabled ? 'enabled' : 'disabled'}`);
     }
   }
 
@@ -275,5 +275,5 @@
     ZEN_MODE_TOGGLE: 'ui:zen:toggle'
   };
 
-  console.log('[EventBus] Initialized');
+  console.debug('[EventBus] Initialized');
 })();

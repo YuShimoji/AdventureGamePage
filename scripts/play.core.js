@@ -72,13 +72,13 @@
       }
 
       const loaded = StorageUtil.loadJSON(GAME_DATA_KEY);
-      debugLog('Loaded game data from storage:', loaded);
+      console.debug('Loaded game data from storage:', loaded);
       const normalize = window.Converters?.normalizeSpecToEngine || normalizeSpecToEngine;
-      debugLog('Using normalize function:', normalize);
+      console.debug('Using normalize function:', normalize);
       let game;
       try {
         game = normalize(loaded);
-        debugLog('Normalized game data:', game);
+        console.debug('Normalized game data:', game);
         if (!game && loaded) {
           const invalidError = new Error('保存されたゲームデータの形式が無効です。');
           invalidError.code = 'INVALID_GAME_DATA';
@@ -108,13 +108,13 @@
         }
         throw wrapped;
       }
-      debugLog('Final game data:', game);
+      console.debug('Final game data:', game);
       return game;
     },
 
     createEngine: function (elements, game) {
-      debugLog('Creating engine with game data:', game);
-      debugLog('Game data start property:', game?.start);
+      console.debug('Creating engine with game data:', game);
+      console.debug('Game data start property:', game?.start);
       return GameEngine.createEngine(game, {
         titleEl: elements.titleEl,
         imageEl: elements.imageEl,

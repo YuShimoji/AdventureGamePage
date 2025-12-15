@@ -4,7 +4,7 @@
     init: function() {
       this.setupEditor();
       this.loadSettings();
-      console.log('AdminEditor initialized');
+      console.debug('AdminEditor initialized');
     },
 
     // Character count and placeholder management

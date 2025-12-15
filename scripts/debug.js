@@ -26,7 +26,7 @@
     const itemId = prompt('アイテムIDを入力:', 'sword');
     if (itemId && window.gameEngine?.addItem) {
       const success = window.gameEngine.addItem(itemId, 1);
-      console.log(`アイテム追加: ${itemId} - ${success ? '成功' : '失敗'}`);
+      console.debug(`アイテム追加: ${itemId} - ${success ? '成功' : '失敗'}`);
       if (window.updateInventoryUI) window.updateInventoryUI();
     }
   }
@@ -35,7 +35,7 @@
     const itemId = prompt('アイテムIDを入力:', 'sword');
     if (itemId && window.gameEngine?.removeItem) {
       const success = window.gameEngine.removeItem(itemId, 1);
-      console.log(`アイテム削除: ${itemId} - ${success ? '成功' : '失敗'}`);
+      console.debug(`アイテム削除: ${itemId} - ${success ? '成功' : '失敗'}`);
       if (window.updateInventoryUI) window.updateInventoryUI();
     }
   }
@@ -43,7 +43,7 @@
   function debugClearInventory() {
     if (window.gameEngine?.clearInventory) {
       window.gameEngine.clearInventory();
-      console.log('インベントリクリア完了');
+      console.debug('インベントリクリア完了');
       if (window.updateInventoryUI) window.updateInventoryUI();
     }
   }
@@ -51,14 +51,14 @@
   function debugSave() {
     if (window.gameEngine?.saveProgress) {
       window.gameEngine.saveProgress();
-      console.log('ゲーム保存完了');
+      console.debug('ゲーム保存完了');
     }
   }
 
   function debugLoad() {
     if (window.gameEngine?.loadProgress) {
       window.gameEngine.loadProgress();
-      console.log('ゲーム読み込み完了');
+      console.debug('ゲーム読み込み完了');
       if (window.updateInventoryUI) window.updateInventoryUI();
     }
   }
@@ -66,7 +66,7 @@
   function debugReset() {
     if (window.gameEngine?.reset) {
       window.gameEngine.reset();
-      console.log('ゲームリセット完了');
+      console.debug('ゲームリセット完了');
       if (window.updateInventoryUI) window.updateInventoryUI();
     }
   }
@@ -76,7 +76,7 @@
     if (nodeId && window.gameEngine?.setNode) {
       try {
         window.gameEngine.setNode(nodeId);
-        console.log(`ノードジャンプ: ${nodeId}`);
+        console.debug(`ノードジャンプ: ${nodeId}`);
       } catch (e) {
         console.error(`ノードジャンプ失敗: ${nodeId}`, e);
       }
@@ -85,7 +85,7 @@
 
   function debugShowState() {
     if (window.gameEngine) {
-      console.log('ゲーム状態:', {
+      console.debug('ゲーム状態:', {
         currentNode: window.gameEngine.currentNodeId || '不明',
         hasBack: window.gameEngine.canGoBack?.() || false,
         hasForward: window.gameEngine.canGoForward?.() || false,
@@ -96,7 +96,7 @@
 
   function debugShowInventory() {
     if (window.gameEngine?.getInventory) {
-      console.log('インベントリ:', window.gameEngine.getInventory());
+      console.debug('インベントリ:', window.gameEngine.getInventory());
     }
   }
 
@@ -117,7 +117,7 @@
       // デバッグ用のアクション実行
       try {
         window.gameEngine.executeAction(action);
-        console.log(`変数操作: ${key} ${operation} ${value}`);
+        console.debug(`変数操作: ${key} ${operation} ${value}`);
         if (window.ToastManager) {
           ToastManager.success(`変数を設定しました: ${key} = ${value}`);
         } else {
@@ -139,7 +139,7 @@
       try {
         const state = window.gameEngine.getState ? window.gameEngine.getState() : {};
         const vars = state.variables || {};
-        console.log('現在の変数:', vars);
+        console.debug('現在の変数:', vars);
         if (window.ToastManager) {
           ToastManager.info(`現在の変数:\n${JSON.stringify(vars, null, 2)}`);
         } else {
@@ -169,5 +169,5 @@
   document.getElementById('debug-set-variable')?.addEventListener('click', debugSetVariable);
   document.getElementById('debug-show-variables')?.addEventListener('click', debugShowVariables);
 
-  console.log('デバッグUIが有効化されました (🔧ボタン)');
+  console.debug('デバッグUIが有効化されました (🔧ボタン)');
 })();

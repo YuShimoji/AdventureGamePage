@@ -82,7 +82,7 @@ async function main() {
 
     await page.screenshot({ path: path.join(__dirname, '..', 'tests', 'e2e-screenshot.png') });
 
-    console.log(`[E2E] Mocha tests: ${result.tests}, failures: ${result.failures}`);
+    console.debug(`[E2E] Mocha tests: ${result.tests}, failures: ${result.failures}`);
 
     await browser.close();
 

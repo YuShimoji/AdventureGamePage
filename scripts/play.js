@@ -55,7 +55,7 @@
   function initPlayPage() {
     // Initialize core modules
     const { elements, engine, game } = window.PlayCore.init();
-    debugLog('PlayCore.init returned:', { elements, engine, game });
+    console.debug('PlayCore.init returned:', { elements, engine, game });
 
     // Initialize feature modules
     window.PlaySave.init(engine, game.title);
@@ -136,7 +136,7 @@
         }
       });
 
-      debugLog('[PLAY] Play elements hidden for non-play page');
+      console.debug('[PLAY] Play elements hidden for non-play page');
     }
   });
 })();

@@ -38,10 +38,10 @@
 
       // 4.6 SavePreviewPanelManagerの初期化（admin.jsより先に実行）
       if (window.SavePreviewPanelManager && window.APP_CONFIG?.ui?.showSavePreview) {
-        console.log('[DEBUG] SavePreviewPanelManager found, initializing...');
+        console.debug('[DEBUG] SavePreviewPanelManager found, initializing...');
         try {
           await window.SavePreviewPanelManager.initialize();
-          console.log('[DEBUG] SavePreviewPanelManager initialized successfully');
+          console.debug('[DEBUG] SavePreviewPanelManager initialized successfully');
         } catch (e) {
           console.error('[DEBUG] SavePreviewPanelManager initialization failed:', e);
           log?.('error', 'SavePreviewPanelManager initialization failed', { error: e.message });

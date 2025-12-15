@@ -4,7 +4,7 @@
   window.AdminCore = {
     init: function () {
       this.setupCore();
-      console.log('AdminCore initialized');
+      console.debug('AdminCore initialized');
     },
 
     setupCore: function () {

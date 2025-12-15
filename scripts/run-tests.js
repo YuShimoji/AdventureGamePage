@@ -1,284 +1,65 @@
 #!/usr/bin/env node
 // Test runner script with proper process management for Windows
-const { spawn, execSync } = require('child_process');
-const http = require('http');
+// Refactored to use modular components
+const path = require('path');
 
-const PORT = 18080;
-const HOST = '127.0.0.1';
-const TEST_PATH = '/tests/test.html';
-let TEST_URL = `http://${HOST}:${PORT}${TEST_PATH}`;
-const SERVER_START_TIMEOUT = 10000;
-const TEST_TIMEOUT = 30000;
-
-function log(message) {
-  console.log(`[TEST] ${message}`);
-}
-
-function waitForServerFromOutput(serverProcess) {
-  return new Promise((resolve, reject) => {
-    let resolved = false;
-    let buffer = '';
-    const timeout = setTimeout(() => {
-      if (!resolved) {
-        reject(new Error('Dev server did not report ready state in time'));
-      }
-    }, SERVER_START_TIMEOUT);
-
-    const handleLine = line => {
-      const trimmed = line.trim();
-      if (trimmed) {
-        console.log(`[dev-server] ${trimmed}`);
-        const match = trimmed.match(/http:\/\/127\.0\.0\.1:(\d+)\//);
-        if (match && !resolved) {
-          resolved = true;
-          clearTimeout(timeout);
-          resolve(parseInt(match[1], 10));
-        }
-      }
-    };
-
-    serverProcess.stdout.on('data', chunk => {
-      buffer += chunk.toString();
-      const lines = buffer.split(/\r?\n/);
-      buffer = lines.pop();
-      lines.forEach(handleLine);
-    });
-
-    serverProcess.stdout.on('error', err => {
-      if (!resolved) {
-        clearTimeout(timeout);
-        reject(err);
-      }
-    });
-
-    serverProcess.on('exit', code => {
-      if (!resolved) {
-        clearTimeout(timeout);
-        reject(new Error(`Dev server exited with code ${code} before reporting ready state`));
-      }
-    });
-  });
-}
-
-function error(message) {
-  console.error(`[TEST ERROR] ${message}`);
-}
-
-// Check if port is in use
-function checkPort(port) {
-  return new Promise(resolve => {
-    const server = http.createServer();
-    server.listen(port, '127.0.0.1', () => {
-      server.close(() => resolve(false));
-    });
-    server.on('error', () => resolve(true));
-  });
-}
-
-// Kill process using the port (Windows specific)
-function killPortProcess(port) {
-  try {
-    // Use netstat to find process ID
-    const output = execSync(`netstat -ano | findstr :${port}`, { encoding: 'utf8' });
-    const lines = output.split('\n').filter(line => line.includes(`:${port}`));
-
-    const pids = [];
-    for (const line of lines) {
-      const parts = line.trim().split(/\s+/);
-      if (parts.length >= 5) {
-        const pid = parts[parts.length - 1];
-        if (pid && pid !== '0' && !pids.includes(pid)) {
-          pids.push(pid);
-        }
-      }
-    }
-
-    for (const pid of pids) {
-      try {
-        execSync(`taskkill /PID ${pid} /F`, { stdio: 'inherit' });
-        log(`Killed process ${pid} using port ${port}`);
-      } catch (e) {
-        // Process might have already exited
-      }
-    }
-
-    // Wait a bit for port to be freed
-    return new Promise(resolve => setTimeout(resolve, 2000));
-  } catch (e) {
-    log(`No process found using port ${port}`);
-    return Promise.resolve();
-  }
-}
-
-// Wait for server to be ready (check multiple ports)
-function waitForServer(startPort, maxRetries = 10) {
-  return new Promise((resolve, reject) => {
-    let currentPort = startPort;
-    let attempts = 0;
-
-    function check() {
-      attempts++;
-      const url = `http://${HOST}:${currentPort}${TEST_PATH}`;
-
-      http
-        .get(url, res => {
-          if (res.statusCode === 200) {
-            resolve(currentPort);
-            return;
-          }
-          res.resume();
-          if (attempts >= maxRetries) {
-            reject(new Error(`Server not accessible on any port after ${maxRetries} attempts`));
-            return;
-          }
-          currentPort++;
-          setTimeout(check, 500);
-        })
-        .on('error', () => {
-          if (attempts >= maxRetries) {
-            reject(new Error(`Server not accessible on any port after ${maxRetries} attempts`));
-            return;
-          }
-          currentPort++;
-          setTimeout(check, 500);
-        });
-    }
-
-    check();
-  });
-}
-
-function wait(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-// Single smoke test attempt
-function runSmokeTestOnce(url) {
-  return new Promise((resolve, reject) => {
-    let finished = false;
-
-    log(`Running smoke test against ${url} ...`);
-
-    const req = http.get(url, res => {
-      const { statusCode } = res;
-      log(`Test URL responded with status ${statusCode}`);
-
-      // We don't need the full body for a smoke test; just drain it.
-      res.resume();
-
-      if (finished) return;
-      finished = true;
-
-      if (statusCode === 200) {
-        log('Smoke test passed (HTTP 200)');
-        resolve();
-      } else {
-        reject(new Error(`Smoke test failed with status ${statusCode}`));
-      }
-    });
-
-    req.on('error', err => {
-      if (finished) return;
-      finished = true;
-      reject(new Error(`Error requesting test URL: ${err.message}`));
-    });
-
-    // Timeout
-    setTimeout(() => {
-      if (finished) return;
-      finished = true;
-      try {
-        req.destroy();
-      } catch {}
-      reject(new Error('Test timeout'));
-    }, TEST_TIMEOUT);
-  });
-}
-
-// Run tests with a couple of retries to avoid transient 404/connection issues
-async function runTests(retries = 3, delayMs = 500) {
-  const url = TEST_URL;
-  let lastError = null;
-  for (let attempt = 1; attempt <= retries; attempt++) {
-    try {
-      await runSmokeTestOnce(url);
-      return;
-    } catch (err) {
-      lastError = err;
-      error(`${err.message} (attempt ${attempt}/${retries})`);
-      if (attempt < retries) {
-        log(`Retrying in ${delayMs}ms...`);
-        await wait(delayMs);
-      }
-    }
-  }
-  throw lastError || new Error('Smoke test failed');
-}
-
-// Main test runner
+const TestServerManager = require('./run-tests.server.js');
+const TestRunner = require('./run-tests.test.js');
+const TestUtils = require('./run-tests.utils.js');
 async function main() {
+  TestUtils.validateEnvironment();
+
+  const serverManager = new TestServerManager();
   let serverProcess = null;
-  let actualPort = PORT;
 
   try {
-    log('Starting test runner...');
+    TestUtils.log('Starting dev server...');
 
-    if (process.env.AGP_TEST_KILL_PORT === '1') {
-      const inUse = await checkPort(PORT);
-      if (inUse) {
-        await killPortProcess(PORT);
-      }
+    // Try to kill any existing server on the port
+    if (TestUtils.checkWindowsProcess(serverManager.PORT)) {
+      TestUtils.log(`Port ${serverManager.PORT} is in use, attempting to free it...`);
+      TestUtils.killWindowsProcess(serverManager.PORT);
+      // Wait a bit for the port to be freed
+      await new Promise(resolve => setTimeout(resolve, 1000));
     }
 
-    log('Starting development server...');
-    serverProcess = spawn('node', ['scripts/dev-server.js'], {
-      stdio: ['pipe', 'pipe', 'inherit'],
-      detached: false,
-      env: { ...process.env, PORT: String(PORT) },
-    });
+    const { server, port } = await serverManager.startServer(path.join(__dirname, 'dev-server.js'));
+    serverProcess = server;
 
-    // Handle server process errors
-    serverProcess.on('error', err => {
-      error(`Server process error: ${err.message}`);
-    });
+    TestUtils.log(`Server started on port ${port}`);
 
-    // Wait for server to be ready and get actual port
-    log('Waiting for server to be ready...');
-    try {
-      actualPort = await waitForServerFromOutput(serverProcess);
-    } catch (stdoutErr) {
-      log(`Falling back to port probing: ${stdoutErr.message}`);
-      actualPort = await waitForServer(PORT);
+    // Update test URL with actual port
+    const testRunner = new TestRunner(serverManager.TEST_URL);
+
+    // Wait for server to be ready
+    await serverManager.checkServerReady(serverManager.TEST_URL);
+
+    TestUtils.log('Running smoke test...');
+    const smokeResult = await testRunner.runSmokeTest();
+    testRunner.logResult(smokeResult);
+
+    if (!smokeResult.success) {
+      throw new Error('Smoke test failed');
     }
 
-    const actualTestUrl = `http://${HOST}:${actualPort}${TEST_PATH}`;
-    log(`Server is ready on port ${actualPort}, running tests...`);
+    TestUtils.log('All tests passed!');
 
-    // Override TEST_URL with actual port
-    TEST_URL = actualTestUrl;
-
-    await runTests();
-
-    log('All tests completed successfully!');
   } catch (err) {
-    error(`Test runner failed: ${err.message}`);
+    console.error('[TEST] Error:', err.message || err);
     process.exitCode = 1;
   } finally {
-    // Clean up server process
     if (serverProcess) {
-      log('Stopping server...');
-      serverProcess.kill();
+      TestUtils.log('Stopping server...');
+      serverManager.killServer(serverProcess);
     }
   }
 }
 
-// Handle command line arguments
-if (process.argv.includes('--ci')) {
-  // CI mode - more strict
-  process.env.CI = 'true';
+if (require.main === module) {
+  main().catch(err => {
+    console.error('[TEST] Unhandled error:', err);
+    process.exit(1);
+  });
 }
 
-main().catch(err => {
-  error(`Unhandled error: ${err.message}`);
-  process.exitCode = 1;
-});
+module.exports = { main, TestServerManager, TestRunner, TestUtils };

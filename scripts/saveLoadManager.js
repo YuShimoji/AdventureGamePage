@@ -9,7 +9,7 @@
   window.SaveLoadManager = {
     init: function () {
       this.initSaveLoad();
-      console.log('SaveLoadManager initialized');
+      console.debug('SaveLoadManager initialized');
     },
 
     // Save/load functionality
@@ -142,7 +142,7 @@
 
       if (btnQuickZen)
         btnQuickZen.addEventListener('click', () => {
-          console.log('[SaveLoadManager] Quick Zen clicked');
+          console.debug('[SaveLoadManager] Quick Zen clicked');
           document.body.classList.toggle('zen-mode');
         });
       if (btnQuickSidebar)
@@ -157,7 +157,7 @@
           sidebar.classList.toggle('show', isShownAfter);
           const rect = sidebar.getBoundingClientRect();
           const style = window.getComputedStyle(sidebar);
-          console.log('[SaveLoadManager] Quick Sidebar clicked', {
+          console.debug('[SaveLoadManager] Quick Sidebar clicked', {
             isShownBefore,
             isShownAfter,
             hasShowClass: sidebar.classList.contains('show'),
@@ -182,7 +182,7 @@
             return;
           }
           themePanel.hidden = !themePanel.hidden;
-          console.log('[SaveLoadManager] Quick Theme clicked', { hiddenAfter: themePanel.hidden });
+          console.debug('[SaveLoadManager] Quick Theme clicked', { hiddenAfter: themePanel.hidden });
         });
       if (btnQuickMore && dropdown) {
         btnQuickMore.addEventListener('click', e => {
@@ -192,7 +192,7 @@
           if (willOpen) {
             dropdown.hidden = false;
           }
-          console.log('[SaveLoadManager] Quick More clicked', { opened: willOpen });
+          console.debug('[SaveLoadManager] Quick More clicked', { opened: willOpen });
         });
         document.addEventListener('click', e => {
           if (dropdown && !dropdown.hidden && !e.target.closest('.floating-controls-group')) {

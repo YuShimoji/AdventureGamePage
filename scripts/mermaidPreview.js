@@ -9,11 +9,11 @@
   document.addEventListener('DOMContentLoaded', () => {
     // ページコンテキストチェック: adminページでのみ初期化
     if (!isAdminPage()) {
-      console.log('[MermaidPreview] Skipped: not admin page');
+      console.debug('[MermaidPreview] Skipped: not admin page');
       return;
     }
 
-    console.log('[MermaidPreview] Initializing on admin page');
+    console.debug('[MermaidPreview] Initializing on admin page');
     if (document.getElementById('mermaid-panel')) {
       // Wait for admin-boot-complete event instead of initializing immediately
       const initializeMermaidPreview = () => {
@@ -36,13 +36,13 @@
 
       // Check if admin-boot already completed
       if (window.AdminBoot && document.getElementById('editor')) {
-        console.log('[MermaidPreview] Admin-boot already complete, initializing now');
+        console.debug('[MermaidPreview] Admin-boot already complete, initializing now');
         initializeMermaidPreview();
       } else {
-        console.log('[MermaidPreview] Waiting for admin-boot-complete event');
+        console.debug('[MermaidPreview] Waiting for admin-boot-complete event');
         // Wait for admin-boot-complete event
         document.addEventListener('admin-boot-complete', () => {
-          console.log('[MermaidPreview] Admin-boot-complete event received');
+          console.debug('[MermaidPreview] Admin-boot-complete event received');
           initializeMermaidPreview();
         }, { once: true });
       }
