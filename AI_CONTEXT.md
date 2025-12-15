@@ -56,8 +56,7 @@
 - **node_modules**: Git追跡から除外済み（`package-lock.json` + `npm ci` 前提）
 
 - **use_item のテスト不足**
-  - `use_item` の基本挙動（消費/consume:false/存在しないアイテムで例外にならない）はテスト追加済み。
-  - ただし `set_flag` / `heal` の effect 反映についてはテスト未追加（実装は済み）。
+  - `use_item` の基本挙動（消費/consume:false/存在しないアイテムで例外にならない）および effect（`set_variable` / `set_flag` / `heal`）はテスト追加済み。
 
 - **tests/test.html の依存不足（sinon）**
   - `errorHandler.spec.js` / `migrationWizard.spec.js` / `snapshotCompare.spec.js` 等が `sinon` を使用しているが、`tests/test.html` が sinon を読み込んでいない。

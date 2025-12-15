@@ -187,4 +187,69 @@ describe('GameEngine', function () {
     expect(state.variables.hp).to.equal(undefined);
     expect(engine.getInventory().items.length).to.equal(0);
   });
+
+  it('executes use_item set_flag effect', function () {
+    const game = {
+      title: 'UseItemSetFlag',
+      start: 's',
+      items: [{ id: 'potion', name: 'Potion', type: 'consumable', description: '', usable: true }],
+      nodes: {
+        s: { text: 'S', choices: [{ text: 'Use', to: 'u' }] },
+        u: {
+          text: 'U',
+          choices: [],
+          actions: [
+            { type: 'add_item', itemId: 'potion', quantity: 1 },
+            {
+              type: 'use_item',
+              itemId: 'potion',
+              effect: { type: 'set_flag', flag: 'opened' },
+            },
+          ],
+        },
+      },
+    };
+
+    const els = TestHelpers.makeEls();
+    const engine = GameEngine.createEngine(game, els);
+    engine.render();
+    engine.setNode('u');
+
+    const state = engine.getPlayerState();
+    expect(state.flags.opened).to.equal(true);
+    expect(engine.hasItem('potion')).to.equal(false);
+  });
+
+  it('executes use_item heal effect and clamps to maxHealth', function () {
+    const game = {
+      title: 'UseItemHeal',
+      start: 's',
+      items: [{ id: 'potion', name: 'Potion', type: 'consumable', description: '', usable: true }],
+      nodes: {
+        s: { text: 'S', choices: [{ text: 'Use', to: 'u' }] },
+        u: {
+          text: 'U',
+          choices: [],
+          actions: [
+            { type: 'add_item', itemId: 'potion', quantity: 1 },
+            {
+              type: 'use_item',
+              itemId: 'potion',
+              effect: { type: 'heal', value: 10, maxHealth: 100 },
+            },
+          ],
+        },
+      },
+    };
+
+    const els = TestHelpers.makeEls();
+    const engine = GameEngine.createEngine(game, els);
+    engine.setPlayerState({ variables: { health: 95 } });
+    engine.render();
+    engine.setNode('u');
+
+    const state = engine.getPlayerState();
+    expect(state.variables.health).to.equal(100);
+    expect(engine.hasItem('potion')).to.equal(false);
+  });
 });
