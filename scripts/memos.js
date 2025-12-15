@@ -133,6 +133,31 @@
       if (e.key === "Escape" && !panel.hidden) {
         e.preventDefault();
         closePanel();
+      } else if (e.key === "Tab" && !panel.hidden) {
+        // Focus trapping within panel
+        const focusableElements = panel.querySelectorAll(
+          'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        );
+        const focusableArray = Array.from(focusableElements).filter(el => el.offsetParent !== null);
+
+        if (focusableArray.length === 0) return;
+
+        const firstElement = focusableArray[0];
+        const lastElement = focusableArray[focusableArray.length - 1];
+
+        if (e.shiftKey) {
+          // Shift+Tab
+          if (document.activeElement === firstElement) {
+            e.preventDefault();
+            lastElement.focus();
+          }
+        } else {
+          // Tab
+          if (document.activeElement === lastElement) {
+            e.preventDefault();
+            firstElement.focus();
+          }
+        }
       }
     }
 
@@ -140,6 +165,7 @@
       if (!panel.hidden) return;
       lastFocused = document.activeElement;
       panel.hidden = false;
+      panel.classList.add('fade-in');
       panel.removeAttribute("aria-hidden");
       panel.removeAttribute("inert");
       if (openBtn) {
@@ -164,6 +190,7 @@
 
     function closePanel() {
       if (panel.hidden) return;
+      panel.classList.remove('fade-in');
       panel.hidden = true;
       panel.setAttribute("aria-hidden", "true");
       panel.setAttribute("inert", "");

@@ -592,3 +592,74 @@ body:not(.play-page) .modal-overlay {
     margin-bottom: 6px;
   }
 }
+
+/* Animation Enhancements */
+
+/* Fade-in animation for modals and panels */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideOutRight {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+}
+
+/* Modal animations */
+.modal-overlay.fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Panel animations */
+.inventory-panel.fade-in {
+  animation: slideInRight 0.3s ease-out;
+}
+
+.save-slots-panel.fade-in {
+  animation: slideInRight 0.3s ease-out;
+}
+
+/* Button press feedback */
+.btn:active {
+  transform: scale(0.98);
+  transition: transform 0.1s ease;
+}
+
+/* Smooth tab transitions */
+.tab-content {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.tab-content.hidden {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+.tab-content.active {
+  opacity: 1;
+  transform: translateY(0);
+}

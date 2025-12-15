@@ -33,6 +33,9 @@
           }
         }
 
+        // Add animation class for slide-in effect
+        inventoryPanel.classList.add('fade-in');
+
         if (btnInventory) {
           btnInventory.setAttribute('aria-expanded', 'true');
         }
@@ -53,6 +56,9 @@
           // Restore scrolling
           document.body.style.overflow = '';
         }
+
+        // Remove animation class so next open can re-trigger it cleanly
+        inventoryPanel.classList.remove('fade-in');
 
         if (btnInventory) {
           btnInventory.setAttribute('aria-expanded', 'false');

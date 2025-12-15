@@ -187,8 +187,14 @@
       const saveSlotsPanel = document.getElementById('save-slots-panel');
       const btnSaveSlots = document.getElementById('btn-save-slots');
 
+      if (!saveSlotsPanel) return;
+
       this.updateSaveSlotsList();
       window.PlayModalFocus.openModalWithFocus(saveSlotsPanel);
+
+      // Add animation class for slide-in effect
+      saveSlotsPanel.classList.add('fade-in');
+
       if (btnSaveSlots) {
         btnSaveSlots.setAttribute('aria-expanded', 'true');
       }
@@ -197,6 +203,11 @@
     hideSaveSlotsPanel() {
       const saveSlotsPanel = document.getElementById('save-slots-panel');
       const btnSaveSlots = document.getElementById('btn-save-slots');
+
+      if (!saveSlotsPanel) return;
+
+      // Remove animation class so next open can re-trigger it cleanly
+      saveSlotsPanel.classList.remove('fade-in');
 
       window.PlayModalFocus.closeModalWithFocus(saveSlotsPanel);
       if (btnSaveSlots) {

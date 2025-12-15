@@ -28,6 +28,7 @@
       iframe.src = "play.html";
       modal.hidden = false;
       modal.style.display = "flex";
+      modal.classList.add('fade-in');
       modal.setAttribute("aria-hidden", "false");
       lastFocused = document.activeElement;
       try {
@@ -38,6 +39,7 @@
 
     function closeModal() {
       if (!modal || !iframe) return;
+      modal.classList.remove('fade-in');
       iframe.src = "about:blank";
       modal.hidden = true;
       modal.style.display = "none";

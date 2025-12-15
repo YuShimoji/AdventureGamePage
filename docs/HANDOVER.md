@@ -266,6 +266,33 @@
     - `consume: false` の場合に消費されないこと
     - 存在しないアイテム使用で例外にならないこと
 
+- **UI/UX・アクセシビリティ改善（Play/Admin）**
+  - `styles/play.css`:
+    - モーダル/パネル用の `fadeIn` / `slideInRight` / `slideOutRight` キーフレームと、ボタン押下・タブ遷移向けのアニメーションを追加。
+  - `scripts/playtest.js`:
+    - プレイテストモーダル表示時に `fade-in` クラスを付与し、閉じる際に除去することで、開閉アニメーションを付けた。
+  - `scripts/memos.js`:
+    - メモパネル表示時に `fade-in` クラスを付与し、Esc キー閉じ・Tab/Shift+Tab でのフォーカストラップを実装。
+  - `scripts/play.inventory.js`:
+    - インベントリパネル開閉時に `fade-in` クラスを追加/削除し、`PlayModalFocus` が存在する場合はそれを優先してフォーカス管理を行うように統合。
+  - `scripts/playModalSaveSlots.js`:
+    - セーブスロットパネル開閉時に `fade-in` クラスを追加/削除し、既存の `PlayModalFocus` に基づくフォーカス制御と組み合わせて動作させるようにした。
+  - `scripts/savePreview.js`:
+    - 保存プレビューパネルのオーバーレイに対して、Esc キー閉じ・Tab/Shift+Tab でのフォーカストラップ・フォーカス復帰ロジックを強化。
+  - `scripts/admin.editor.js`:
+    - Admin エディタに Ctrl/Cmd+S（保存）、Ctrl/Cmd+Z（元に戻す）、Ctrl/Cmd+Y（やり直し）のキーボードショートカットを追加。
+
+- **ログ整備・テスト基盤/Devサーバ・SavePreview のモジュール化**
+  - `scripts/debug.js` / `scripts/eventBus.js` / `scripts/play.core.js` / `scripts/play.js` / `scripts/mermaidPreview.js` / `scripts/saveLoadManager.js` / `scripts/admin-*.js` / `scripts/e2e-tests.js` / `scripts/run-tests.js` など:
+    - デバッグ目的の `console.log` を `console.debug` に統一し、`APP_CONFIG.debug.showConsoleLogs` フラグで表示/非表示を切り替えられるよう整理。
+  - `scripts/run-tests.server.js` / `scripts/run-tests.test.js` / `scripts/run-tests.utils.js` / `scripts/run-tests.js`:
+    - テストランナーを「サーバ起動」「テスト実行」「ユーティリティ」に分割し、dev-server プロセス管理・ログ出力・環境検証をモジュールとして切り出し。
+  - `scripts/dev-server.js` / `scripts/dev-server.mime.js` / `scripts/dev-server.utils.js` / `scripts/e2e-tests.core.js`:
+    - dev-server の MIME 管理・パス検証・ポート選択処理をモジュール化し、E2E テスト用のサーバ起動/停止ロジックを `e2e-tests.core.js` に集約。
+  - `scripts/savePreview.core.js` / `scripts/savePreview.overlay.js` / `scripts/savePreview.renderer.js` / `scripts/savePreview.controls.js` / `scripts/savePreview.js`:
+    - SavePreview パネルを「オーバーレイ」「レンダラー」「コントロール」「パネル管理」に分割し、admin-boot から利用できるモジュールとして再構成。
+    - 既存のグローバル `SavePreview` API は shim として維持しつつ、新構成が利用可能な場合はそちらを優先して使用するようにした。
+
 ### 設計上の判断と理由
 
 - `use_item` の effect 反映を UI ではなく **エンジン側（`GameEngineUtils.executeEffect`）へ寄せる**
@@ -299,6 +326,12 @@
   - `effect.value` 未指定の場合は `10`。
   - `effect.maxHealth` 未指定の場合は `100`。
   - 結果は `maxHealth` で上限 clamp。
+
+### テスト結果 (今回セッション)
+
+- `npm test`: PASS
+  - `scripts/run-tests.js` 経由で dev-server を起動し、`/tests/test.html` への HTTP 200 スモークテストが成功。
+  - 本セッションで追加した UI/UX/A11y・テストランナー/Devサーバ/SavePreview 関連変更を含む HEAD 時点でグリーンであることを確認。
 
 ### 未対応・今後の課題
 
@@ -345,7 +378,7 @@
 
 ## 最終更新日時
 
-**2025-12-15** - npm audit fix詳細反映（js-yaml更新）、アイテム使用（use_item）の effect 反映をゲームエンジン側へ実装し、ユニットテストを追加
+**2025-12-15** - npm audit fix詳細反映（js-yaml更新）、アイテム使用（use_item）の effect 反映をゲームエンジン側へ実装し、UI/UX・アクセシビリティ改善（モーダル/パネルアニメーション・フォーカストラップ・キーボードショートカット）およびテストランナー/Devサーバ/SavePreview のモジュール化を反映（本ファイルおよびコードベースを更新）
 
 ---
 

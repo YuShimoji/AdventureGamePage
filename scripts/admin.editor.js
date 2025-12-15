@@ -126,6 +126,30 @@
       // Input event listener for character count updates
       editor.addEventListener('input', () => this.updateCharCount(editor, count));
 
+      // Keyboard shortcuts
+      document.addEventListener('keydown', (e) => {
+        if (e.ctrlKey || e.metaKey) { // Support both Ctrl and Cmd
+          switch (e.key) {
+            case 's': // Save
+              e.preventDefault();
+              if (window.StorageOperationsManager && typeof window.StorageOperationsManager.saveCurrent === 'function') {
+                window.StorageOperationsManager.saveCurrent();
+              } else if (window.AdminAPI && typeof window.AdminAPI.saveCurrent === 'function') {
+                window.AdminAPI.saveCurrent();
+              }
+              break;
+            case 'z': // Undo
+              e.preventDefault();
+              this.exec('undo');
+              break;
+            case 'y': // Redo
+              e.preventDefault();
+              this.exec('redo');
+              break;
+          }
+        }
+      });
+
       // Placeholder configuration
       if (window.APP_CONFIG?.editor?.placeholder) {
         editor.setAttribute('data-placeholder', window.APP_CONFIG.editor.placeholder);

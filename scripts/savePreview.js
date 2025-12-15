@@ -254,6 +254,31 @@
       if (e.key === "Escape" && this.overlay.isOpen()) {
         e.preventDefault();
         this.overlay.close();
+      } else if (e.key === "Tab" && this.overlay.isOpen()) {
+        // Focus trapping within modal
+        const focusableElements = this.panel.querySelectorAll(
+          'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        );
+        const focusableArray = Array.from(focusableElements).filter(el => el.offsetParent !== null);
+
+        if (focusableArray.length === 0) return;
+
+        const firstElement = focusableArray[0];
+        const lastElement = focusableArray[focusableArray.length - 1];
+
+        if (e.shiftKey) {
+          // Shift+Tab
+          if (document.activeElement === firstElement) {
+            e.preventDefault();
+            lastElement.focus();
+          }
+        } else {
+          // Tab
+          if (document.activeElement === lastElement) {
+            e.preventDefault();
+            firstElement.focus();
+          }
+        }
       }
     };
 
