@@ -18,6 +18,21 @@
 - `executeEffect` は `executeEffect(effect, state)` として `state` を受け取り、`playerState.variables/flags` を更新できる形を前提とする
 - `stop_sfx` は `AudioManager.stopAllSFX()` に委譲し、オーディオ制御点を AudioManager に集約する
 
+## 直近の決定事項（2025-12-17 / 案A: 静的ページの最小モダン化）
+
+- バッティング回避のため、まず `index.html` / `learn.html` など **静的ページのみ**を対象に UI をモダン化
+  - `common.css` → `modern.css` の順に読み込み（modern の見た目を維持）
+  - 静的ページ内で `common.css` のテーマ変数（`--bg-color` 等）→ `modern.css` トークン（`--bg-primary` 等）へのブリッジを追加
+  - `scripts/config.js` を読み込み、`APP_CONFIG` を参照できるようにする
+
+## 直近の決定事項（2025-12-17 / メディア方針 B'）
+
+- 画像/音声の既定方針を **B'（相対パス + DataURL 許可、外部URLは既定OFF）**として実装
+  - `scripts/mediaResolver.js` を SSOT にして許可/禁止を判定
+  - Play では `node.image` と `play_bgm` / `play_sfx` の `url` を MediaResolver 経由に統一
+  - Admin/Editor のプレビューも MediaResolver 経由に統一し、`innerHTML` による画像挿入は廃止（DOM生成）
+  - learn のメディアサンプルは外部URLを撤去し、画像は軽量SVG DataURL、音声は当面C（未同梱のため再生しない）
+
 ## プロジェクト概要
 
 - リポジトリ: AdventureGamePage（static-web-app+node-tooling）

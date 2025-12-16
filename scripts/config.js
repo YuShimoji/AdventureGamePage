@@ -69,6 +69,16 @@
       enabled: true, // 開発時にtrueに設定してデバッグUIを表示
       showConsoleLogs: true,
     },
+    media: {
+      allowHttp: false,
+      allowHttps: false,
+      allowData: true,
+      allowRelative: true,
+      allowBlob: true,
+      allowProtocolRelative: false,
+      maxDataUrlBytes: 250000,
+      allowSvgDataUrl: true,
+    },
     game: {
       autoSave: {
         enabled: true, // ノード遷移時の自動セーブ

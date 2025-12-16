@@ -5,15 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>学ぶ | Adventure Game Page</title>
     <!-- Modern UI Theme -->
-    <link rel="stylesheet" href="styles/modern.css?v=1" />
     <link rel="stylesheet" href="styles/common.css" />
+    <link rel="stylesheet" href="styles/modern.css?v=1" />
     <style>
+      :root {
+        --bg-primary: var(--bg-color);
+        --bg-secondary: var(--surface);
+        --bg-tertiary: var(--surface-hover);
+        --bg-elevated: var(--surface-active);
+        --text-primary: var(--text-color);
+        --text-secondary: color-mix(in srgb, var(--text-color) 75%, var(--bg-color) 25%);
+        --text-muted: var(--muted);
+        --text-inverse: #ffffff;
+        --accent: var(--accent-color);
+        --accent-hover: color-mix(in srgb, var(--accent-color) 85%, white);
+        --accent-subtle: color-mix(in srgb, var(--accent-color) 14%, transparent);
+        --border-subtle: color-mix(in srgb, var(--border) 60%, transparent);
+        --border-default: var(--border);
+        --border-strong: color-mix(in srgb, var(--border) 70%, white);
+      }
       .learn-main {
         max-width: 1000px;
         margin: 0 auto;
         padding: var(--space-xl) var(--space-md);
       }
-      
+
       .intro-card {
         background: var(--bg-secondary);
         border: 1px solid var(--border-subtle);
@@ -21,24 +37,24 @@
         padding: var(--space-lg);
         margin-bottom: var(--space-xl);
       }
-      
+
       .intro-card h2 {
         font-size: var(--text-xl);
         margin: 0 0 var(--space-sm);
       }
-      
+
       .intro-card p {
         font-size: var(--text-sm);
         color: var(--text-secondary);
         margin: 0;
       }
-      
+
       .examples-grid {
         display: grid;
         gap: var(--space-md);
         grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
       }
-      
+
       .example-card {
         background: var(--bg-secondary);
         border: 1px solid var(--border-subtle);
@@ -47,23 +63,23 @@
         display: flex;
         flex-direction: column;
       }
-      
+
       .example-header {
         padding: var(--space-md);
         border-bottom: 1px solid var(--border-subtle);
       }
-      
+
       .example-header h3 {
         font-size: var(--text-base);
         font-weight: 600;
         margin: 0 0 var(--space-xs);
       }
-      
+
       .example-badge {
         font-size: var(--text-xs);
         color: var(--text-muted);
       }
-      
+
       .example-code {
         flex: 1;
         background: var(--bg-primary);
@@ -75,7 +91,7 @@
         line-height: var(--line-height-relaxed);
         color: var(--text-secondary);
       }
-      
+
       .example-footer {
         padding: var(--space-md);
         border-top: 1px solid var(--border-subtle);
@@ -87,7 +103,7 @@
     <header class="app-header">
       <a class="header-brand" href="index.html">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M15 18l-6-6 6-6"/>
+          <path d="M15 18l-6-6 6-6" />
         </svg>
         <span>トップ</span>
       </a>
@@ -156,57 +172,183 @@
     </main>
 
     <script src="scripts/storage.js"></script>
+    <script src="scripts/config.js"></script>
     <script>
+      function svgDataUrl(title, subtitle) {
+        const safeTitle = String(title || '').replace(/[<>]/g, '');
+        const safeSub = String(subtitle || '').replace(/[<>]/g, '');
+        const svg = `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="700" viewBox="0 0 1200 700">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#4a9eff" stop-opacity="0.28" />
+      <stop offset="1" stop-color="#b8f7d1" stop-opacity="0.22" />
+    </linearGradient>
+  </defs>
+  <rect x="0" y="0" width="1200" height="700" fill="#0b1220" />
+  <rect x="0" y="0" width="1200" height="700" fill="url(#g)" />
+  <rect x="60" y="60" width="1080" height="580" rx="24" fill="#0b1220" fill-opacity="0.35" stroke="#4a9eff" stroke-opacity="0.35" />
+  <text x="120" y="240" font-family="ui-sans-serif, system-ui" font-size="64" fill="#e6f0ff">${safeTitle}</text>
+  <text x="120" y="320" font-family="ui-sans-serif, system-ui" font-size="28" fill="#bcd0ff" opacity="0.9">${safeSub}</text>
+  <text x="120" y="600" font-family="ui-sans-serif, system-ui" font-size="18" fill="#bcd0ff" opacity="0.75">(learn sample: inline SVG DataURL)</text>
+</svg>`;
+        return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+      }
+
       // サンプル定義（エンジン形式）
       const EXAMPLES = {
         basic: {
-          title: '基本分岐', start: 'start',
+          title: '基本分岐',
+          start: 'start',
           nodes: {
-            start: { text: '最初の部屋。', choices: [ { text: '次へ', to: 'next' } ] },
-            next:  { text: 'おめでとう！', choices: [ { text: '最初に戻る', to: 'start' } ] }
-          }
+            start: { text: '最初の部屋。', choices: [{ text: '次へ', to: 'next' }] },
+            next: { text: 'おめでとう！', choices: [{ text: '最初に戻る', to: 'start' }] },
+          },
         },
         inventory: {
-          title: 'インベントリ', start: 'start',
+          title: 'インベントリ',
+          start: 'start',
+          items: [
+            {
+              id: 'rusty_key',
+              name: '錆びた鍵',
+              type: 'key',
+              description: '古い鍵。扉を開けるのに使える。',
+            },
+            {
+              id: 'health_potion',
+              name: '回復薬',
+              type: 'consumable',
+              description: '飲むと気分が少し良くなる。',
+            },
+          ],
           nodes: {
-            start: { text: '剣を拾いますか？', choices: [ { text: '拾う', to: 'got' }, { text: 'やめる', to: 'end' } ], actions:[ { type:'add_item', itemId:'sword', quantity:1 } ] },
-            got:   { text: '剣を手に入れた！', choices: [ { text:'使う', to:'use' } ] },
-            use:   { text: '剣を振る！', choices: [ { text:'終わる', to:'end' } ], actions:[ { type:'use_item', itemId:'sword', effect:{ type:'show_text', text:'華麗な一撃！' } } ] },
-            end:   { text: 'おしまい。', choices: [ { text:'最初へ', to:'start' } ] }
-          }
+            start: {
+              text: '足元に「錆びた鍵」と「回復薬」が落ちている。',
+              choices: [
+                { text: '拾う', to: 'pickup' },
+                { text: '無視して進む', to: 'door' },
+              ],
+            },
+            pickup: {
+              text: '道具を拾った。',
+              choices: [
+                { text: '扉へ', to: 'door' },
+                { text: '回復薬を使う', to: 'use_potion' },
+              ],
+              actions: [
+                { type: 'add_item', itemId: 'rusty_key', quantity: 1 },
+                { type: 'add_item', itemId: 'health_potion', quantity: 1 },
+              ],
+            },
+            use_potion: {
+              text: '回復薬を使った。',
+              choices: [{ text: '扉へ', to: 'door' }],
+              actions: [
+                {
+                  type: 'use_item',
+                  itemId: 'health_potion',
+                  consume: true,
+                  effect: { type: 'show_text', text: '少し落ち着いた。' },
+                },
+              ],
+            },
+            door: {
+              text: '扉がある。鍵穴が見える。',
+              choices: [
+                {
+                  text: '鍵で開ける',
+                  to: 'end',
+                  conditions: [{ type: 'has_item', itemId: 'rusty_key', count: 1 }],
+                },
+                { text: '戻る', to: 'start' },
+              ],
+            },
+            end: {
+              text: '扉が開いた。外の光が差し込む。- 終 -',
+              choices: [{ text: '最初から', to: 'start' }],
+            },
+          },
         },
         variables: {
-          title: '変数と条件', start: 'start',
+          title: '変数と条件',
+          start: 'start',
           nodes: {
-            start: { text: 'スコアを+1します。', choices: [ { text:'加算', to:'next' } ], actions:[ { type:'set_variable', key:'score', operation:'add', value:1 } ] },
-            next:  { text: 'score が 1 以上なら扉が開く。', choices: [ { text:'扉へ', to:'door' } ] },
-            door:  { text: '扉の前。', choices: [ { text:'開ける', to:'open', conditions:[ { type:'variable_equals', key:'score', operator:">=", value:1 } ] } ] },
-            open:  { text: '開いた！', choices: [ { text:'最初へ', to:'start' } ] }
-          }
+            start: {
+              text: 'スコアを+1してから扉へ向かう。',
+              choices: [
+                { text: 'スコアを加算', to: 'calc' },
+                { text: '扉へ（未加算）', to: 'door' },
+              ],
+            },
+            calc: {
+              text: 'score を +1 した。',
+              choices: [{ text: '扉へ', to: 'door' }],
+              actions: [{ type: 'set_variable', key: 'score', operation: 'add', value: 1 }],
+            },
+            door: {
+              text: '扉の前。',
+              choices: [
+                {
+                  text: '開ける（score>=1）',
+                  to: 'open',
+                  conditions: [{ type: 'variable_equals', key: 'score', operator: '>=', value: 1 }],
+                },
+                { text: '戻る', to: 'start' },
+              ],
+            },
+            open: { text: '開いた！', choices: [{ text: '最初へ', to: 'start' }] },
+          },
         },
         media: {
-          title: '画像とサウンド', start: 'start',
+          title: '画像とサウンド',
+          start: 'start',
           nodes: {
-            start: { title:'森の入口', image:'https://placehold.co/1200x700?text=Forest+Entrance', text: '音楽が始まる。', choices: [ { text:'進む', to:'deep' } ], actions:[ { type:'play_bgm', url:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3', volume:0.6, loop:true } ] },
-            deep:  { title:'森の奥', image:'https://placehold.co/1200x700?text=Forest+Deep', text: 'ガサガサ…', choices: [ { text:'音', to:'sfx' }, { text:'やめる', to:'stop' } ] },
-            sfx:   { text: '効果音！', choices: [ { text:'戻る', to:'deep' } ], actions:[ { type:'play_sfx', url:'https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3', volume:0.9 } ] },
-            stop:  { text: '音楽を止める。', choices: [ { text:'最初へ', to:'start' } ], actions:[ { type:'stop_bgm', fadeOut:true } ] }
-          }
-        }
+            start: { text: '森に入る。', choices: [{ text: '進む', to: 'enter' }] },
+            enter: {
+              title: '森の入口',
+              image: svgDataUrl('森の入口', 'Forest Entrance'),
+              text: '画像を表示する例。※音声は未同梱のため、このサンプルでは再生しません。',
+              choices: [{ text: 'さらに進む', to: 'deep' }],
+            },
+            deep: {
+              title: '森の奥',
+              image: svgDataUrl('森の奥', 'Forest Deep'),
+              text: 'ガサガサ…（音声は未同梱）',
+              choices: [
+                { text: '音', to: 'sfx' },
+                { text: 'やめる', to: 'stop' },
+              ],
+            },
+            sfx: {
+              text: '（効果音サンプルは未同梱のため省略）',
+              choices: [{ text: '戻る', to: 'deep' }],
+            },
+            stop: {
+              text: 'おしまい。',
+              choices: [{ text: '最初へ', to: 'start' }],
+            },
+          },
+        },
       };
 
-      function pretty(obj){ return JSON.stringify(obj, null, 2); }
-      function mountCodes(){
+      function pretty(obj) {
+        return JSON.stringify(obj, null, 2);
+      }
+      function mountCodes() {
         document.getElementById('code-basic').textContent = pretty(EXAMPLES.basic);
         document.getElementById('code-inventory').textContent = pretty(EXAMPLES.inventory);
         document.getElementById('code-variables').textContent = pretty(EXAMPLES.variables);
         document.getElementById('code-media').textContent = pretty(EXAMPLES.media);
       }
-      function loadAndPlay(example){
+      function loadAndPlay(example) {
         try {
-          StorageUtil.saveJSON('agp_game_data', example);
+          const key = window.APP_CONFIG?.storage?.keys?.gameData || 'agp_game_data';
+          StorageUtil.saveJSON(key, example);
           window.location.href = 'play.html';
-        } catch(e){ alert('読み込みに失敗しました'); }
+        } catch (e) {
+          alert('読み込みに失敗しました');
+        }
       }
       document.addEventListener('DOMContentLoaded', () => {
         mountCodes();

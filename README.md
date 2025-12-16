@@ -126,6 +126,15 @@ const myGame = {
   - `headerShortcuts`: S/L/I キーによるヘッダーボタン（保存/読込/インベントリ）操作のON/OFF
   - `choiceNavigation`: 選択肢リスト内でのキーボードナビゲーション（矢印キー/数字キー）のON/OFF
 
+#### メディア（画像/音声）ポリシー
+
+- 既定（B'）: **相対パス** と **DataURL** を許可し、**外部URL（http/https）は既定でブロック**します。
+  - 例: `images/scene.jpg` / `data:image/...`
+- 外部URLを許可したい場合は `scripts/config.js` の `APP_CONFIG.media` を変更してください。
+  - `allowHttp` / `allowHttps`: 外部URL許可
+  - `maxDataUrlBytes`: DataURLの上限（大きい画像は `localStorage` を圧迫しやすいため注意）
+  - `allowSvgDataUrl`: `data:image/svg+xml` を許可するか
+
 ### テスト
 
 - `test-rpg.html` で包括的テスト実行

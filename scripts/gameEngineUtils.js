@@ -39,7 +39,14 @@
             break;
           case 'play_bgm':
             if (window.AudioManager && typeof window.AudioManager.playBGM === 'function') {
-              window.AudioManager.playBGM(action.url, {
+              const resolved = window.MediaResolver?.resolveAudioUrl
+                ? window.MediaResolver.resolveAudioUrl(action.url)
+                : { ok: !!action.url, url: action.url };
+              if (!resolved || !resolved.ok) {
+                console.warn('[MediaResolver] Audio blocked:', resolved);
+                break;
+              }
+              window.AudioManager.playBGM(resolved.url, {
                 volume: action.volume,
                 loop: action.loop,
                 fadeIn: action.fadeIn,
@@ -54,7 +61,14 @@
             break;
           case 'play_sfx':
             if (window.AudioManager && typeof window.AudioManager.playSFX === 'function') {
-              window.AudioManager.playSFX(action.url, {
+              const resolved = window.MediaResolver?.resolveAudioUrl
+                ? window.MediaResolver.resolveAudioUrl(action.url)
+                : { ok: !!action.url, url: action.url };
+              if (!resolved || !resolved.ok) {
+                console.warn('[MediaResolver] Audio blocked:', resolved);
+                break;
+              }
+              window.AudioManager.playSFX(resolved.url, {
                 volume: action.volume,
                 loop: action.loop,
               });

@@ -1,12 +1,33 @@
 // 複雑サンプルゲーム: 森の冒険者 (RPG風)
+function sampleRpgImg(title, subtitle) {
+  const safeTitle = String(title || '').replace(/[<>]/g, '');
+  const safeSub = String(subtitle || '').replace(/[<>]/g, '');
+  const svg = `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="700" viewBox="0 0 1200 700">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#4a9eff" stop-opacity="0.28" />
+      <stop offset="1" stop-color="#b8f7d1" stop-opacity="0.22" />
+    </linearGradient>
+  </defs>
+  <rect x="0" y="0" width="1200" height="700" fill="#0b1220" />
+  <rect x="0" y="0" width="1200" height="700" fill="url(#g)" />
+  <rect x="60" y="60" width="1080" height="580" rx="24" fill="#0b1220" fill-opacity="0.35" stroke="#4a9eff" stroke-opacity="0.35" />
+  <text x="120" y="240" font-family="ui-sans-serif, system-ui" font-size="64" fill="#e6f0ff">${safeTitle}</text>
+  <text x="120" y="320" font-family="ui-sans-serif, system-ui" font-size="28" fill="#bcd0ff" opacity="0.9">${safeSub}</text>
+</svg>`;
+  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+}
+
 window.SAMPLE_GAME_RPG = {
+  _img: sampleRpgImg,
   title: '森の冒険者',
   start: 'village',
   nodes: {
     village: {
       title: '村の広場',
-      text: 'あなたは小さな村の広場にいます。村人たちが忙しそうに働いています。北には古い森が見えます。穏やかな村のBGMが流れています。',
-      image: 'images/village.jpg',
+      text: 'あなたは小さな村の広場にいます。村人たちが忙しそうに働いています。北には古い森が見えます。',
+      image: sampleRpgImg('村の広場', 'Village'),
       choices: [
         {
           label: '森へ向かう',
@@ -21,16 +42,13 @@ window.SAMPLE_GAME_RPG = {
           target: 'check_inventory',
         },
       ],
-      actions: [
-        { type: 'play_bgm', url: 'audio/village-bgm.mp3', volume: 0.6, loop: true, fadeIn: true },
-        { type: 'set_variable', key: 'visited_village', value: true },
-      ],
+      actions: [{ type: 'set_variable', key: 'visited_village', value: true }],
     },
 
     forest_entrance: {
       title: '森の入り口',
-      text: '森の入り口に到着しました。木々の隙間から不気味な気配が感じられます。村のBGMがフェードアウトし、森の雰囲気が変わります。',
-      image: 'images/forest-entrance.jpg',
+      text: '森の入り口に到着しました。木々の隙間から不気味な気配が感じられます。',
+      image: sampleRpgImg('森の入り口', 'Forest Entrance'),
       choices: [
         {
           label: '森の中へ進む',
@@ -51,7 +69,6 @@ window.SAMPLE_GAME_RPG = {
         },
       ],
       actions: [
-        { type: 'play_bgm', url: 'audio/forest-bgm.mp3', volume: 0.8, loop: true, crossfade: true },
         { type: 'set_variable', key: 'entered_forest', value: true },
         { type: 'set_variable', key: 'visited_forest', value: true },
         { type: 'set_variable', key: 'bravery', operation: 'add', value: 1 },
@@ -61,7 +78,7 @@ window.SAMPLE_GAME_RPG = {
     forest_deep: {
       title: '森の奥深く',
       text: '森の奥深くに進むと、突然何かが動く気配がしました！ 草むらがざわつきます。',
-      image: 'images/forest-deep.jpg',
+      image: sampleRpgImg('森の奥深く', 'Forest Deep'),
       choices: [
         {
           label: '草むらを調べる',
@@ -72,13 +89,12 @@ window.SAMPLE_GAME_RPG = {
           target: 'forest_entrance',
         },
       ],
-      actions: [{ type: 'play_sfx', url: 'audio/monster-rustle.mp3', volume: 0.7 }],
     },
 
     monster_encounter: {
       title: 'モンスター遭遇！',
-      text: '草むらから小さなモンスターが飛び出してきました！ 戦闘のBGMが流れます。',
-      image: 'images/monster.jpg',
+      text: '草むらから小さなモンスターが飛び出してきました！',
+      image: sampleRpgImg('モンスター遭遇！', 'Monster'),
       choices: [
         {
           label: '戦う',
@@ -90,16 +106,12 @@ window.SAMPLE_GAME_RPG = {
           target: 'forest_entrance',
         },
       ],
-      actions: [
-        { type: 'play_bgm', url: 'audio/battle-bgm.mp3', volume: 1.0, loop: true, crossfade: true },
-        { type: 'play_sfx', url: 'audio/monster-growl.mp3', volume: 0.8 },
-      ],
     },
 
     battle_win: {
       title: '勝利！',
-      text: 'モンスターを倒しました！ 勝利のファンファーレが鳴り響きます。',
-      image: 'images/victory.jpg',
+      text: 'モンスターを倒しました！',
+      image: sampleRpgImg('勝利！', 'Victory'),
       choices: [
         {
           label: '先に進む',
@@ -107,8 +119,6 @@ window.SAMPLE_GAME_RPG = {
         },
       ],
       actions: [
-        { type: 'stop_bgm', fadeOut: true },
-        { type: 'play_sfx', url: 'audio/victory-fanfare.mp3', volume: 0.9 },
         { type: 'add_item', itemId: 'treasure_key', quantity: 1 },
         { type: 'set_variable', key: 'defeated_monster', value: true },
       ],
@@ -117,7 +127,7 @@ window.SAMPLE_GAME_RPG = {
     forest_path_left: {
       title: '危険な小道',
       text: '薄暗い小道を進むと、突然オオカミが現れました！ 逃げるか戦うか？',
-      image: 'images/wolf.jpg',
+      image: sampleRpgImg('危険な小道', 'Wolf'),
       choices: [
         {
           label: '戦う',
@@ -134,7 +144,7 @@ window.SAMPLE_GAME_RPG = {
     fight_wolf: {
       title: 'オオカミとの戦い',
       text: '勇猛に剣を振るい、オオカミを倒しました！ 経験値を得ました。',
-      image: 'images/fight.jpg',
+      image: sampleRpgImg('戦い', 'Fight'),
       choices: [
         {
           label: '先に進む',
@@ -151,7 +161,7 @@ window.SAMPLE_GAME_RPG = {
     forest_path_right: {
       title: '静かな小道',
       text: '穏やかな小道を進むと、きれいな泉が見つかりました。水を飲むと体力が回復します。',
-      image: 'images/spring.jpg',
+      image: sampleRpgImg('静かな小道', 'Spring'),
       choices: [
         {
           label: '水を飲む',
@@ -182,7 +192,7 @@ window.SAMPLE_GAME_RPG = {
     treasure_room: {
       title: '宝の部屋',
       text: '森の奥深くにある古い部屋に到着しました。宝箱がありますが、鍵がかかっています。',
-      image: 'images/treasure.jpg',
+      image: sampleRpgImg('宝の部屋', 'Treasure'),
       choices: [
         {
           label: '鍵を開ける',
@@ -232,7 +242,7 @@ window.SAMPLE_GAME_RPG = {
     village_victory: {
       title: '凱旋',
       text: '村に戻り、宝物を見せびらかすと、村人たちが歓声を上げました。あなたは英雄になりました！',
-      image: 'images/victory.jpg',
+      image: sampleRpgImg('凱旋', 'Return'),
       choices: [
         {
           label: '冒険を続ける',

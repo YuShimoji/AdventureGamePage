@@ -17,18 +17,31 @@
 
       if (this.elements.imageEl) {
         const url = node.image;
-        if (typeof url === 'string' && url.trim()) {
+        const resolved = window.MediaResolver?.resolveImageRef
+          ? window.MediaResolver.resolveImageRef(url)
+          : { ok: typeof url === 'string' && url.trim(), src: url };
+
+        if (resolved && resolved.ok && typeof resolved.src === 'string' && resolved.src.trim()) {
           this.elements.imageEl.hidden = false;
           this.elements.imageEl.innerHTML = '';
           const img = document.createElement('img');
-          img.src = url;
+          img.src = resolved.src;
           img.alt = node.title ? `${node.title} の画像` : 'シーン画像';
           img.loading = 'lazy';
           img.decoding = 'async';
           img.style.maxWidth = '100%';
           img.style.height = 'auto';
+          img.onerror = () => {
+            try {
+              this.elements.imageEl.innerHTML = '';
+              this.elements.imageEl.hidden = true;
+            } catch {}
+          };
           this.elements.imageEl.appendChild(img);
         } else {
+          if (resolved && resolved.ok === false && window.APP_CONFIG?.debug?.showConsoleLogs) {
+            console.warn('[MediaResolver] Image blocked:', resolved);
+          }
           this.elements.imageEl.innerHTML = '';
           this.elements.imageEl.hidden = true;
         }
