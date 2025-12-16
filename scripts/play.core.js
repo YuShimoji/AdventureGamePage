@@ -1,11 +1,5 @@
 (function () {
   // Play Core Module - Game initialization and engine setup
-  function debugLog(...args) {
-    if (window.APP_CONFIG?.debug?.showConsoleLogs) {
-      console.log(...args);
-    }
-  }
-
   window.PlayCore = {
     init: function () {
       const elements = this.getUIElements();

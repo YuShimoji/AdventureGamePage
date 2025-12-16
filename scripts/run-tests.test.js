@@ -42,11 +42,7 @@ class TestRunner {
   }
 
   async runMochaTest() {
-    return new Promise((resolve, reject) => {
-      const timeoutId = setTimeout(() => {
-        reject(new Error('Mocha test timed out'));
-      }, this.TEST_TIMEOUT);
-
+    return new Promise((resolve) => {
       // For Mocha tests, we need a browser automation tool like Puppeteer
       // This is a placeholder for actual Mocha test execution
       // In the original code, this would be handled by the browser test

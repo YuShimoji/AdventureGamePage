@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Test runner server management module
-const { spawn, execSync } = require('child_process');
+const { spawn } = require('child_process');
 const http = require('http');
 
 class TestServerManager {
@@ -58,7 +58,7 @@ class TestServerManager {
         }
       });
 
-      serverProcess.on('exit', (code, signal) => {
+      serverProcess.on('exit', (code) => {
         if (!resolved) {
           clearTimeout(timeout);
           reject(new Error(`Server exited prematurely with code ${code}`));

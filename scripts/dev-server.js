@@ -3,9 +3,8 @@
 // Refactored to use modular components
 const http = require("http");
 const fs = require("fs");
-const path = require("path");
 
-const { MIME, getMimeType } = require("./dev-server.mime.js");
+const { getMimeType } = require("./dev-server.mime.js");
 const { safeJoin, serveFile, findAvailablePort } = require("./dev-server.utils.js");
 
 const PORT = process.env.PORT ? Number(process.env.PORT) : 8080;

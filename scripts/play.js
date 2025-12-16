@@ -1,11 +1,5 @@
 (function () {
   // Main play.js - UI rendering and coordination after modularization
-  function debugLog(...args) {
-    if (window.APP_CONFIG?.debug?.showConsoleLogs) {
-      console.log(...args);
-    }
-  }
-
   function renderEmptyStateForNoGameData() {
     const sceneEl = document.getElementById('scene');
     const choicesEl = document.getElementById('choices');
