@@ -29,6 +29,11 @@
     }
   }
 
+  function clearSelectedSnapshots() {
+    selectedSnapshots = [];
+    updateCompareButton();
+  }
+
   async function compareSnapshots() {
     if (selectedSnapshots.length !== 2) {
       alert("比較するには2つのスナップショットを選択してください");
@@ -160,12 +165,17 @@
     document.body.appendChild(modal);
 
     // Render diff
-    renderDiff(diff);
+    renderDiff(diff, modal);
 
     // Event handlers
-    document.getElementById("compare-close").addEventListener("click", () => {
-      modal.remove();
-    });
+    const closeBtn =
+      (typeof modal.querySelector === 'function' && modal.querySelector('#compare-close')) ||
+      document.getElementById('compare-close');
+    if (closeBtn && typeof closeBtn.addEventListener === 'function') {
+      closeBtn.addEventListener('click', () => {
+        modal.remove();
+      });
+    }
 
     modal.addEventListener("click", (e) => {
       if (e.target === modal) modal.remove();
@@ -180,8 +190,10 @@
     return stats;
   }
 
-  function renderDiff(diff) {
-    const container = document.getElementById("diff-container");
+  function renderDiff(diff, rootEl) {
+    const container =
+      (rootEl && typeof rootEl.querySelector === 'function' && rootEl.querySelector('#diff-container')) ||
+      document.getElementById('diff-container');
     if (!container) return;
 
     diff.forEach((item) => {
@@ -219,6 +231,7 @@
   // Expose API
   window.SnapshotCompare = {
     selectSnapshotForComparison,
+    clearSelectedSnapshots,
     compareSnapshots,
     getSelectedSnapshots: () => selectedSnapshots.slice(),
   };

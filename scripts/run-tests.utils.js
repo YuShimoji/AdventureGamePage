@@ -6,6 +6,21 @@ class TestUtils {
     console.debug(`[TEST] ${message}`);
   }
 
+  static _extractWindowsPidsFromNetstat(output) {
+    const text = String(output || '');
+    const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+    const pids = [];
+
+    for (const line of lines) {
+      const m = line.match(/(\d+)\s*$/);
+      if (!m) continue;
+      const pid = String(m[1] || '').trim();
+      if (pid) pids.push(pid);
+    }
+
+    return Array.from(new Set(pids));
+  }
+
   static checkWindowsProcess(port) {
     try {
       // Check if port is in use on Windows
@@ -23,14 +38,22 @@ class TestUtils {
       const { execSync } = require('child_process');
       // Find PID using the port
       const output = execSync(`netstat -ano | findstr :${port}`, { encoding: 'utf8' });
-      const lines = output.split('\n').filter(line => line.trim());
-      if (lines.length > 0) {
-        const parts = lines[0].split(/\s+/);
-        const pid = parts[parts.length - 1];
+
+      const pids = this._extractWindowsPidsFromNetstat(output)
+        .map(pid => pid.replace(/\D/g, ''))
+        .filter(Boolean);
+
+      if (pids.length === 0) {
+        this.log(`No PID found for port ${port}; skipping taskkill`);
+        return false;
+      }
+
+      pids.forEach(pid => {
         execSync(`taskkill /PID ${pid} /T /F`);
         this.log(`Killed process ${pid} using port ${port}`);
-        return true;
-      }
+      });
+
+      return true;
     } catch (e) {
       this.log(`Failed to kill process on port ${port}: ${e.message}`);
     }

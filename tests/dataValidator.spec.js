@@ -50,7 +50,7 @@ describe('DataValidator', function() {
 
       const result = window.DataValidator.validateGameData(invalidData);
       expect(result.valid).to.be.false;
-      expect(result.errors).to.include('移動先 nonexistent が存在しません');
+      expect(result.errors.some(e => String(e).includes('移動先 nonexistent が存在しません'))).to.be.true;
     });
   });
 
@@ -109,7 +109,7 @@ describe('DataValidator', function() {
       const result = window.DataValidator.repairData(brokenData, 'game');
       expect(result.success).to.be.true;
       expect(result.data.nodes.start.choices).to.be.empty;
-      expect(result.repairs).to.include('無効な選択肢を削除しました');
+      expect(result.repairs.some(r => String(r).includes('無効な選択肢を削除しました'))).to.be.true;
     });
   });
 

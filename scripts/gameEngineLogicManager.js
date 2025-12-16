@@ -372,7 +372,7 @@
     hasItem(itemId, minQuantity = 1) {
       if (!itemId) return false;
       const item = this.state.playerState.inventory.items.find(item => item.id === itemId);
-      return item && item.quantity >= minQuantity;
+      return !!(item && item.quantity >= minQuantity);
     }
 
     getItemCount(itemId) {

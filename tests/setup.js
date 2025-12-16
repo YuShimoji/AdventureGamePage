@@ -3,8 +3,22 @@
   window.APP_CONFIG = window.APP_CONFIG || {};
   APP_CONFIG.storage = APP_CONFIG.storage || {};
   APP_CONFIG.storage.backend = 'localStorage';
-  APP_CONFIG.storage.keys = { simple: 'test_simple', full: 'test_full' };
-  APP_CONFIG.storage.snapshots = { enabled: true, prefix: 'test_snap_' };
+
+  APP_CONFIG.storage.keys = APP_CONFIG.storage.keys || {};
+  APP_CONFIG.storage.keys.simple = APP_CONFIG.storage.keys.simple || 'agp_manuscript_simple';
+  APP_CONFIG.storage.keys.full = APP_CONFIG.storage.keys.full || 'agp_manuscript_full';
+  APP_CONFIG.storage.keys.gameData = APP_CONFIG.storage.keys.gameData || 'agp_game_data';
+  APP_CONFIG.storage.keys.gameProgress = APP_CONFIG.storage.keys.gameProgress || 'agp_game_progress';
+  APP_CONFIG.storage.keys.saveSlots = APP_CONFIG.storage.keys.saveSlots || 'agp_save_slots';
+  APP_CONFIG.storage.keys.items = APP_CONFIG.storage.keys.items || 'agp_items';
+  APP_CONFIG.storage.keys.characters = APP_CONFIG.storage.keys.characters || 'agp_characters';
+  APP_CONFIG.storage.keys.lore = APP_CONFIG.storage.keys.lore || 'agp_lore';
+  APP_CONFIG.storage.keys.state = APP_CONFIG.storage.keys.state || 'agp_state';
+  APP_CONFIG.storage.keys.backupLegacy = APP_CONFIG.storage.keys.backupLegacy || 'agp_backup_legacy';
+
+  APP_CONFIG.storage.snapshots = APP_CONFIG.storage.snapshots || {};
+  APP_CONFIG.storage.snapshots.enabled = true;
+  APP_CONFIG.storage.snapshots.prefix = 'test_snap_';
 
   window.TestHelpers = {
     clearTestStorage() {

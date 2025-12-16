@@ -14,7 +14,7 @@ describe('MigrationWizard', function() {
 
     const mockStorage = {
       getItem: sinon.stub().withArgs('agp_manuscript_full').returns(JSON.stringify(mockLegacyData)),
-      setItem: sinon.spy(),
+      setItem: sinon.stub(),
       removeItem: sinon.spy()
     };
     Object.defineProperty(window, 'localStorage', { value: mockStorage, writable: true });
@@ -32,13 +32,15 @@ describe('MigrationWizard', function() {
       const originalCreateElement = document.createElement;
       document.createElement = sinon.spy();
 
-      // Call function
-      showMigrationWizard();
+      try {
+        // Call function
+        showMigrationWizard();
 
-      // Should not create elements if no legacy data
-      expect(document.createElement.notCalled).to.be.true;
-
-      document.createElement = originalCreateElement;
+        // Should not create elements if no legacy data
+        expect(document.createElement.notCalled).to.be.true;
+      } finally {
+        document.createElement = originalCreateElement;
+      }
     });
 
     it('should not show wizard when migration already done', function() {
@@ -47,11 +49,13 @@ describe('MigrationWizard', function() {
       const originalCreateElement = document.createElement;
       document.createElement = sinon.spy();
 
-      showMigrationWizard();
+      try {
+        showMigrationWizard();
 
-      expect(document.createElement.notCalled).to.be.true;
-
-      document.createElement = originalCreateElement;
+        expect(document.createElement.notCalled).to.be.true;
+      } finally {
+        document.createElement = originalCreateElement;
+      }
     });
   });
 
@@ -116,7 +120,6 @@ describe('MigrationWizard', function() {
 
     it('should handle migration errors', async function() {
       // Force an error by making localStorage.setItem throw
-      localStorage.setItem.restore();
       localStorage.setItem = sinon.stub().throws(new Error('Storage full'));
 
       const result = await performMigrationWithProgress();

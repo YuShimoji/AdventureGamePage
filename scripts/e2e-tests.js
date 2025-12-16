@@ -57,36 +57,54 @@ async function main() {
   try {
     await serverReady;
     const baseUrl = `http://127.0.0.1:${port}`;
-    const testUrl = `${baseUrl}/tests/test.html`;
+    const testUrl = `${baseUrl}/tests/test.html?e2e=1`;
 
     const browser = await chromium.launch();
     const page = await browser.newPage();
+
+    page.on('console', (msg) => {
+      try {
+        console.debug(`[E2E][browser console.${msg.type()}] ${msg.text()}`);
+      } catch {}
+    });
+
+    page.on('pageerror', (err) => {
+      try {
+        console.error(`[E2E][browser pageerror] ${String((err && err.message) || err)}`);
+      } catch {}
+    });
 
     await page.goto(testUrl, { waitUntil: 'networkidle' });
 
     // Wait for Mocha to complete by polling the .failures count
     await page.waitForFunction(() => {
       // eslint-disable-next-line no-undef
-      if (!window.mocha || !window.mocha.suite) return false;
+      const done = window.__mochaDone === true;
       // eslint-disable-next-line no-undef
-      const stats = window.mocha.stats;
-      return stats && typeof stats.tests === 'number' && stats.tests > 0;
+      const stats = window.__mochaStats;
+      return done && stats && typeof stats.tests === 'number';
     }, { timeout: 60000 });
 
     // eslint-disable-next-line no-undef
     const result = await page.evaluate(() => {
-      const stats = window.mocha && window.mocha.stats;
-      if (!stats) return { tests: 0, failures: 0 };
-      return { tests: stats.tests || 0, failures: stats.failures || 0 };
+      const stats = window.__mochaStats;
+      if (!stats) return { tests: 0, failures: 1, error: 'mocha stats missing' };
+      return { tests: stats.tests || 0, failures: stats.failures || 0, error: stats.error };
     });
 
     await page.screenshot({ path: path.join(__dirname, '..', 'tests', 'e2e-screenshot.png') });
 
     console.debug(`[E2E] Mocha tests: ${result.tests}, failures: ${result.failures}`);
+    if (result.error) {
+      console.error(`[E2E] Mocha error: ${result.error}`);
+    }
 
     await browser.close();
 
-    if (result.failures > 0) {
+    if (!result.tests || result.tests <= 0) {
+      console.error('[E2E] No tests detected; treating as failure');
+      process.exitCode = 1;
+    } else if (result.failures > 0) {
       process.exitCode = 1;
     }
   } catch (err) {

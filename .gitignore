@@ -49,6 +49,7 @@ build/
 # Browser screenshots and temp files
 screenshots/
 temp/
+tests/e2e-screenshot.png
 
 # Local development files
 local-*.json

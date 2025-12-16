@@ -24,7 +24,7 @@ describe('SnapshotCompare', function() {
     };
 
     // Reset selected snapshots
-    window.SnapshotCompare.getSelectedSnapshots().length = 0;
+    window.SnapshotCompare.clearSelectedSnapshots();
   });
 
   describe('selectSnapshotForComparison', function() {
@@ -82,6 +82,7 @@ describe('SnapshotCompare', function() {
 
       // Mock document methods for modal creation
       const originalCreateElement = document.createElement;
+      const originalBodyAppendChild = document.body.appendChild;
       const mockModal = {
         style: {},
         appendChild: sinon.spy(),
@@ -92,13 +93,16 @@ describe('SnapshotCompare', function() {
       document.createElement = sinon.stub().returns(mockModal);
       document.body.appendChild = sinon.spy();
 
-      await window.SnapshotCompare.compareSnapshots();
+      try {
+        await window.SnapshotCompare.compareSnapshots();
 
-      expect(document.createElement.calledWith('div')).to.be.true;
-      expect(document.body.appendChild.calledWith(mockModal)).to.be.true;
-
-      // Restore
-      document.createElement = originalCreateElement;
+        expect(document.createElement.calledWith('div')).to.be.true;
+        expect(document.body.appendChild.calledWith(mockModal)).to.be.true;
+      } finally {
+        // Restore
+        document.createElement = originalCreateElement;
+        document.body.appendChild = originalBodyAppendChild;
+      }
     });
   });
 });

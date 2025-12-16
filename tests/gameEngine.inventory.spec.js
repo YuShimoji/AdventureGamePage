@@ -3,6 +3,19 @@ describe('GameEngine - Inventory System', () => {
   const testGameData = {
     title: 'Test Game',
     start: 'start',
+    items: [
+      { id: 'sword', name: 'Sword', type: 'weapon', description: '', usable: false },
+      { id: 'potion', name: 'Potion', type: 'consumable', description: '', usable: true },
+      { id: 'key', name: 'Key', type: 'key', description: '', usable: false },
+      ...Array.from({ length: 20 }, (_, i) => ({
+        id: `item_${i}`,
+        name: `Item ${i}`,
+        type: 'item',
+        description: '',
+        usable: false,
+      })),
+      { id: 'extra_item', name: 'Extra', type: 'item', description: '', usable: false },
+    ],
     nodes: {
       start: {
         title: 'Start',

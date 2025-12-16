@@ -36,7 +36,13 @@
     <script src="../scripts/snapshotCompare.js"></script>
     <script src="../scripts/converters.js"></script>
     <script src="../scripts/validator.js"></script>
+    <script src="../scripts/nodeEditorUtils.js"></script>
+    <script src="../scripts/nodeEditor/ui/readUIRefs.js"></script>
+    <script src="../scripts/nodeEditor/ui/forms.js"></script>
+    <script src="../scripts/nodeEditor/ui/preview.js"></script>
+    <script src="../scripts/nodeEditorUIManager.js"></script>
     <script src="../scripts/nodeEditor.js"></script>
+    <script src="../scripts/migrationWizard.js"></script>
     <script src="../scripts/gameEngineLogicManager.js"></script>
     <script src="../scripts/gameEngineUIManager.js"></script>
     <script src="../scripts/gameEngineUtils.js"></script>
@@ -49,7 +55,17 @@
     <script>
       // Mocha setup
       if (window.mocha) {
-        mocha.setup('bdd');
+        (function () {
+          try {
+            const params = new URLSearchParams(window.location.search || '');
+            const isE2E = params.get('e2e') === '1';
+            if (isE2E) {
+              mocha.setup({ ui: 'bdd', reporter: 'spec' });
+              return;
+            }
+          } catch {}
+          mocha.setup('bdd');
+        })();
       }
       // Fallback expect if chai fails to load
       (function () {
@@ -196,11 +212,78 @@
     <script src="./gameEngine.back.spec.js"></script>
     <script src="./gameEngine.forward.spec.js"></script>
     <script src="./gameEngine.a11y.spec.js"></script>
-    <!-- <script src="./gameEngine.inventory.spec.js"></script> -->
+    <script src="./gameEngine.inventory.spec.js"></script>
     <script src="./nodeEditor.api.spec.js"></script>
 
     <script>
-      mocha.run();
+      (function () {
+        window.__mochaDone = false;
+        window.__mochaStats = { tests: 0, failures: 0 };
+
+        function markFatal(err) {
+          if (window.__mochaDone) return;
+          window.__mochaStats = {
+            tests: 0,
+            failures: 1,
+            error: String((err && err.message) || err || 'unknown error'),
+          };
+          window.__mochaDone = true;
+        }
+
+        window.addEventListener('error', function (e) {
+          markFatal((e && e.error) || (e && e.message) || e);
+        });
+
+        window.addEventListener('unhandledrejection', function (e) {
+          markFatal((e && e.reason) || e);
+        });
+
+        function ensureMochaRoot() {
+          let el = document.getElementById('mocha');
+          if (el) return el;
+          el = document.createElement('div');
+          el.id = 'mocha';
+          const target = document.body || document.documentElement;
+          if (target && typeof target.appendChild === 'function') {
+            target.appendChild(el);
+          }
+          return el;
+        }
+
+        function startMocha() {
+          if (window.__mochaDone) return;
+          ensureMochaRoot();
+
+          if (!window.mocha || typeof window.mocha.run !== 'function') {
+            window.__mochaDone = true;
+            window.__mochaStats = { tests: 0, failures: 1, error: 'mocha not available' };
+            return;
+          }
+
+          const runner = mocha.run();
+          window.__mochaRunner = runner;
+
+          runner.on('end', function () {
+            try {
+              const stats = runner.stats || (window.mocha && window.mocha.stats) || {};
+              window.__mochaStats = {
+                tests: stats.tests || 0,
+                failures: stats.failures || 0,
+              };
+            } catch (e) {
+              window.__mochaStats = { tests: 0, failures: 1, error: String((e && e.message) || e) };
+            } finally {
+              window.__mochaDone = true;
+            }
+          });
+        }
+
+        if (document.readyState === 'complete') {
+          startMocha();
+        } else {
+          window.addEventListener('load', startMocha);
+        }
+      })();
     </script>
   </body>
 </html>
