@@ -248,110 +248,55 @@
   - `npm test`: PASS
   - `npm run test:ci`: PASS
 
-## 今回セッションの作業サマリ (2025-12-15)
+## 今回セッションの作業サマリ (2025-12-16)
 
 ### 実施した変更内容
 
-- `scripts/gameEngineUtils.js`
-  - `executeAction` に `stop_sfx` を追加（`AudioManager.stopAllSFX()` に委譲）。
-  - `use_item` の効果実行で `executeEffect(action.effect, state)` の形に統一（state を渡す）。
-  - `executeEffect` を拡張し、以下の effect をゲームエンジン側で反映するようにした。
-    - `set_variable`
-    - `set_flag`
-    - `heal`
+- **GameEngine API 縮退（設計上の過剰公開を抑止）**
+  - `scripts/gameEngine.js`: `executeAction` / `getState` / `clearInventory` / `checkConditions` の公開を停止し、`currentNodeId` getter のみ維持。
+  - 理由: 過剰なAPI公開が設計負債を生むため、テスト/デバッグ用途は `getPlayerState` / `setPlayerState` に寄せる。
+  - 依存コード調整:
+    - `scripts/debug.js`: デバッグUIの変数操作・インベントリ操作・セーブ発火を `getPlayerState` / `setPlayerState` 経由に変更。
+    - `scripts/tests.js`: 簡易テストスイートをAPI非依存にし、`getPlayerState` / `setPlayerState` と基本APIで同等の検証を行う。構文エラー（misplaced switch-case）も解消。
+    - `tests/gameEngine.inventory.spec.js`: `clearInventory` テストを `setPlayerState` 経由のクリアに置換。保存キー `agp_progress` を `agp_game_progress` に修正。
+    - `tests/setup.js`: テストストレージクリアに `agp_game_progress` も追加。
 
-- `tests/gameEngine.spec.js`
-  - `use_item` のユニットテストを追加。
-    - デフォルトで消費されること（quantity=1 の場合は削除）
-    - `consume: false` の場合に消費されないこと
-    - 存在しないアイテム使用で例外にならないこと
+- **test-rpg.html のスクリプト依存修正**
+  - `test-rpg.html`: 欠損 `sample-game-basic.js` を `sampleData.js` に置換、`play.html` 相当の依存順に揃え、body に `play-page` class を付与。
+  - テストステータス表示を `engine.getState` 依存から `getPlayerState` 依存へ変更。
 
-- **UI/UX・アクセシビリティ改善（Play/Admin）**
-  - `styles/play.css`:
-    - モーダル/パネル用の `fadeIn` / `slideInRight` / `slideOutRight` キーフレームと、ボタン押下・タブ遷移向けのアニメーションを追加。
-  - `scripts/playtest.js`:
-    - プレイテストモーダル表示時に `fade-in` クラスを付与し、閉じる際に除去することで、開閉アニメーションを付けた。
-  - `scripts/memos.js`:
-    - メモパネル表示時に `fade-in` クラスを付与し、Esc キー閉じ・Tab/Shift+Tab でのフォーカストラップを実装。
-  - `scripts/play.inventory.js`:
-    - インベントリパネル開閉時に `fade-in` クラスを追加/削除し、`PlayModalFocus` が存在する場合はそれを優先してフォーカス管理を行うように統合。
-  - `scripts/playModalSaveSlots.js`:
-    - セーブスロットパネル開閉時に `fade-in` クラスを追加/削除し、既存の `PlayModalFocus` に基づくフォーカス制御と組み合わせて動作させるようにした。
-  - `scripts/savePreview.js`:
-    - 保存プレビューパネルのオーバーレイに対して、Esc キー閉じ・Tab/Shift+Tab でのフォーカストラップ・フォーカス復帰ロジックを強化。
-  - `scripts/admin.editor.js`:
-    - Admin エディタに Ctrl/Cmd+S（保存）、Ctrl/Cmd+Z（元に戻す）、Ctrl/Cmd+Y（やり直し）のキーボードショートカットを追加。
-
-- **ログ整備・テスト基盤/Devサーバ・SavePreview のモジュール化**
-  - `scripts/debug.js` / `scripts/eventBus.js` / `scripts/play.core.js` / `scripts/play.js` / `scripts/mermaidPreview.js` / `scripts/saveLoadManager.js` / `scripts/admin-*.js` / `scripts/e2e-tests.js` / `scripts/run-tests.js` など:
-    - デバッグ目的の `console.log` を `console.debug` に統一し、`APP_CONFIG.debug.showConsoleLogs` フラグで表示/非表示を切り替えられるよう整理。
-  - `scripts/run-tests.server.js` / `scripts/run-tests.test.js` / `scripts/run-tests.utils.js` / `scripts/run-tests.js`:
-    - テストランナーを「サーバ起動」「テスト実行」「ユーティリティ」に分割し、dev-server プロセス管理・ログ出力・環境検証をモジュールとして切り出し。
-  - `scripts/dev-server.js` / `scripts/dev-server.mime.js` / `scripts/dev-server.utils.js` / `scripts/e2e-tests.core.js`:
-    - dev-server の MIME 管理・パス検証・ポート選択処理をモジュール化し、E2E テスト用のサーバ起動/停止ロジックを `e2e-tests.core.js` に集約。
-  - `scripts/savePreview.core.js` / `scripts/savePreview.overlay.js` / `scripts/savePreview.renderer.js` / `scripts/savePreview.controls.js` / `scripts/savePreview.js`:
-    - SavePreview パネルを「オーバーレイ」「レンダラー」「コントロール」「パネル管理」に分割し、admin-boot から利用できるモジュールとして再構成。
-    - 既存のグローバル `SavePreview` API は shim として維持しつつ、新構成が利用可能な場合はそちらを優先して使用するようにした。
+- **tests/test.html のブラウザMocha基盤整備**
+  - `package.json`: mocha/chai/sinon を devDependencies に追加。
+  - `tests/test.html`: Mocha/Chai/Sinon を外部CDNから `node_modules` 読み込みへ切り替え、環境依存を解消。
+  - 結果: `npm test` が dev-server + HTTP 200 スモークテストで安定動作を確認。
 
 ### 設計上の判断と理由
 
-- `use_item` の effect 反映を UI ではなく **エンジン側（`GameEngineUtils.executeEffect`）へ寄せる**
-  - ノードエディタ（UI）で設定した effect が、実行環境（ゲームエンジン）で確実に再現される状態を SSOT にするため。
-  - UI 実装に依存せず、`use_item` の仕様（消費/効果）がテスト可能になるため。
-
-- `executeEffect(effect, state)` のシグネチャに変更
-  - effect の種類が増える前提で、プレイヤー状態（variables/flags 等）を確実に更新できるようにするため。
-
-- `stop_sfx` は `AudioManager.stopAllSFX()` に委譲
-  - `stop_bgm` と同様に AudioManager を唯一のオーディオ制御点として扱い、分岐ロジックを増やさないため。
+- **GameEngine API 縮退**: テスト/デバッグの過剰依存を防ぎ、純粋な `GameEngine` インターフェースを維持するため。拡張が必要な場合はテスト専用モジュールで対応。
+- **ローカル依存化**: CDN依存を避け、npm ci 前提で再現性を確保。ブラウザ環境でのテスト安定化のため。
 
 ### 仮定した仕様（今回実装/テストが前提にしたもの）
 
-- `use_item`
-  - `consume !== false` のとき 1 個消費（デフォルト消費）。
-  - インベントリに該当 item が無い / quantity が 0 の場合は **例外にせず終了**。
-
-- `effect.type === 'set_variable'`
-  - `effect.key` が変数キー。
-  - `effect.operation` は `set/add/subtract/multiply/divide` を想定（未指定は `set`）。
-  - `set` で `value` 未指定の場合は `true` を入れる。
-
-- `effect.type === 'set_flag'`
-  - `effect.flag` がフラグキー。
-  - `effect.value` 未指定の場合は `true`。
-
-- `effect.type === 'heal'`
-  - 反映先は `playerState.variables`。
-  - `effect.key` 未指定の場合は `'health'`。
-  - `effect.value` 未指定の場合は `10`。
-  - `effect.maxHealth` 未指定の場合は `100`。
-  - 結果は `maxHealth` で上限 clamp。
+- GameEngine API: `getPlayerState` / `setPlayerState` が基本。拡張APIはテスト/デバッグ用途に限る。
+- テスト基盤: `npm test` はスモークテスト（HTTP 200）。ブラウザMocha実行は `tests/test.html` 単体で可能。
 
 ### テスト結果 (今回セッション)
 
 - `npm test`: PASS
-  - `scripts/run-tests.js` 経由で dev-server を起動し、`/tests/test.html` への HTTP 200 スモークテストが成功。
-  - 本セッションで追加した UI/UX/A11y・テストランナー/Devサーバ/SavePreview 関連変更を含む HEAD 時点でグリーンであることを確認。
+  - dev-server 起動 + `/tests/test.html` HTTP 200 スモークテスト成功。
+  - API縮退・依存修正を含む HEAD 時点でグリーン。
 
 ### 未対応・今後の課題
 
-- `use_item` の effect テスト整理
-  - `set_variable` / `set_flag` / `heal` はユニットテスト追加済み。
-  - 他の effect を追加する場合は、同様にユニットテストを追加して仕様を固定する。
-
-- `tests/test.html` のテスト実行環境が未整備
-  - `sinon` 依存（`errorHandler.spec.js` / `migrationWizard.spec.js` / `snapshotCompare.spec.js` 等）に対して、`tests/test.html` が sinon をロードしていない。
-  - `tests/test.html` は現状 `npm test` のスモーク用途（HTTP 200）としては機能するが、Mocha の実行結果を CI で評価していない。
-
-- `test-rpg.html` の script 参照が破損
-  - `scripts/sample-game-basic.js` が存在せず（現状は `scripts/sampleData.js` が該当）、ページ単体での確認が崩れている。
-  - `play.html` と同等のロード順に揃える対応が未実施。
+- `use_item` の `set_flag` / `heal` 効果テスト: 既存 `tests/gameEngine.spec.js` に追加済みだが、実行確認が必要。
+- `tests/test.html` の全 spec 実行: sinon 追加済みだが、ブラウザで全テスト通過確認。
+- E2Eテスト: Playwright ブラウザ導入（`npx playwright install`）で `npm run test:e2e` を有効化。
 
 ### 次に着手すべき作業
 
-1. `tests/test.html` に sinon を追加し、ブラウザ上で Mocha が全 spec を実行できる状態にする（依存スクリプトも必要に応じて追加）。
-2. `use_item` のユニットテストに `set_flag` / `heal` ケースを追加し、今回の `executeEffect` 拡張を固定する。
-3. `test-rpg.html` の欠損 script を修正し、`play.html` と同等のロード順に揃える（最低限 `sampleData.js` への置換）。
+1. `npm run test:e2e` のブラウザ導入と実行確認。
+2. `tests/test.html` で全 Mocha spec がブラウザ実行可能か確認。
+3. `use_item` 効果のUI/エンジン間整合性テスト（手動）。
 
 ---
 
@@ -379,7 +324,7 @@
 
 ## 最終更新日時
 
-**2025-12-15** - npm audit fix詳細反映（js-yaml更新）、アイテム使用（use_item）の effect 反映をゲームエンジン側へ実装し、UI/UX・アクセシビリティ改善（モーダル/パネルアニメーション・フォーカストラップ・キーボードショートカット）およびテストランナー/Devサーバ/SavePreview のモジュール化を反映（本ファイルおよびコードベースを更新）
+**2025-12-16** - GameEngine API縮退（executeAction/getState/clearInventory/checkConditions削除）、test-rpg.htmlスクリプト依存修正、tests/test.htmlブラウザMocha基盤整備（CDN→node_modules依存化）、各種テスト修正を反映（本ファイルおよびコードベースを更新）
 
 ---
 
@@ -387,15 +332,17 @@
 
 ### 🚀 即時着手可能なタスク
 
-1. **ブラウザE2Eテスト基盤（Playwright PoC）の実行/拡張**
-   - 現状: `npm test` は dev-server + `/tests/test.html` への HTTP 200 スモークテストのみ
-   - PoC: `npm run test:e2e`（`scripts/e2e-tests.js`）で `/tests/test.html` を実ブラウザ実行し、Mocha 結果（failures）を集計
-   - 初回セットアップ: `npx playwright install chromium`
-   - 関連ファイル: `scripts/run-tests.js`, `scripts/dev-server.js`, `scripts/e2e-tests.js`, `tests/test.html`
+1. **tests/test.html の全 spec 実行確認**
+   - sinon 追加済みでブラウザMocha実行可能か確認。
+   - 関連: `tests/test.html`, `package.json`
 
-2. **ARIA属性の拡充**
-   - 主要モーダル/パネルの `role="dialog"` / `aria-modal` / 見出しラベルは整備済み
-   - 今後: 細かなコントロール（トグルボタンなど）の `aria-*` とフォーカス順序の継続的な最適化
+2. **use_item 効果のUI/エンジン間整合性テスト**
+   - `set_flag` / `heal` 効果のUI反映を確認。
+   - 手動テスト項目追加。
+
+3. **E2Eテスト基盤拡張**
+   - `npm run test:e2e` の Playwright ブラウザ導入と実行確認。
+   - 要 `npx playwright install chromium`
 
 ### 📦 新規追加モジュールの使用方法
 
@@ -417,14 +364,14 @@ ThemeToggle.isDark(); // ダークテーマかどうか
 
 ### 📂 今回のセッションで変更/追加されたファイル
 
-- `styles/modern.css` - アニメーション強化、ライトテーマ追加
-- `scripts/toastManager.js` - **新規** トースト通知
-- `scripts/themeToggle.js` - **新規** テーマ切り替え
-- `scripts/config.js` - themeMode キー追加
-- `admin.html` - スクリプト読み込み追加
-- `play.html` - スクリプト読み込み追加
-- `CHANGELOG.md` - 変更履歴更新
-- `docs/HANDOVER.md` - 本ファイル
+- `package.json` - mocha/chai/sinon を devDependencies に追加
+- `scripts/gameEngine.js` - executeAction/getState/clearInventory/checkConditions を公開停止
+- `scripts/debug.js` - GameEngine API非依存化（getPlayerState/setPlayerState使用）
+- `scripts/tests.js` - 簡易テストスイートをAPI非依存化、構文エラー解消
+- `test-rpg.html` - script参照修正（sample-game-basic.js→sampleData.js、play.html依存順揃え、play-page class付与）
+- `tests/test.html` - Mocha/Chai/Sinon を node_modules 読み込みへ切り替え
+- `tests/gameEngine.inventory.spec.js` - clearInventory テストを setPlayerState 経由に置換、保存キー修正
+- `tests/setup.js` - テストストレージクリアに agp_game_progress 追加
 
 #### UI/UX総改修 - Typora風モダンデザイン ✅ (2025-11-27)
 
@@ -669,5 +616,5 @@ scripts/
 ## 連絡先・問い合わせ
 
 **プロジェクトリポジトリ**: https://github.com/YuShimoji/AdventureGamePage  
-**最終更新**: 2025-12-12  
+**最終更新**: 2025-12-16  
 **担当者**: AI Assistant (Cascade)

@@ -60,7 +60,7 @@
     render();
 
     // Return API
-    return {
+    const api = {
       render,
       setNode: id =>
         logicManager.setNode(
@@ -99,6 +99,15 @@
       getSlotInfo: logicManager.getSlotInfo.bind(logicManager),
       copySlot: logicManager.copySlot.bind(logicManager),
     };
+
+    try {
+      Object.defineProperty(api, 'currentNodeId', {
+        enumerable: true,
+        get: () => state.nodeId,
+      });
+    } catch {}
+
+    return api;
   }
 
   window.GameEngine = { createEngine };

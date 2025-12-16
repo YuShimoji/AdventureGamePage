@@ -4,11 +4,19 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>AdventureGamePage Tests</title>
-    <link rel="stylesheet" href="https://unpkg.com/mocha/mocha.css" />
+    <link rel="stylesheet" href="../node_modules/mocha/mocha.css" />
     <style>
-      body { background: #111; color: #eee; }
-      .container { width: min(980px, 100% - 32px); margin: 16px auto; }
-      a { color: #8fd; }
+      body {
+        background: #111;
+        color: #eee;
+      }
+      .container {
+        width: min(980px, 100% - 32px);
+        margin: 16px auto;
+      }
+      a {
+        color: #8fd;
+      }
     </style>
   </head>
   <body>
@@ -29,80 +37,145 @@
     <script src="../scripts/converters.js"></script>
     <script src="../scripts/validator.js"></script>
     <script src="../scripts/nodeEditor.js"></script>
+    <script src="../scripts/gameEngineLogicManager.js"></script>
+    <script src="../scripts/gameEngineUIManager.js"></script>
+    <script src="../scripts/gameEngineUtils.js"></script>
     <script src="../scripts/gameEngine.js"></script>
 
     <!-- Test libs -->
-    <script src="https://unpkg.com/mocha/mocha.js"></script>
-    <script src="https://unpkg.com/chai/chai.js"></script>
+    <script src="../node_modules/mocha/mocha.js"></script>
+    <script src="../node_modules/chai/chai.js"></script>
+    <script src="../node_modules/sinon/pkg/sinon.js"></script>
     <script>
       // Mocha setup
-      if(window.mocha){ mocha.setup('bdd'); }
+      if (window.mocha) {
+        mocha.setup('bdd');
+      }
       // Fallback expect if chai fails to load
-      (function(){
-        if(window.chai && window.chai.expect){ window.expect = window.chai.expect; return; }
+      (function () {
+        if (window.chai && window.chai.expect) {
+          window.expect = window.chai.expect;
+          return;
+        }
         console.warn('chai not loaded; using minimal expect polyfill');
-        function deepEqual(a,b){
-          if(a===b) return true; if(typeof a!==typeof b) return false;
-          if(a && b && typeof a==='object'){
-            if(Array.isArray(a)){
-              if(!Array.isArray(b) || a.length!==b.length) return false;
-              for(let i=0;i<a.length;i++){ if(!deepEqual(a[i], b[i])) return false; }
+        function deepEqual(a, b) {
+          if (a === b) return true;
+          if (typeof a !== typeof b) return false;
+          if (a && b && typeof a === 'object') {
+            if (Array.isArray(a)) {
+              if (!Array.isArray(b) || a.length !== b.length) return false;
+              for (let i = 0; i < a.length; i++) {
+                if (!deepEqual(a[i], b[i])) return false;
+              }
               return true;
             }
-            const ak = Object.keys(a), bk = Object.keys(b);
-            if(ak.length!==bk.length) return false;
-            for(const k of ak){ if(!deepEqual(a[k], b[k])) return false; }
+            const ak = Object.keys(a),
+              bk = Object.keys(b);
+            if (ak.length !== bk.length) return false;
+            for (const k of ak) {
+              if (!deepEqual(a[k], b[k])) return false;
+            }
             return true;
           }
-          return a==b;
+          return a == b;
         }
-        function deepInclude(obj, subset){
-          for(const k in subset){ if(!(k in obj)) return false; if(!deepEqual(obj[k], subset[k])) return false; }
+        function deepInclude(obj, subset) {
+          for (const k in subset) {
+            if (!(k in obj)) return false;
+            if (!deepEqual(obj[k], subset[k])) return false;
+          }
           return true;
         }
-        function includeMembers(arr, mems){ return Array.isArray(arr) && mems.every(m => arr.includes(m)); }
-        window.expect = function(v){
+        function includeMembers(arr, mems) {
+          return Array.isArray(arr) && mems.every(m => arr.includes(m));
+        }
+        window.expect = function (v) {
           return {
             to: {
-              equal: (e)=>{ if(v!==e) throw new Error(`expected ${JSON.stringify(v)} to equal ${JSON.stringify(e)}`); },
+              equal: e => {
+                if (v !== e) throw new Error(`expected ${JSON.stringify(v)} to equal ${JSON.stringify(e)}`);
+              },
               be: {
-                an: (t)=>{ if(typeof v !== t) throw new Error(`expected type ${t} but got ${typeof v}`); },
-                true: ()=>{ if(v!==true) throw new Error('expected true'); },
-                false: ()=>{ if(v!==false) throw new Error('expected false'); },
+                an: t => {
+                  if (typeof v !== t) throw new Error(`expected type ${t} but got ${typeof v}`);
+                },
+                true: () => {
+                  if (v !== true) throw new Error('expected true');
+                },
+                false: () => {
+                  if (v !== false) throw new Error('expected false');
+                },
               },
               deep: {
-                equal: (e)=>{ if(!deepEqual(v,e)) throw new Error('expected deep equal'); },
-                include: (subset)=>{ if(!deepInclude(v,subset)) throw new Error('expected deep include'); },
+                equal: e => {
+                  if (!deepEqual(v, e)) throw new Error('expected deep equal');
+                },
+                include: subset => {
+                  if (!deepInclude(v, subset)) throw new Error('expected deep include');
+                },
               },
               include: {
-                members: (mems)=>{ if(!includeMembers(v, mems)) throw new Error('expected array to include members'); }
+                members: mems => {
+                  if (!includeMembers(v, mems)) throw new Error('expected array to include members');
+                },
               },
               have: {
-                length: (n)=>{ if(!v || v.length!==n) throw new Error(`expected length ${n}, got ${v && v.length}`); }
+                length: n => {
+                  if (!v || v.length !== n) throw new Error(`expected length ${n}, got ${v && v.length}`);
+                },
               },
-              exist: ()=>{ if(v==null) throw new Error('expected to exist'); },
-              throw: (errLike)=>{
-                if(typeof v !== 'function') throw new Error('expected a function');
+              exist: () => {
+                if (v == null) throw new Error('expected to exist');
+              },
+              throw: errLike => {
+                if (typeof v !== 'function') throw new Error('expected a function');
                 let thrown = null;
-                try { v(); } catch(e){ thrown = e; }
-                if(!thrown) throw new Error('expected function to throw');
-                if(errLike instanceof RegExp){ if(!errLike.test(String(thrown && thrown.message || thrown))) throw new Error('expected thrown error to match regexp'); }
-                else if(typeof errLike === 'string'){ if(!String(thrown && thrown.message || thrown).includes(errLike)) throw new Error('expected thrown error message to include string'); }
-                else if(typeof errLike === 'function'){ if(!(thrown instanceof errLike)) throw new Error('expected thrown error to be instance of provided constructor'); }
+                try {
+                  v();
+                } catch (e) {
+                  thrown = e;
+                }
+                if (!thrown) throw new Error('expected function to throw');
+                if (errLike instanceof RegExp) {
+                  if (!errLike.test(String((thrown && thrown.message) || thrown)))
+                    throw new Error('expected thrown error to match regexp');
+                } else if (typeof errLike === 'string') {
+                  if (!String((thrown && thrown.message) || thrown).includes(errLike))
+                    throw new Error('expected thrown error message to include string');
+                } else if (typeof errLike === 'function') {
+                  if (!(thrown instanceof errLike))
+                    throw new Error('expected thrown error to be instance of provided constructor');
+                }
               },
               not: {
-                throw: (errLike)=>{
-                  if(typeof v !== 'function') throw new Error('expected a function');
+                throw: errLike => {
+                  if (typeof v !== 'function') throw new Error('expected a function');
                   let thrown = null;
-                  try { v(); } catch(e){ thrown = e; }
-                  if(!thrown) return; // ok
-                  if(errLike instanceof RegExp){ if(errLike.test(String(thrown && thrown.message || thrown))) throw new Error('expected function not to throw matching regexp'); return; }
-                  if(typeof errLike === 'string'){ if(String(thrown && thrown.message || thrown).includes(errLike)) throw new Error('expected function not to throw message including string'); return; }
-                  if(typeof errLike === 'function'){ if(thrown instanceof errLike) throw new Error('expected function not to throw provided constructor'); return; }
+                  try {
+                    v();
+                  } catch (e) {
+                    thrown = e;
+                  }
+                  if (!thrown) return; // ok
+                  if (errLike instanceof RegExp) {
+                    if (errLike.test(String((thrown && thrown.message) || thrown)))
+                      throw new Error('expected function not to throw matching regexp');
+                    return;
+                  }
+                  if (typeof errLike === 'string') {
+                    if (String((thrown && thrown.message) || thrown).includes(errLike))
+                      throw new Error('expected function not to throw message including string');
+                    return;
+                  }
+                  if (typeof errLike === 'function') {
+                    if (thrown instanceof errLike)
+                      throw new Error('expected function not to throw provided constructor');
+                    return;
+                  }
                   throw new Error('expected function not to throw');
-                }
-              }
-            }
+                },
+              },
+            },
           };
         };
       })();
@@ -126,6 +199,8 @@
     <!-- <script src="./gameEngine.inventory.spec.js"></script> -->
     <script src="./nodeEditor.api.spec.js"></script>
 
-    <script>mocha.run();</script>
+    <script>
+      mocha.run();
+    </script>
   </body>
 </html>

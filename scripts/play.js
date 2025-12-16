@@ -120,10 +120,11 @@
 
   // ページ固有のクリーンアップ（どのページでも実行）
   document.addEventListener('DOMContentLoaded', function () {
-    // play.html以外ではプレイ要素を強制的に非表示
-    if (
-      !(window.location.pathname.endsWith('play.html') || window.location.pathname === '/play.html')
-    ) {
+    // playページ以外ではプレイ要素を強制的に非表示
+    // ルーティング/ファイル名変更に強くするため、pathname ではなく body class で判定
+    const isPlayLikePage = !!document.body && document.body.classList.contains('play-page');
+
+    if (!isPlayLikePage) {
       const playElements = ['save-slots-panel', 'inventory-panel', 'save-load-modal'];
 
       playElements.forEach(id => {

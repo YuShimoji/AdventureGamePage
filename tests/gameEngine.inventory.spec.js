@@ -7,22 +7,20 @@ describe('GameEngine - Inventory System', () => {
       start: {
         title: 'Start',
         text: 'Welcome to the game!',
-        choices: [
-          { text: 'Go to room', to: 'room1' }
-        ]
+        choices: [{ text: 'Go to room', to: 'room1' }],
       },
       room1: {
         title: 'Room 1',
         text: 'You are in room 1',
-        choices: []
-      }
-    }
+        choices: [],
+      },
+    },
   };
 
   const mockElements = {
     titleEl: document.createElement('div'),
     textEl: document.createElement('div'),
-    choicesEl: document.createElement('div')
+    choicesEl: document.createElement('div'),
   };
 
   beforeEach(() => {
@@ -35,7 +33,7 @@ describe('GameEngine - Inventory System', () => {
     it('should add a new item to inventory', () => {
       const result = engine.addItem('sword', 1);
       chai.assert.isTrue(result);
-      
+
       const inventory = engine.getInventory();
       chai.assert.lengthOf(inventory.items, 1);
       chai.assert.equal(inventory.items[0].id, 'sword');
@@ -45,7 +43,7 @@ describe('GameEngine - Inventory System', () => {
     it('should increase quantity when adding existing item', () => {
       engine.addItem('potion', 1);
       engine.addItem('potion', 2);
-      
+
       const inventory = engine.getInventory();
       chai.assert.lengthOf(inventory.items, 1);
       chai.assert.equal(inventory.items[0].quantity, 3);
@@ -61,7 +59,7 @@ describe('GameEngine - Inventory System', () => {
       for (let i = 0; i < 20; i++) {
         engine.addItem(`item_${i}`, 1);
       }
-      
+
       const result = engine.addItem('extra_item', 1);
       chai.assert.isFalse(result);
     });
@@ -138,7 +136,7 @@ describe('GameEngine - Inventory System', () => {
     it('should return inventory with items', () => {
       engine.addItem('sword', 1);
       engine.addItem('potion', 3);
-      
+
       const inventory = engine.getInventory();
       chai.assert.lengthOf(inventory.items, 2);
       chai.assert.equal(inventory.currentSlots, 2);
@@ -149,7 +147,7 @@ describe('GameEngine - Inventory System', () => {
       engine.addItem('sword', 1);
       const inv1 = engine.getInventory();
       const inv2 = engine.getInventory();
-      
+
       chai.assert.notStrictEqual(inv1.items, inv2.items);
     });
   });
@@ -158,9 +156,16 @@ describe('GameEngine - Inventory System', () => {
     it('should remove all items', () => {
       engine.addItem('sword', 1);
       engine.addItem('potion', 5);
-      
-      engine.clearInventory();
-      
+
+      const ps = engine.getPlayerState();
+      engine.setPlayerState({
+        ...ps,
+        inventory: {
+          ...(ps.inventory || {}),
+          items: [],
+        },
+      });
+
       const inventory = engine.getInventory();
       chai.assert.lengthOf(inventory.items, 0);
     });
@@ -169,33 +174,33 @@ describe('GameEngine - Inventory System', () => {
   describe('Persistence', () => {
     it('should save inventory when adding item', () => {
       engine.addItem('sword', 1);
-      
+
       // Create new engine and load
       const newEngine = window.GameEngine.createEngine(testGameData, mockElements);
       newEngine.loadProgress();
-      
+
       chai.assert.isTrue(newEngine.hasItem('sword'));
     });
 
     it('should save inventory when removing item', () => {
       engine.addItem('potion', 5);
       engine.removeItem('potion', 2);
-      
+
       // Create new engine and load
       const newEngine = window.GameEngine.createEngine(testGameData, mockElements);
       newEngine.loadProgress();
-      
+
       chai.assert.equal(newEngine.getItemCount('potion'), 3);
     });
 
     it('should load inventory from storage', () => {
       engine.addItem('key', 1);
       engine.addItem('potion', 3);
-      
+
       // Create new engine and load
       const newEngine = window.GameEngine.createEngine(testGameData, mockElements);
       newEngine.loadProgress();
-      
+
       const inventory = newEngine.getInventory();
       chai.assert.lengthOf(inventory.items, 2);
       chai.assert.isTrue(newEngine.hasItem('key'));
@@ -204,13 +209,13 @@ describe('GameEngine - Inventory System', () => {
 
     it('should handle missing inventory in saved data', () => {
       // Save progress without inventory
-      window.StorageUtil.saveJSON('agp_progress', {
+      window.StorageUtil.saveJSON('agp_game_progress', {
         title: testGameData.title,
         nodeId: 'start',
         history: [],
-        forward: []
+        forward: [],
       });
-      
+
       engine.loadProgress();
       const inventory = engine.getInventory();
       chai.assert.lengthOf(inventory.items, 0);
@@ -221,9 +226,9 @@ describe('GameEngine - Inventory System', () => {
     it('should clear inventory on reset', () => {
       engine.addItem('sword', 1);
       engine.addItem('potion', 5);
-      
+
       engine.reset();
-      
+
       const inventory = engine.getInventory();
       chai.assert.lengthOf(inventory.items, 0);
     });
@@ -233,7 +238,7 @@ describe('GameEngine - Inventory System', () => {
     it('should maintain inventory across node transitions', () => {
       engine.addItem('key', 1);
       engine.setNode('room1');
-      
+
       chai.assert.isTrue(engine.hasItem('key'));
     });
 
@@ -241,7 +246,7 @@ describe('GameEngine - Inventory System', () => {
       engine.addItem('sword', 1);
       engine.setNode('room1');
       engine.goBack();
-      
+
       chai.assert.isTrue(engine.hasItem('sword'));
     });
   });

@@ -35,7 +35,10 @@
   "homepage": "https://github.com/YuShimoji/AdventureGamePage#readme",
   "devDependencies": {
     "eslint": "^8.57.0",
+    "mocha": "^10.2.0",
+    "chai": "^4.3.10",
     "prettier": "^3.2.5",
+    "sinon": "^17.0.1",
     "playwright": "^1.49.0"
   },
   "engines": {
