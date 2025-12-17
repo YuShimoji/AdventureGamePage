@@ -115,14 +115,14 @@
 
 ### 🔧 技術的負債対応
 
-| タスク                                            | 状態           | 備考                                                                                                     |
-| ------------------------------------------------- | -------------- | -------------------------------------------------------------------------------------------------------- |
-| npm test テストランナー安定化                     | ✅ 完了        | dev-server + Node http による `/tests/test.html` スモークテストへ移行                                    |
-| ブラウザE2Eテスト導入（Puppeteer/Playwright検討） | ✅ 強化         | Playwright: `npm run test:e2e` が `tests/test.html` の Mocha 結果を取得して失敗を検知                    |
-| CI 品質ゲート（lint + E2E）                       | ✅ 追加        | `.github/workflows/ci-quality.yml` を追加（`npm ci`/`lint`/`test`/`test:e2e`）                           |
-| 既存alertのToast置換                              | ✅ 完了        | ToastManager でプレイ/管理両方の通知を統一                                                               |
-| 依存関係の最新化                                  | ✅ 完了        | js-yaml 4.1.0→4.1.1 更新完了                                                                             |
-| パフォーマンス最適化                              | 📋 未着手      | ローディング改善                                                                                         |
+| タスク                                            | 状態      | 備考                                                                                                     |
+| ------------------------------------------------- | --------- | -------------------------------------------------------------------------------------------------------- |
+| npm test テストランナー安定化                     | ✅ 完了   | dev-server + Node http による `/tests/test.html` スモークテストへ移行                                    |
+| ブラウザE2Eテスト導入（Puppeteer/Playwright検討） | ✅ 強化   | Playwright E2E: `npm run test:e2e` が `tests/test.html` の Mocha 結果を取得して失敗を検知                |
+| CI 品質ゲート（lint + E2E）                       | ✅ 追加   | `.github/workflows/ci-quality.yml` を追加（`npm ci`/`lint`/`test`/`test:e2e`）                           |
+| 既存alertのToast置換                              | ✅ 完了   | ToastManager でプレイ/管理両方の通知を統一                                                               |
+| 依存関係の最新化                                  | ✅ 完了   | js-yaml 4.1.0→4.1.1 更新完了                                                                             |
+| パフォーマンス最適化                              | 📋 未着手 | ローディング改善                                                                                         |
 
 ## 今回セッションの調査サマリ (2025-12-05)
 
@@ -301,6 +301,54 @@
 
 ---
 
+## 今回セッションの作業サマリ (2025-12-17)
+
+### 目的（バッティング回避 + UIモダン化の下準備）
+
+- 既存の A11y / ゲームエンジン作業と衝突しないよう、まず `index.html` / `learn.html` など **静的ページ側だけ**を最小変更でモダン化（案A）。
+
+### 調査と意思決定（メディア取り扱い）
+
+- 画像/音声の参照は「相対パス」「DataURL」「外部URL（http/https）」の3系統が混在していた。
+- プロジェクトの性質（静的ページ/オフライン寄り/外部依存削減）と XSS/追跡リスクを踏まえ、既定方針を **B'** として確定。
+  - **許可**: 相対パス、DataURL（必要に応じて blob:）
+  - **既定で禁止**: 外部URL（http/https）
+  - learn の音声サンプルは、ローカル同梱が整うまで当面 **C（無効/注記）** とする
+
+### 実装内容（MediaResolver / ポリシー適用）
+
+- `scripts/mediaResolver.js` を追加し、許可/禁止判定のSSOT化
+- `scripts/config.js` に `APP_CONFIG.media` を追加（既定: 外部URL OFF / DataURL+相対パス ON / DataURL上限あり）
+- Play
+  - `scripts/gameEngineUIManager.js`: `node.image` を MediaResolver 経由で解決し、ブロック/ロード失敗時は安全に非表示
+  - `scripts/gameEngineUtils.js`: `play_bgm` / `play_sfx` を MediaResolver 経由にし、ブロック時は再生しない
+- Admin/Editor
+  - `admin.html`: `scripts/mediaResolver.js` の読み込みを追加
+  - `scripts/nodeEditor/ui/preview.js`: 画像プレビューを `innerHTML` 連結から DOM 生成に変更し、MediaResolver 経由で解決
+  - `scripts/nodeEditorLogicManager.js` / `scripts/nodeEditor/ui/forms.js`: 画像URL/音声URL入力でポリシー違反時に警告（同一値の連続警告は抑制）
+- Learn
+  - `learn.html`: 外部URL（画像/音声）を撤去し、画像は軽量SVG DataURLに変更。音声は未同梱のため注記して無効化
+- テスト/サンプル
+  - `test-rpg.html`: `scripts/mediaResolver.js` を追加
+  - `scripts/sample-game-rpg.js`: 実体のない `images/` / `audio/` 参照で体験が崩れるため、画像を軽量SVG DataURLへ置換し、音声アクションは当面撤去
+
+### ドキュメント更新
+
+- `README.md`: メディアポリシー（B'）と `APP_CONFIG.media` の調整方法を追記
+
+### 品質ゲート
+
+- `npm run lint`: PASS
+- `npm test`: PASS
+
+### 既知課題 / 次の担当者が判断すべき点
+
+- `admin.html` は Mermaid を CDN 依存している（外部依存を減らす方針ならローカル同梱の検討が必要）
+- DataURL は保存容量（localStorage/IndexedDB）を圧迫しやすい。将来的に `asset://` などのIDB管理へ拡張余地あり
+- 外部URLを許可したい場合は `APP_CONFIG.media.allowHttp/allowHttps` を明示的にONにする運用で統一
+
+---
+
 ## 重要技術情報
 
 ### モジュールアーキテクチャ
@@ -325,7 +373,7 @@
 
 ## 最終更新日時
 
-**2025-12-16** - GameEngine API縮退（executeAction/getState/clearInventory/checkConditions削除）、test-rpg.htmlスクリプト依存修正、tests/test.htmlブラウザMocha基盤整備（CDN→node_modules依存化）、各種テスト修正を反映（本ファイルおよびコードベースを更新）
+**2025-12-17** - メディア取り扱いポリシー（B'）の申し送りを追記し、CI品質ゲート（lint + test + E2E）安定化の変更を統合（本ファイルを更新）
 
 ---
 
@@ -617,5 +665,5 @@ scripts/
 ## 連絡先・問い合わせ
 
 **プロジェクトリポジトリ**: https://github.com/YuShimoji/AdventureGamePage  
-**最終更新**: 2025-12-16  
+**最終更新**: 2025-12-17  
 **担当者**: AI Assistant (Cascade)

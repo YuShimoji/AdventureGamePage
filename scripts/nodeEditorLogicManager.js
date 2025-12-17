@@ -252,6 +252,8 @@
 
     const { sel, startSel, id, text, image } = window.NodeEditorUIManager.readUIRefs();
 
+    let lastWarnedImageRef = null;
+
     if (sel)
       sel.addEventListener('change', () => window.NodeEditorUIManager.renderNodeForm(sel.value));
     if (startSel)
@@ -359,7 +361,28 @@
         const specData = window.NodeEditorUIManager.getSpecData();
         const node = window.NodeEditorUtils.findNodeById(specData.nodes, sel.value);
         if (!node) return;
-        node.image = image.value.trim() || undefined;
+        const nextRef = image.value.trim();
+        node.image = nextRef || undefined;
+
+        if (nextRef && nextRef !== lastWarnedImageRef && window.MediaResolver?.resolveImageRef) {
+          const resolved = window.MediaResolver.resolveImageRef(nextRef);
+          if (resolved && resolved.ok === false) {
+            lastWarnedImageRef = nextRef;
+            const baseMsg =
+              '画像URLがポリシーによりブロックされました（相対パス / DataURL を推奨）';
+            if (window.ToastManager) {
+              if (resolved.reason === 'data_too_large' && typeof resolved.bytes === 'number') {
+                ToastManager.warning(
+                  `${baseMsg}: サイズが大きすぎます（${Math.round(resolved.bytes / 1024)}KB）`
+                );
+              } else {
+                ToastManager.warning(baseMsg);
+              }
+            } else {
+              alert(baseMsg);
+            }
+          }
+        }
         window.NodeEditorUIManager.setDirty(true);
         window.NodeEditorUIManager.notifySpecUpdated();
         // Real-time validation
