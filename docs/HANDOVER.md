@@ -372,7 +372,7 @@
 
 ## 最終更新日時
 
-**2025-12-16** - GameEngine API縮退（executeAction/getState/clearInventory/checkConditions削除）、test-rpg.htmlスクリプト依存修正、tests/test.htmlブラウザMocha基盤整備（CDN→node_modules依存化）、各種テスト修正を反映（本ファイルおよびコードベースを更新）
+**2025-12-17** - i18n基盤と管理画面ストーリー作成フローを導入し、メディアポリシーを確定（本ファイルを更新）
 
 ---
 
