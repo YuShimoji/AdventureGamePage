@@ -340,6 +340,7 @@
 
 - `npm run lint`: PASS
 - `npm test`: PASS
+- `npm run test:e2e`: PASS（Mocha failures=0。ログ上 `tests/images/test.jpg` の 404 が出る場合があるが、現状テスト失敗には影響しない）
 
 ### 既知課題 / 次の担当者が判断すべき点
 
