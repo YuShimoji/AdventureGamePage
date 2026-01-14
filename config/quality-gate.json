@@ -1,0 +1,17 @@
+{
+  "minSuccessRate": 85,
+  "minQualityScore": 70,
+  "minTestCount": 10,
+  "maxFailureRate": 15,
+  "requireCoverage": true,
+  "allowFlakyTests": false,
+  "notifications": {
+    "github": {
+      "enabled": true,
+      "prComment": true,
+      "statusCheck": true,
+      "issueOnFailure": true,
+      "issueLabel": "quality-gate-failure"
+    }
+  }
+}
