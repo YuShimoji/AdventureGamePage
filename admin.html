@@ -55,6 +55,25 @@
         </button>
       </div>
 
+      <!-- Sample Select Modal -->
+      <div id="sample-select-modal" class="modal-overlay" hidden>
+        <div class="modal-content" role="dialog" aria-labelledby="sample-modal-title">
+          <h3 id="sample-modal-title">サンプルを選択</h3>
+          <p class="text-muted">サンプルゲームをノードエディタに読み込みます。</p>
+          <div class="sample-select-grid">
+            <button class="sample-select-btn" data-sample="basic">
+              <strong>基本サンプル</strong>
+              <span class="text-muted">分岐とアイテムの基本形</span>
+            </button>
+            <button class="sample-select-btn" data-sample="rpg">
+              <strong>RPGサンプル</strong>
+              <span class="text-muted">画像・条件分岐・インベントリ</span>
+            </button>
+          </div>
+          <button id="sample-modal-close" class="btn btn-ghost">閉じる</button>
+        </div>
+      </div>
+
       <!-- Node Editor Fullscreen Modal -->
       <div id="node-editor-modal" class="node-editor-modal" hidden>
         <div class="node-editor-modal-header">
@@ -299,8 +318,9 @@
               <div class="ne-banner" id="ne-dirty-banner" hidden>未保存の変更があります（Ctrl+S で保存）</div>
               <div id="ne-empty-state" class="ne-empty-state" hidden>
                 <p>ノードがまだありません。</p>
-                <p>「ノード追加」ボタンで最初のノードを作成してください。</p>
-                <button id="ne-empty-add-node" class="btn">最初のノードを作成</button>
+                <p>サンプルを読み込むか、新しいノードを作成してください。</p>
+                <button id="ne-empty-load-sample" class="btn btn-accent">サンプルを読み込む</button>
+                <button id="ne-empty-add-node" class="btn">空のノードを作成</button>
               </div>
               <div class="field">
                 <span>開始ノード</span>
@@ -738,6 +758,8 @@
     <script src="scripts/storage.js"></script>
     <script src="scripts/strings.js"></script>
     <script src="scripts/config.js"></script>
+    <script src="scripts/sampleData.js"></script>
+    <script src="scripts/sample-game-rpg.js"></script>
     <script src="scripts/mediaResolver.js"></script>
     <script src="scripts/themeUtils.js"></script>
     <script src="scripts/themeUIManager.js"></script>

@@ -135,9 +135,13 @@
 
     if (btnSample) {
       btnSample.addEventListener('click', function () {
-        try {
-          window.open('learn.html', '_blank');
-        } catch (e) {}
+        if (window.AdminCore && typeof window.AdminCore.openSampleModal === 'function') {
+          window.AdminCore.openSampleModal();
+        } else {
+          try {
+            window.open('learn.html', '_blank');
+          } catch (e) {}
+        }
       });
     }
   }

@@ -14,6 +14,9 @@
       // Node editor empty state
       this.setupNodeEditorEmptyState();
 
+      // Sample select modal
+      this.setupSampleSelectModal();
+
       // Initialize all admin modules
       if (window.AdminEditor) {
         window.AdminEditor.init();
@@ -107,6 +110,16 @@
       emptyState.hidden = nodeCount > 0;
     }
 
+    // Wire up the "load sample" button in empty state
+    var emptyLoadSample = document.getElementById('ne-empty-load-sample');
+    if (emptyLoadSample) {
+      emptyLoadSample.addEventListener('click', function () {
+        if (window.AdminCore && typeof window.AdminCore.openSampleModal === 'function') {
+          window.AdminCore.openSampleModal();
+        }
+      });
+    }
+
     // Wire up the "create first node" button
     if (emptyAddBtn) {
       emptyAddBtn.addEventListener('click', function () {
@@ -132,6 +145,109 @@
         updateEmptyState();
       }
     }, 2000);
+  };
+
+  // --- Sample Select Modal ---
+  window.AdminCore.setupSampleSelectModal = function () {
+    var modal = document.getElementById('sample-select-modal');
+    var closeBtn = document.getElementById('sample-modal-close');
+    if (!modal) return;
+
+    // Close modal
+    if (closeBtn) {
+      closeBtn.addEventListener('click', function () {
+        modal.hidden = true;
+      });
+    }
+    // Close on backdrop click
+    modal.addEventListener('click', function (e) {
+      if (e.target === modal) modal.hidden = true;
+    });
+
+    // Sample buttons
+    var sampleBtns = modal.querySelectorAll('.sample-select-btn');
+    sampleBtns.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var sampleType = btn.dataset.sample;
+        var gameData = null;
+
+        if (sampleType === 'basic' && window.SAMPLE_GAME) {
+          gameData = window.SAMPLE_GAME;
+        } else if (sampleType === 'rpg' && window.SAMPLE_GAME_RPG) {
+          gameData = window.SAMPLE_GAME_RPG;
+        }
+
+        if (!gameData) {
+          if (window.ToastManager) {
+            window.ToastManager.error('サンプルデータが見つかりません');
+          }
+          return;
+        }
+
+        try {
+          // Convert engine format to spec format for NodeEditor
+          var spec = null;
+          if (Array.isArray(gameData.nodes)) {
+            // Already engine format (array of nodes)
+            spec = window.Converters?.engineToSpec
+              ? window.Converters.engineToSpec(gameData)
+              : null;
+          } else {
+            // Object keyed format (spec-like) - normalize
+            spec = window.NodeEditorUtils
+              ? window.NodeEditorUtils.normalizeSpec(gameData)
+              : null;
+          }
+
+          if (!spec) {
+            if (window.ToastManager) {
+              window.ToastManager.error('サンプルの変換に失敗しました');
+            }
+            return;
+          }
+
+          // Also save to agp_game_data for play button
+          var GAME_DATA_KEY =
+            window.APP_CONFIG?.storage?.keys?.gameData || 'agp_game_data';
+          if (window.Converters?.normalizeSpecToEngine) {
+            var engine = window.Converters.normalizeSpecToEngine(spec);
+            window.StorageUtil.saveJSON(GAME_DATA_KEY, engine);
+          }
+
+          // Load into NodeEditor
+          window.NodeEditorUIManager.setSpecData(spec);
+          window.NodeEditorUIManager.refreshNodeList(
+            spec.meta?.start || Object.keys(spec.nodes || {})[0]
+          );
+          window.NodeEditorUIManager.refreshExportList();
+          window.NodeEditorUIManager.refreshNodeIdDatalist();
+          window.NodeEditorUIManager.refreshUnresolvedPanel();
+          window.NodeEditorUIManager.setDirty(false);
+          window.NodeEditorUIManager.notifySpecUpdated();
+
+          modal.hidden = true;
+
+          if (window.ToastManager) {
+            window.ToastManager.success(
+              gameData.title
+                ? '「' + gameData.title + '」を読み込みました'
+                : 'サンプルを読み込みました'
+            );
+          }
+        } catch (e) {
+          console.error('[AdminCore] Sample load failed:', e);
+          if (window.ToastManager) {
+            window.ToastManager.error('サンプルの読み込みに失敗しました: ' + e.message);
+          }
+        }
+      });
+    });
+  };
+
+  // --- Open Sample Modal (public) ---
+  window.AdminCore.openSampleModal = function () {
+    var modal = document.getElementById('sample-select-modal');
+    if (modal) modal.hidden = false;
   };
 
   // Initialize AdminCore when boot completes
