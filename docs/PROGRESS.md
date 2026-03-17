@@ -1,117 +1,70 @@
-# 開発進捗レポート (2025-12-14 更新)
+# 開発進捗レポート (2026-03-17 更新)
 
 ## 現在の状況
 
-### 直近の更新 ✅ (2025-12-14)
+### 直近の更新 (2026-03-17)
 
-- UI/UX改善・アクセシビリティ強化の継続（ToastManager / ThemeToggle / 各モーダル/パネルのA11y改善など）
-- テスト基盤: `npm test` ランナー安定化、Playwright によるブラウザE2E PoC（`npm run test:e2e`、初回は `npx playwright install chromium`）
-- ドキュメント整合性: `docs/HANDOVER.md` / `docs/PROGRESS.md` / `docs/ISSUES.md` / `docs/specs/game-data-schema.md` の最新化
-- 仕様/実装同期: auto-save / item-usage / variable-system の issue を現状実装に合わせて同期
-- ログ整理: `APP_CONFIG.debug.showConsoleLogs` でログを制御（play 系の無条件ログを削減）
+- CLAUDE.md 充実化 (プロジェクト概要・DECISION LOG・Key Paths・Architecture・Rules)
+- spec-index.json 新規作成 (14エントリ)
+- docs/specs/ に12件の仕様書を新規作成
+- AI_CONTEXT.md をレガシー化し CLAUDE.md に統合
+- shared-workflows サブモジュール除去
 
-### 完了済みタスク
+### 完了済みフェーズ
 
-#### プロジェクト総点検・リファクタリング ✅ (2025-11-25)
+#### Phase 1: コア安定化 (完了)
 
-##### Phase 1: 不要ファイルのクリーンアップ
+- マイグレーション機能強化 (プログレスバー・バックアップ/復元・データバリデーション)
+- スナップショット機能拡張 (日時フィルタ・比較・検索)
+- エラーハンドリング統一 (errorHandler.js)
+- ログ出力整理 (APP_CONFIG.debug.showConsoleLogs)
+- 手動テスト25項目パス
 
-- 一時バックアップファイル削除 (`temp_origin_play.js`, `temp_original_gameEngine.js`)
-- 空のコミットメッセージファイル削除 (`commit-msg*.txt`, `merge-msg.txt`)
-- 空の設定ファイル削除 (`eslint.config.js`, `webpack.config.js`, `jsdoc.json`)
-- 空のスクリプト削除 (`create-debug-page.js`, `test-lint.js`, `admin.js`)
-- **削除ファイル数**: 12ファイル、約70KB削減
+#### Phase 2: プレイヤー状態管理 (完了)
 
-##### Phase 2: 長大スクリプトの分割
+- インベントリシステム (addItem/removeItem/hasItem + UI + キーボードショートカット)
+- ゲーム状態永続化 (saveGame/loadGame/setPlayerState/getPlayerState)
+- マルチセッション保存 (createSlot/deleteSlot/saveToSlot/loadFromSlot)
+- テスト追加 (gameEngine.inventory.spec.js 等)
 
-- **wysiwygStoryEditor.js** (727行) → 4モジュールに分割:
-  - `wysiwygStoryEditor.core.js`: 状態管理・初期化・公開API
-  - `wysiwygStoryEditor.canvas.js`: Canvas描画・マウスイベント
-  - `wysiwygStoryEditor.ui.js`: UI生成・ツールバー・プロパティパネル
-  - `wysiwygStoryEditor.conditions.js`: 条件分岐エディタ
-- **nodeEditorLogicManager.js** (445行 → 340行):
-  - `nodeEditorValidation.js`: バリデーションロジック分離
+#### Phase 3: モジュラリティ改善 (完了)
 
-##### Phase 3: コード品質改善
+- NodeEditor UI モジュール分割 (nodeEditorUIManager 738行→172行、77%減)
+- 絵文字完全削除、テキストベースラベルに統一
+- 単一責任原則の徹底、依存関係の明確化
 
-- `config.js`: ストレージキーを集約（ハードコーディング削減）
-- `play.inventory.js`: TODOコメントを実装に置換
-  - `executeItemEffect()` メソッド追加
-  - heal, set_flag, set_variable, show_text エフェクトをサポート
+#### Phase 4: UI/UX改善 (進行中)
 
-#### RF-05: Play.js のモーダル/フォーカス制御分離 ✅ (2025-11-20)
-
-- **新規モジュール作成**: `scripts/play.modal.js`
-- **play.js 簡素化**: PlayCore/PlaySave/PlayInventory/PlayInput/PlayModal の接着コードのみ
-
-#### UX改善: ゲームデータ未保存時の空状態UI ✅ (2025-11-20)
-
-- エラーダイアログ → ページ内カードUIに変更
-- 「管理画面を開く」「ゲームJSONを読み込む」誘導ボタン追加
+- テーマ切替 (ダーク/ライト + OS連動 + カスタムテーマ)
+- モーダル/パネルのA11y改善 (フォーカストラップ・ARIA)
+- モジュール分割 (savePreview 5分割、mermaidPreview 6分割、play.modal 分離)
+- メディアポリシー B' 実装 (外部URL既定OFF)
+- UI安定化 (hidden保証・hover改善・テーマトークン拡充)
+- アクセシビリティ (キーボードナビ・スクリーンリーダー基本対応)
 
 ### 進行中/保留タスク
 
-#### UI全体モダナイズ 🔄 (優先中)
+#### UI全体モダナイズ (進行中)
 
-- 対象: レガシーなレイアウト/スタイル/コンポーネント
-- 計画:
-  - 短期: Play/Admin画面の状態別UI改善
-  - 中期: ヘッダー/ナビ統一デザイン、カード/モーダル刷新
-  - 長期: コンポーネント指向CSS/JS整理、モバイル対応
+- 短期: WritingPage の CSS Variables / Accordion パターンを参考にした統一設計
+- 中期: SPA統合 Phase B (hash router 本格化)
+- 長期: コンポーネント指向CSS/JS整理、モバイル対応
 
-#### 残りの長大ファイル (300行超)
+#### テスト自動化 (保留)
 
-| ファイル                   | 行数  | 状態       |
-| -------------------------- | ----- | ---------- |
-| savePreview.js             | 539行 | 要分割検討 |
-| mermaidPreviewUIManager.js | 531行 | 要分割検討 |
-| storageProvider.js         | 387行 | 許容範囲   |
-| aiStoryImprover.js         | 377行 | 許容範囲   |
-| admin-boot.js              | 373行 | 許容範囲   |
-| play.save.js               | 362行 | 許容範囲   |
+- 現状の `npm test` は HTTP 200 スモークテストのみ
+- Mocha spec の CI 評価は未実装
+- Playwright E2E PoC は整備済み
 
-## 今後の開発ロードマップ
+## 仕様管理
 
-### フェーズ1: コア機能安定化 (進行中)
-
-**目標**: 基本機能の品質向上とテスト整備
-
-| No  | タスク                   | 優先度 | 工数目安 | 完了基準                         | 状態                 |
-| --- | ------------------------ | ------ | -------- | -------------------------------- | -------------------- |
-| 1-1 | 手動テスト実施・バグ修正 | 高     | 2-3h     | 全項目パス、コンソールエラーなし | ✅ 完了 (2025-11-26) |
-| 1-3 | エラーハンドリング統一   | 中     | 2h       | ユーザー友好的なエラーメッセージ | ✅ 完了 (2025-11-26) |
-| 1-4 | ログ出力整理             | 中     | 1h       | デバッグ効率化                   | ✅ 完了 (2025-12-14) |
-| 1-2 | 自動テスト拡充           | 中     | 3-4h     | テストカバレッジ80%以上          | 保留                 |
-
-**完了基準**:
-
-- [x] 手動テスト全項目パス (25項目すべて○)
-- [x] エラーハンドリング統一完了
-- [ ] 自動テスト80%以上パス
-- [ ] コンソールに不要なエラー/警告なし
-
-### フェーズ3: 機能拡張 (以降)
-
-- バックログの優先タスク実行
-  - インベントリシステム強化
-  - ゲーム状態永続化
-  - デバッグUI改善
+- `docs/spec-index.json` — 14エントリの仕様索引
+- `docs/specs/` — 14件の仕様書 (game-data-schema, ui-home-hero, game-engine-core, inventory-system, save-load-system, node-editor, storage-provider, theme-system, media-policy, mermaid-preview, accessibility, spa-integration, error-handling, export-import)
 
 ## 技術的メモ
 
 - **モジュール化方針**: 責務単一の小モジュール群 + 接着コード
 - **ストレージキー**: `APP_CONFIG.storage.keys` で一元管理
 - **エラーハンドリング**: コード付きエラーでUI分岐 (NO_GAME_DATA 等)
-- **ログ管理**: `APP_CONFIG.debug.showConsoleLogs` で制御
+- **メディアポリシー**: MediaResolver (B') が SSOT
 - **Gitワークフロー**: mainブランチで直接作業 → 即プッシュ
-
-## 次のアクション
-
-1. UIモダナイズの具体化
-2. 残りの長大ファイル分割検討（優先度に応じて）
-
-## 連絡事項
-
-- 進捗はこちらのドキュメントで随時更新
-- 重大な変更はコミットメッセージに詳細記載
-- テストは手動確認を優先 (自動テストは別タスク)
