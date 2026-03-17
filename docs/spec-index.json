@@ -1,0 +1,128 @@
+[
+  {
+    "id": "SP-001",
+    "title": "Game Data JSON Schema",
+    "status": "done",
+    "pct": 100,
+    "cat": "core",
+    "file": "docs/specs/game-data-schema.md",
+    "summary": "管理画面で作成したコンテンツをプレイ画面で解釈する分岐ゲームデータ形式"
+  },
+  {
+    "id": "SP-002",
+    "title": "UI Home Hero & CTA",
+    "status": "done",
+    "pct": 100,
+    "cat": "ui",
+    "file": "docs/specs/ui-home-hero.md",
+    "summary": "トップページのヒーローセクションとCTA導線"
+  },
+  {
+    "id": "SP-003",
+    "title": "Game Engine Core",
+    "status": "done",
+    "pct": 100,
+    "cat": "core",
+    "file": "docs/specs/game-engine-core.md",
+    "summary": "ノード遷移・選択肢評価・アクション実行・履歴管理のコアエンジン"
+  },
+  {
+    "id": "SP-004",
+    "title": "Inventory System",
+    "status": "done",
+    "pct": 100,
+    "cat": "core",
+    "file": "docs/specs/inventory-system.md",
+    "summary": "アイテム追加/削除/所持チェック/use_item effect実行"
+  },
+  {
+    "id": "SP-005",
+    "title": "Save/Load & Multi-Session Slots",
+    "status": "done",
+    "pct": 100,
+    "cat": "core",
+    "file": "docs/specs/save-load-system.md",
+    "summary": "ゲーム状態永続化、マルチスロットセーブ、savePreviewパネル"
+  },
+  {
+    "id": "SP-006",
+    "title": "Node Editor",
+    "status": "done",
+    "pct": 90,
+    "cat": "authoring",
+    "file": "docs/specs/node-editor.md",
+    "summary": "ノードCRUD、選択肢/条件/アクション編集、Mermaidプレビュー"
+  },
+  {
+    "id": "SP-007",
+    "title": "Storage Provider Abstraction",
+    "status": "done",
+    "pct": 100,
+    "cat": "core",
+    "file": "docs/specs/storage-provider.md",
+    "summary": "IndexedDB/LocalStorage統一抽象化、dataMigration、dataValidator"
+  },
+  {
+    "id": "SP-008",
+    "title": "Theme System",
+    "status": "done",
+    "pct": 80,
+    "cat": "ui",
+    "file": "docs/specs/theme-system.md",
+    "summary": "ダーク/ライトテーマ切替、カスタムテーマ、ThemePanelManager"
+  },
+  {
+    "id": "SP-009",
+    "title": "Media Policy B'",
+    "status": "done",
+    "pct": 100,
+    "cat": "security",
+    "file": "docs/specs/media-policy.md",
+    "summary": "相対パス+DataURL許可、外部URL既定OFF。MediaResolver SSOT"
+  },
+  {
+    "id": "SP-010",
+    "title": "Mermaid Diagram Preview",
+    "status": "done",
+    "pct": 90,
+    "cat": "authoring",
+    "file": "docs/specs/mermaid-preview.md",
+    "summary": "ノード構造のMermaid図プレビュー、フルスクリーン表示"
+  },
+  {
+    "id": "SP-011",
+    "title": "Accessibility (A11y)",
+    "status": "wip",
+    "pct": 60,
+    "cat": "ui",
+    "file": "docs/specs/accessibility.md",
+    "summary": "キーボードナビ、スクリーンリーダー、フォーカス管理、モーダルトラップ"
+  },
+  {
+    "id": "SP-012",
+    "title": "SPA Integration",
+    "status": "wip",
+    "pct": 20,
+    "cat": "ui",
+    "file": "docs/specs/spa-integration.md",
+    "summary": "複数HTMLページからSPA統合への段階的移行 (Phase A-D)"
+  },
+  {
+    "id": "SP-013",
+    "title": "Error Handling & Toast",
+    "status": "done",
+    "pct": 100,
+    "cat": "core",
+    "file": "docs/specs/error-handling.md",
+    "summary": "統合エラーハンドリング、コード付きエラー分類、Toast通知"
+  },
+  {
+    "id": "SP-014",
+    "title": "Export/Import & Data Migration",
+    "status": "done",
+    "pct": 100,
+    "cat": "core",
+    "file": "docs/specs/export-import.md",
+    "summary": "ゲームデータ JSON エクスポート/インポート、マイグレーションウィザード"
+  }
+]
