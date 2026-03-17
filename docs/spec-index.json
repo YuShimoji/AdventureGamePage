@@ -124,5 +124,14 @@
     "cat": "core",
     "file": "docs/specs/export-import.md",
     "summary": "ゲームデータ JSON エクスポート/インポート、マイグレーションウィザード"
+  },
+  {
+    "id": "SP-015",
+    "title": "Experience Slice: First Game → Play",
+    "status": "wip",
+    "pct": 50,
+    "cat": "experience",
+    "file": "docs/specs/first-game-slice.md",
+    "summary": "admin.htmlでゲーム作成→play.htmlでプレイまでの一気通貫体験スライス"
   }
 ]

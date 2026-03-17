@@ -74,6 +74,45 @@
   gap: var(--space-sm);
 }
 
+/* Play test button */
+.btn-play-test {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-weight: 500;
+  background: var(--accent, #4a90e2);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.btn-play-test:hover {
+  opacity: 0.85;
+}
+.btn-play-test svg {
+  fill: currentColor;
+  stroke: none;
+}
+
+/* Node editor empty state */
+.ne-empty-state {
+  text-align: center;
+  padding: var(--space-lg, 24px) var(--space-md, 16px);
+  color: var(--text-secondary, #888);
+  border: 2px dashed var(--border-subtle, #ddd);
+  border-radius: 8px;
+  margin-bottom: var(--space-md, 16px);
+}
+.ne-empty-state p {
+  margin: 0 0 8px;
+  line-height: 1.5;
+}
+.ne-empty-state .btn {
+  margin-top: 8px;
+}
+
 /* ========================================
    Admin Sidebar - Typora-style
    ======================================== */

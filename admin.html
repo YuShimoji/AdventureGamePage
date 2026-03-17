@@ -27,6 +27,12 @@
       </a>
       <h1 class="header-title">Zenライクエディタ</h1>
       <div class="header-actions">
+        <button id="btn-play-test" class="toolbar-btn btn-play-test" title="ゲームをプレイテスト">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="5 3 19 12 5 21 5 3" />
+          </svg>
+          <span>プレイ</span>
+        </button>
         <span id="char-count" class="text-muted text-sm">0 文字</span>
         <button id="btn-theme" class="toolbar-btn" title="テーマ設定">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -291,6 +297,11 @@
                 <button id="ne-open-modal" class="btn btn-ghost">フルスクリーン編集</button>
               </div>
               <div class="ne-banner" id="ne-dirty-banner" hidden>未保存の変更があります（Ctrl+S で保存）</div>
+              <div id="ne-empty-state" class="ne-empty-state" hidden>
+                <p>ノードがまだありません。</p>
+                <p>「ノード追加」ボタンで最初のノードを作成してください。</p>
+                <button id="ne-empty-add-node" class="btn">最初のノードを作成</button>
+              </div>
               <div class="field">
                 <span>開始ノード</span>
                 <select id="ne-start-select"></select>
