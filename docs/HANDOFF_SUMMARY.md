@@ -1,11 +1,12 @@
-# 作業引き継ぎサマリー (2026-03-17 更新)
+# 作業引き継ぎサマリー (2026-07-27 更新)
 
 ## 現在の状態
 
 - **Phase**: Phase 4 UI/UX改善 (進行中)
-- **直近の作業**: 仕様整備 (CLAUDE.md + spec-index.json + 12仕様書 + ドキュメント同期)
-- **テスト**: `npm test` PASS / `npm run lint` エラーなし
-- **Git**: main ブランチ、4コミット未push
+- **直近の作業**: AI入口を `AGENTS.md` に集約し、`CLAUDE.md` を薄いadapterへ整理。古い `.cursor/MISSION_LOG.md` は再開正本から除外
+- **今回の変更範囲**: 文書とAI入口のみ。ゲーム実装、仕様、生成物は変更していない
+- **直近の製品検証**: `npm test` PASS / `npm run lint` エラーなし（今回のdocs-only sliceでは未再実行）
+- **Git基準**: `main`、同期開始点 `6fc5066b5c`、fetch後 `origin/main` と ahead/behind `0/0`
 
 ## 完了済みフェーズ
 
@@ -18,7 +19,9 @@
 
 - `docs/spec-index.json` — 14エントリ
 - `docs/specs/` — 14仕様書 (SP-001〜SP-014)
-- `CLAUDE.md` — プロジェクト概要・DECISION LOG・Architecture
+- `AGENTS.md` — AIツール共通の薄い入口
+- `docs/HANDOFF_SUMMARY.md` — 現在地と最短再開
+- `CLAUDE.md` — Claude Code用の薄いadapter
 
 ## 次の作業候補
 
@@ -34,7 +37,8 @@
 
 ## 参照先
 
-- CLAUDE.md — プロジェクトルール・アーキテクチャ
+- AGENTS.md — AIツール共通のread order
+- docs/HANDOFF_SUMMARY.md — 現在地
 - docs/spec-index.json — 仕様索引
 - docs/PROGRESS.md — 進捗
 - docs/ISSUES.md — バックログ
